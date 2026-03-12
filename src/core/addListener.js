@@ -2,15 +2,21 @@ import { screen } from "./screen.js";
 import { state } from "./state.js";
 import { eventBus } from "./eventBus.js";
 import { dialogConnect } from "../utils/logger.js";
+import { EVENTS } from "../services/enum.js";
 function getConnectionNames() {
   return (state.connections || [])
     .map((c) => c?.favorite?.name)
     .filter(Boolean);
 }
-
+export function addQueryListeners(query) {
+  query.on("submit", () => {
+    screen.debug("on enter query");
+    eventBus.emit(EVENTS.QUERY_SEND, query.getValue() || {});
+  });
+}
 export const attachFocusStyle = (
   widget,
-  { focusBorder, blurBorder, focusBg, blurBg },
+  { focusBorder = "", blurBorder = "", focusBg = "", blurBg = "" },
 ) => {
   widget.on("focus", () => {
     if (focusBorder) widget.style.border.fg = focusBorder;
@@ -45,12 +51,6 @@ export const attachActions = (
   { connectionDD, databaseDD, collectionDD },
   workspacePanel,
 ) => {
-  eventBus.on("query:result", (query) => {
-    workspacePanel.setContent(JSON.stringify(query));
-
-    screen.render();
-  });
-  eventBus.on("db:collectionsLoaded", (colls) => { });
   connectionDD.header.setContent(" Select Connection ▼ ");
 
   connectionDD.header.key("enter", () => {
@@ -68,21 +68,15 @@ export const attachActions = (
       connectionDD.header.setContent(` ${conn.favorite.name} ▼ `);
       closeDropdown(connectionDD);
 
-      workspacePanel.setContent(dialogConnect("-", "-"));
-
       screen.render();
 
       eventBus.emit("db:connect", uri);
-      //await connectMongo(uri);
-      //   workspacePanel.setContent(msg);
       eventBus.emit("db:fetchDatabases", state.databases);
       state.collections = [];
 
       databaseDD.header.setContent(" Select Database ▼ ");
-      databaseDD.header.focus();
       collectionDD.header.setContent(" Select Collection ▼ ");
 
-      //workspacePanel.setContent();
       screen.render();
     } catch (err) {
       workspacePanel.setContent(`${err.message}`);
@@ -109,7 +103,7 @@ export const attachActions = (
       const dbName = state.databases[index];
 
       databaseDD.header.setContent(` ${dbName} ▼ `);
-      workspacePanel.setContent(dialogConnect(dbName, "-"));
+      workspacePanel.setContent(dialogConnect(dbName));
 
       closeDropdown(databaseDD);
       eventBus.emit("db:databaseSelected", dbName);
@@ -143,14 +137,12 @@ export const attachActions = (
       const name = state.collections[index];
 
       collectionDD.header.setContent(` ${name} ▼ `);
-      workspacePanel.setContent(
-        dialogConnect(state.databases[state.selectedDatabaseIndex], name),
-      );
       closeDropdown(collectionDD);
-
+      eventBus.emit(EVENTS.DB_COLLECTIONS_SELECTED, name);
+      workspacePanel.focus();
       screen.render();
     } catch (error) {
-      workspacePanel.setContent(` Error: ${error.message}`);
+      workspacePanel.setContent(` Error: ${error.stack}`);
       screen.render();
     }
   });

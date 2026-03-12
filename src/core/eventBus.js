@@ -1,3 +1,31 @@
 import { EventEmitter } from "events";
-import { screen } from "./screen.js";
+import { screen, ui } from "./screen.js";
+import { dialogConnect } from "../utils/logger.js";
+import { state } from "./state.js";
+import { EVENTS } from "../services/enum.js";
+import { renderResult } from "../panels/result.panel.js";
+
 export const eventBus = new EventEmitter();
+
+export function registerEventBus() {
+  function renderWorkspace(content) {
+    ui.workspace.setContent(content);
+    screen.render();
+  }
+
+  eventBus.on(EVENTS.QUERY_RESULT, (result) => {
+    //    screen.debug(query);
+    renderResult(ui.workspace, result);
+
+    //    renderWorkspace(JSON.stringify(query));
+  });
+
+  eventBus.on("db:collectionsLoaded", () => {
+    renderWorkspace(dialogConnect());
+  });
+
+  eventBus.on("db:databasesLoaded", (res) => {
+    ui.childConnection.databaseDD.header.focus();
+    renderWorkspace(dialogConnect(res));
+  });
+}

@@ -1,6 +1,8 @@
 import { eventBus } from "../core/eventBus.js";
 import { screen } from "../core/screen.js";
 import { state } from "../core/state.js";
+import { EVENTS } from "./enum.js";
+import { clearLoading, startLoading } from "./loading.js";
 import { connect } from "./mongodb.js";
 
 /*
@@ -9,21 +11,30 @@ import { connect } from "./mongodb.js";
 |--------------------------------------------------------------------------
 */
 screen.debug("mongoService loaded");
-eventBus.on("db:connect", async (uri) => {
+eventBus.on(EVENTS.DB_CONNECT, async (uri) => {
   try {
-    screen.debug("connecting...");
-
+    startLoading();
     await connectMongo(uri);
 
     const dbs = await fetchDatabases();
 
     state.databases = dbs;
 
-    eventBus.emit("db:databasesLoaded", dbs);
-
-    screen.debug("databases loaded");
+    //eventBus.emit("db:databasesLoaded", dbs);
+    //    screen.debug("databases loaded");
+    eventBus.emit(EVENTS.DB_DATABASES_LOADED, {
+      statusCode: 200,
+      developerMessage: `connected successfully`,
+    });
   } catch (err) {
+    clearLoading();
+    eventBus.emit(EVENTS.DB_DATABASES_LOADED, {
+      statusCode: 500,
+      developerMessage: err,
+    });
     screen.debug(err.message);
+  } finally {
+    clearLoading();
   }
 });
 
@@ -33,11 +44,12 @@ eventBus.on("db:connect", async (uri) => {
 |--------------------------------------------------------------------------
 */
 
-eventBus.on("db:databaseSelected", async (dbName) => {
+eventBus.on(EVENTS.DB_DATABASES_SELECTED, async (dbName) => {
   try {
     const cols = await fetchCollections(dbName);
     state.collections = cols;
-    //eventBus.emit("db:collectionsLoaded", cols);
+
+    eventBus.emit(EVENTS.DB_COLLECTIONS_LOADED, cols);
   } catch (err) {
     screen.debug(err.message);
   }
@@ -49,16 +61,19 @@ eventBus.on("db:databaseSelected", async (dbName) => {
 |--------------------------------------------------------------------------
 */
 
-eventBus.on("db:collectionSelected", async (colName) => {
+eventBus.on(EVENTS.DB_COLLECTIONS_SELECTED, async (colName) => {
   try {
-    const docs = await fetchQuery(colName);
-
-    eventBus.emit("query:result", docs);
+    const docs = await fetchQuery();
+    screen.debug("in mongoService");
+    eventBus.emit(EVENTS.QUERY_RESULT, docs);
   } catch (err) {
-    screen.debug(err.message);
+    screen.debug(`[fetchQueryError] ${err.message} `);
   }
 });
-
+eventBus.on(EVENTS.QUERY_SEND, async (query) => {
+  const docs = await fetchQuery(query);
+  eventBus.emit(EVENTS.QUERY_RESULT, docs);
+});
 /*
 |--------------------------------------------------------------------------
 | FUNCTIONS
@@ -90,14 +105,28 @@ async function fetchCollections(dbName) {
 
   return cols.map((c) => c.name);
 }
+function parseQuery(queryString) {
+  if (!queryString || queryString.trim() === "") {
+    return {}; // ← empty = find all
+  }
 
-async function fetchQuery(colName) {
+  try {
+    return JSON.parse(queryString);
+  } catch {
+    screen.debug(`Invalid JSON query: ${queryString}`);
+    return {};
+  }
+}
+async function fetchQuery(query) {
   const dbName = state.databases[state.selectedDatabaseIndex];
+  const colName = state.collections[state.selectedCollectionIndex];
 
+  const filter = parseQuery(query);
+  screen.debug(`dbName ==> ${dbName}`);
   const docs = await state.mongoClient
     .db(dbName)
     .collection(colName)
-    .find({})
+    .find(filter)
     .limit(50)
     .toArray();
 

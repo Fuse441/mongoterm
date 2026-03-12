@@ -1,4 +1,8 @@
-import blessed from "neo-blessed";
+import _blessed from "neo-blessed";
+
+const blessed = /** @type {typeof import('blessed')} */ (
+  /** @type {any} */ (_blessed)
+);
 import { theme } from "../config/app.config.js";
 import { attachFocusStyle } from "../core/addListener.js";
 
@@ -31,7 +35,7 @@ export function createDropdown(top, parent) {
     keys: true,
     mouse: true,
     style: {
-      border: { fg: "cyan" },
+      border: { fg: theme.border.blur },
       bg: "black",
     },
   });
@@ -50,7 +54,7 @@ export function createDropdown(top, parent) {
     alwaysScroll: true,
     scrollbar: {
       ch: " ",
-      inverse: true,
+      //inverse: true,
     },
     style: {
       selected: {

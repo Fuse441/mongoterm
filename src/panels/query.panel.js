@@ -1,9 +1,14 @@
-import blessed from "neo-blessed";
+import _blessed from "neo-blessed";
+
+const blessed = /** @type {typeof import('blessed')} */ (
+  /** @type {any} */ (_blessed)
+);
+
 import { theme } from "../config/app.config.js";
 
 export const queryInput = (workspacePanel) => {
   const box = blessed.textbox({
-    parent: workspacePanel,
+    //    parent: workspacePanel,
     top: 0,
     left: 47,
     width: "75%",

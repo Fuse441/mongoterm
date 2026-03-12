@@ -1,6 +1,7 @@
 import { workspacePanel } from "../panels/workspace.panel.js";
 
 import { screen } from "./screen.js";
+import { state } from "./state.js";
 
 export const keybindings = (ui) => {
   screen.key(["tab"], () => {
@@ -11,9 +12,9 @@ export const keybindings = (ui) => {
     }
   });
 
-  screen.key(["k"], () => {
+  screen.key(["k", "up"], () => {
     if (screen.focused === ui.workspace) {
-      screen.debug("PanelCurrent : Query");
+      screen.debug("workspace → query");
       ui.query.focus();
     }
   });
