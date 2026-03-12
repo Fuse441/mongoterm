@@ -77,5 +77,12 @@ Feel free to open issues or submit pull requests.
 MIT License
 
 
-DEMO
-<img width="1890" height="1005" alt="image" src="https://github.com/user-attachments/assets/030caedc-a0a6-417e-8e93-171ea1898dc0" />
+## Demo
+
+> Last updated: March 12, 2026
+
+### Connection & Navigation
+![Connection](https://github.com/user-attachments/assets/030caedc-a0a6-417e-8e93-171ea1898dc0)
+
+### Query & Result Tree View  
+![Result](https://github.com/user-attachments/assets/540c5599-8fba-4dba-baf0-a122d59a2e3b)
