@@ -78,7 +78,7 @@ MIT License
 
 ## Demo
 
-## Navigation
+### Navigation
 
 <img width="1410" height="1078" alt="image" src="https://github.com/user-attachments/assets/d71ad6df-389e-4cab-83fc-3926a5bc3208" />
 
