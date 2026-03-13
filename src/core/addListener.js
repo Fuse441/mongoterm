@@ -139,7 +139,7 @@ export const attachActions = (
       collectionDD.header.setContent(` ${name} ▼ `);
       closeDropdown(collectionDD);
       eventBus.emit(EVENTS.DB_COLLECTIONS_SELECTED, name);
-      workspacePanel.focus();
+
       screen.render();
     } catch (error) {
       workspacePanel.setContent(` Error: ${error.stack}`);

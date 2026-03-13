@@ -16,6 +16,8 @@ export const queryInput = (workspacePanel) => {
     label: " Query ",
     border: "line",
     inputOnFocus: true,
+    vi: false,
+    cbreak: false,
     keys: true,
     mouse: true,
     style: {

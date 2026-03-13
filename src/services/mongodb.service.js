@@ -64,7 +64,6 @@ eventBus.on(EVENTS.DB_DATABASES_SELECTED, async (dbName) => {
 eventBus.on(EVENTS.DB_COLLECTIONS_SELECTED, async (colName) => {
   try {
     const docs = await fetchQuery();
-    screen.debug("in mongoService");
     eventBus.emit(EVENTS.QUERY_RESULT, docs);
   } catch (err) {
     screen.debug(`[fetchQueryError] ${err.message} `);
@@ -106,7 +105,7 @@ async function fetchCollections(dbName) {
   return cols.map((c) => c.name);
 }
 function parseQuery(queryString) {
-  if (!queryString || queryString.trim() === "") {
+  if (!queryString) {
     return {}; // ← empty = find all
   }
 
@@ -126,7 +125,7 @@ async function fetchQuery(query) {
   const docs = await state.mongoClient
     .db(dbName)
     .collection(colName)
-    .find(filter)
+    .find(filter || {})
     .limit(50)
     .toArray();
 

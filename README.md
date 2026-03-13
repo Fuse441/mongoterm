@@ -76,13 +76,42 @@ Feel free to open issues or submit pull requests.
 
 MIT License
 
-
 ## Demo
 
-> Last updated: March 12, 2026
+## Navigation
+
+<img width="1410" height="1078" alt="image" src="https://github.com/user-attachments/assets/d71ad6df-389e-4cab-83fc-3926a5bc3208" />
+
+> updated: March 13, 2026 [Navigation Map]
+
+| From       | Key               | To          |
+| ---------- | ----------------- | ----------- |
+| connection | `l` / `→`         | workspace   |
+| workspace  | `h` / `←`         | connection  |
+| workspace  | `k` / `↑`         | query input |
+| workspace  | `l` / `→`         | records     |
+| query      | `j` / `↓` / `esc` | workspace   |
+| query      | `h` / `←`         | connection  |
+| record     | `j` / `↓`         | next record |
+| record     | `k` / `↑`         | prev record |
+| record     | `h` / `esc`       | workspace   |
+
+### Global shortcuts
+
+| Key         | Action                        |
+| ----------- | ----------------------------- |
+| `enter`     | submit query (in query panel) |
+| `S-c`       | focus connection panel        |
+| `S-w`       | focus workspace               |
+| `c`         | copy record to clipboard      |
+| `q` / `C-c` | quit                          |
+
+### Query & Result Tree View
+
+![Result](https://github.com/user-attachments/assets/540c5599-8fba-4dba-baf0-a122d59a2e3b)
+
+> updated: March 12, 2026 [Query & Result Tree View]
 
 ### Connection & Navigation
-![Connection](https://github.com/user-attachments/assets/030caedc-a0a6-417e-8e93-171ea1898dc0)
 
-### Query & Result Tree View  
-![Result](https://github.com/user-attachments/assets/540c5599-8fba-4dba-baf0-a122d59a2e3b)
+![Connection](https://github.com/user-attachments/assets/030caedc-a0a6-417e-8e93-171ea1898dc0)

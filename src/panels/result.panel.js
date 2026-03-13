@@ -208,14 +208,15 @@ export function renderResult(parent, docs) {
     box._isRecord = true;
     parent.append(box);
 
-    // container.append(box);
+    //    container.append(box);
   });
 
   //  parent.append(container);
 
   // focus record แรก
   if (docs.length > 0) {
-    parent.children[0]?.focus();
+    parent.focus();
+    // parent.children[0]?.focus();
   }
   //parensetLabel("test");
   parent.screen.render();
