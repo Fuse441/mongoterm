@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { eventBus } from "../core/eventBus.js";
 import { screen } from "../core/screen.js";
 import { state } from "../core/state.js";
@@ -73,6 +74,18 @@ eventBus.on(EVENTS.QUERY_SEND, async (query) => {
   const docs = await fetchQuery(query);
   eventBus.emit(EVENTS.QUERY_RESULT, docs);
 });
+
+eventBus.on(EVENTS.RECORD_UPDATE, async (data) => {
+  try {
+    const parsed = deserialize(data.updated);
+    const { _id, ...updateFields } = parsed;
+    const objectId = _id instanceof ObjectId ? _id : new ObjectId(_id);
+    await upsertData({ _id: objectId, updateFields });
+    eventBus.emit(EVENTS.QUERY_SEND, data.query);
+  } catch (err) {
+    eventBus.emit(EVENTS.TOAST_SHOW, { statusCode: 500, message: err.message });
+  }
+});
 /*
 |--------------------------------------------------------------------------
 | FUNCTIONS
@@ -114,6 +127,37 @@ function parseQuery(queryString) {
   } catch {
     screen.debug(`Invalid JSON query: ${queryString}`);
     return {};
+  }
+}
+function deserialize(jsonString) {
+  try {
+    const json = JSON.parse(jsonString, (key, value) => {
+      if (value?.$oid) return new ObjectId(value.$oid);
+      if (value?.$date) return new Date(value.$date);
+      return value;
+    });
+    return json;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function upsertData({ _id, updateFields }) {
+  const dbName = state.databases[state.selectedDatabaseIndex];
+  const colName = state.collections[state.selectedCollectionIndex];
+
+  try {
+    await state.mongoClient
+      .db(dbName)
+      .collection(colName)
+      .updateOne({ _id }, { $set: updateFields }, { upsert: true });
+
+    eventBus.emit(EVENTS.TOAST_SHOW, {
+      statusCode: 200,
+      message: "record saved!",
+    });
+  } catch (err) {
+    eventBus.emit(EVENTS.TOAST_SHOW, { statusCode: 500, message: err.message });
   }
 }
 async function fetchQuery(query) {

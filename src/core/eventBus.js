@@ -4,6 +4,7 @@ import { dialogConnect } from "../utils/logger.js";
 import { state } from "./state.js";
 import { EVENTS } from "../services/enum.js";
 import { renderResult } from "../panels/result.panel.js";
+import { showToast } from "../panels/toast.panel.js";
 
 export const eventBus = new EventEmitter();
 
@@ -14,12 +15,12 @@ export function registerEventBus() {
   }
 
   eventBus.on(EVENTS.QUERY_RESULT, (result) => {
-    //    screen.debug(query);
     renderResult(ui.workspace, result);
-
-    //    renderWorkspace(JSON.stringify(query));
   });
 
+  eventBus.on(EVENTS.TOAST_SHOW, (rest) => {
+    showToast(screen, rest);
+  });
   eventBus.on("db:collectionsLoaded", () => {
     renderWorkspace(dialogConnect());
   });

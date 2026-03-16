@@ -4,6 +4,46 @@ A lightweight **Terminal User Interface (TUI)** for managing and exploring Mongo
 
 Mongoterm allows developers to connect to MongoDB, browse databases and collections, and inspect documents without leaving the command line. The goal is to provide a fast, keyboard-driven experience similar to graphical tools but fully inside the terminal.
 
+## 🎯 Roadmap
+
+### Core
+
+- [ ] Hint action bar
+- [ ] Query history & autocomplete
+- [ ] Fix project structure
+
+### Editor
+
+- [ ] Syntax highlighting in record editor
+- [ ] Validate JSON before save
+- [ ] Undo / redo support
+
+### Record Management
+
+- [ ] Delete record with confirmation
+- [ ] Insert new record
+- [ ] Duplicate record
+- [ ] Bulk delete
+
+### Query
+
+- [ ] Query builder (no need to type raw JSON)
+- [ ] Save favorite queries
+- [ ] Pagination / limit results
+- [ ] Sort & filter UI
+
+### UX
+
+- [ ] Keybinding help popup (`?`)
+- [ ] Connection manager (multiple connections)
+- [ ] Dark / light theme toggle
+- [ ] Loading indicator for slow queries
+
+### Export
+
+- [ ] Export result as JSON file
+- [ ] Export result as CSV
+
 ## ✨ Features
 
 - Manage MongoDB connections
@@ -56,17 +96,6 @@ Then select a connection and start exploring your MongoDB databases from the ter
 
 The main goal of this project is to create a **fast and minimal MongoDB client for the terminal**, providing a developer-friendly experience for working with MongoDB without needing a graphical interface.
 
-## 📌 Roadmap
-
-Planned features:
-
-- Query editor
-- Document viewer improvements
-- Pagination for large collections
-- Connection management
-- Better keyboard navigation
-- UI improvements
-
 ## 🤝 Contributing
 
 Contributions, suggestions, and feedback are welcome.
@@ -78,7 +107,7 @@ MIT License
 
 ## Demo
 
-### Navigation
+## Navigation
 
 <img width="1410" height="1078" alt="image" src="https://github.com/user-attachments/assets/d71ad6df-389e-4cab-83fc-3926a5bc3208" />
 

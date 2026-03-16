@@ -2,10 +2,12 @@ import _blessed from "neo-blessed";
 const blessed = /** @type {typeof import('blessed')} */ (
   /** @type {any} */ (_blessed)
 );
-
+import copyPaste from "copy-paste";
 import { theme } from "../config/app.config.js";
 import { workspacePanel } from "./workspace.panel.js";
 import { screen, ui } from "../core/screen.js";
+import { showToast } from "./toast.panel.js";
+import { openEditor } from "./modal.panel.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -140,16 +142,29 @@ function createRecordBox(parent, doc, idx) {
   // Copy: กด 'c'
   box.key(["c"], () => {
     const json = JSON.stringify(doc, null, 2);
-    // TODO: ใส่ clipboard lib เช่น clipboardy
-    // clipboardy.writeSync(json);
-    showToast(parent.screen, "Copied to clipboard!");
+    try {
+      copyPaste.copy(json, () => {
+        showToast(parent.screen, {
+          statusCode: 200,
+          message: "Copied to clipboard!",
+        });
+      });
+    } catch (error) {
+      screen.debug(error);
+    }
   });
 
   // Edit: กด 'e'
   box.key(["e"], () => {
-    // TODO: เปิด editor panel
-    // openEditor(parent, doc);
-    showToast(parent.screen, `Edit record ${idx + 1}`);
+    try {
+      openEditor(doc);
+      showToast(parent.screen, {
+        statusCode: 200,
+        message: `Edit record ${idx + 1}`,
+      });
+    } catch (error) {
+      screen.debug(error);
+    }
   });
 
   // Delete: กด 'd'
@@ -227,26 +242,3 @@ export function renderResult(parent, docs) {
 | TOAST HELPER
 |--------------------------------------------------------------------------
 */
-function showToast(screen, message) {
-  const toast = blessed.box({
-    bottom: 1,
-    right: 2,
-    width: message.length + 4,
-    height: 3,
-    content: ` ${message} `,
-    tags: true,
-    border: "line",
-    style: {
-      border: { fg: "green" },
-      fg: "green",
-    },
-  });
-
-  screen.append(toast);
-  screen.render();
-
-  setTimeout(() => {
-    screen.remove(toast);
-    screen.render();
-  }, 1500);
-}

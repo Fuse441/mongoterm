@@ -6,4 +6,6 @@ export const EVENTS = Object.freeze({
   DB_COLLECTIONS_LOADED: "db:collectionsLoaded",
   QUERY_RESULT: "query:result",
   QUERY_SEND: "query:send",
+  RECORD_UPDATE: "record_update",
+  TOAST_SHOW: "show:toast",
 });
