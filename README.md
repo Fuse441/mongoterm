@@ -34,7 +34,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 
 ### UX
 
-- [✅] Keybinding help popup (`?`)
+- [x] Keybinding help popup (`?`)
 - [ ] Connection manager (multiple connections)
 - [ ] Dark / light theme toggle
 - [ ] Loading indicator for slow queries
