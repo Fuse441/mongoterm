@@ -34,7 +34,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 
 ### UX
 
-- [ ] Keybinding help popup (`?`)
+- [✅] Keybinding help popup (`?`)
 - [ ] Connection manager (multiple connections)
 - [ ] Dark / light theme toggle
 - [ ] Loading indicator for slow queries
@@ -107,11 +107,11 @@ MIT License
 
 ## Demo
 
+![demo](./demo.gif)
+
 ## Navigation
 
 <img width="1410" height="1078" alt="image" src="https://github.com/user-attachments/assets/d71ad6df-389e-4cab-83fc-3926a5bc3208" />
-
-> updated: March 13, 2026 [Navigation Map]
 
 | From       | Key               | To          |
 | ---------- | ----------------- | ----------- |
@@ -134,13 +134,3 @@ MIT License
 | `S-w`       | focus workspace               |
 | `c`         | copy record to clipboard      |
 | `q` / `C-c` | quit                          |
-
-### Query & Result Tree View
-
-![Result](https://github.com/user-attachments/assets/540c5599-8fba-4dba-baf0-a122d59a2e3b)
-
-> updated: March 12, 2026 [Query & Result Tree View]
-
-### Connection & Navigation
-
-![Connection](https://github.com/user-attachments/assets/030caedc-a0a6-417e-8e93-171ea1898dc0)
