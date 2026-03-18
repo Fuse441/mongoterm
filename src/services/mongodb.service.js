@@ -86,6 +86,16 @@ eventBus.on(EVENTS.RECORD_UPDATE, async (data) => {
     eventBus.emit(EVENTS.TOAST_SHOW, { statusCode: 500, message: err.message });
   }
 });
+
+eventBus.on(EVENTS.RECORD_DELETE, async ({ id, query }) => {
+  screen.debug(`delete record id: ${id}`);
+  try {
+    await deleteData(id);
+    eventBus.emit(EVENTS.QUERY_SEND, query);
+  } catch (err) {
+    eventBus.emit(EVENTS.TOAST_SHOW, { statusCode: 500, message: err.message });
+  }
+});
 /*
 |--------------------------------------------------------------------------
 | FUNCTIONS
@@ -155,6 +165,24 @@ async function upsertData({ _id, updateFields }) {
     eventBus.emit(EVENTS.TOAST_SHOW, {
       statusCode: 200,
       message: "record saved!",
+    });
+  } catch (err) {
+    eventBus.emit(EVENTS.TOAST_SHOW, { statusCode: 500, message: err.message });
+  }
+}
+async function deleteData(id) {
+  const dbName = state.databases[state.selectedDatabaseIndex];
+  const colName = state.collections[state.selectedCollectionIndex];
+
+  try {
+    await state.mongoClient
+      .db(dbName)
+      .collection(colName)
+      .deleteOne({ _id: new ObjectId(id) });
+
+    eventBus.emit(EVENTS.TOAST_SHOW, {
+      statusCode: 200,
+      message: "record deleted!",
     });
   } catch (err) {
     eventBus.emit(EVENTS.TOAST_SHOW, { statusCode: 500, message: err.message });
