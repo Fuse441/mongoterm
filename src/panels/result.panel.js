@@ -7,7 +7,9 @@ import { theme } from "../config/app.config.js";
 import { workspacePanel } from "./workspace.panel.js";
 import { screen, ui } from "../core/screen.js";
 import { showToast } from "./toast.panel.js";
-import { openEditor } from "./modal.panel.js";
+import { openDialogConfirm, openEditor } from "./modal.panel.js";
+import { eventBus } from "../core/eventBus.js";
+import { EVENTS } from "../services/enum.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -169,7 +171,18 @@ function createRecordBox(parent, doc, idx) {
 
   // Delete: กด 'd'
   box.key(["d"], () => {
-    showToast(parent.screen, `Delete record ${idx + 1}`);
+    const query = ui.query.getContent();
+
+    openDialogConfirm(
+      `Are you sure you want to delete this record id: ${id}?`,
+      () => {
+        deleteRecord({ id, query });
+      },
+    );
+    showToast(parent.screen, {
+      statusCode: 200,
+      message: `Delete record ${idx + 1}`,
+    });
   });
 
   // Tab / Shift+Tab → เลื่อนไป box ถัดไป/ก่อนหน้า
@@ -187,6 +200,9 @@ function createRecordBox(parent, doc, idx) {
 | RENDER RESULT
 |--------------------------------------------------------------------------
 */
+function deleteRecord({ id, query }) {
+  eventBus.emit(EVENTS.RECORD_DELETE, { id, query });
+}
 export function renderResult(parent, docs) {
   // เคลียร์ของเก่าก่อน
   parent.children.slice().forEach((child) => {

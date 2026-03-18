@@ -9,51 +9,6 @@ import { EVENTS } from "../services/enum.js";
 import { onKeypress } from "../services/onKeypress.service.js";
 let editorInstance = null;
 
-const recordEditor = (doc) => {
-  // overlay backdrop
-  const overlay = blessed.box({
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    style: { bg: "black", transparent: true },
-    opacity: 0.5,
-  });
-
-  // editor box
-  const box = blessed.textarea({
-    top: "center",
-    left: "center",
-    width: "70%",
-    height: "60%",
-    label: " Edit Record ",
-    border: "line",
-    inputOnFocus: true,
-    vi: false,
-    keys: true,
-    mouse: true,
-    scrollable: true,
-    tags: false,
-    style: {
-      border: { fg: theme.border.focus },
-      focus: { border: { fg: "cyan" } },
-    },
-    content: JSON.stringify(doc, null, 2),
-  });
-
-  // hint bar
-  const hint = blessed.box({
-    bottom: 10,
-    left: 138,
-    width: "12%",
-    height: 1,
-    tags: true,
-    content: " {grey-fg}esc{/grey-fg} close  {grey-fg}C-s{/grey-fg} save ",
-  });
-
-  return { overlay, box, hint };
-};
-
 export function openEditor(doc) {
   if (editorInstance) closeEditor();
 
@@ -152,5 +107,106 @@ export function closeEditor() {
   screen.remove(box);
   screen.remove(hint);
   editorInstance = null;
+  screen.render();
+}
+let confirmInstance = null;
+export function openDialogConfirm(message, onConfirm) {
+  const overlay = blessed.box({
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    style: { bg: "black", transparent: true },
+  });
+
+  const box = blessed.box({
+    top: "center",
+    left: "center",
+    width: 50,
+    height: 10,
+    label: " Confirm ",
+    border: "line",
+    keys: true,
+    mouse: true,
+    style: {
+      border: { fg: "cyan" },
+    },
+  });
+
+  const msgText = blessed.text({
+    parent: box,
+    top: 1,
+    left: "center",
+    content: message,
+    style: { fg: "white" },
+  });
+
+  const btnConfirm = blessed.button({
+    parent: box,
+    bottom: 1,
+    left: "25%-4",
+    width: 12,
+    height: 3,
+    content: "  Yes  ",
+    border: "line",
+    mouse: true,
+    keys: true,
+    style: {
+      border: { fg: "green" },
+      focus: { border: { fg: "white" }, bg: "green" },
+      hover: { bg: "green" },
+    },
+  });
+
+  const btnCancel = blessed.button({
+    parent: box,
+    bottom: 1,
+    left: "65%-4",
+    width: 12,
+    height: 3,
+    content: "  No  ",
+    border: "line",
+    mouse: true,
+    keys: true,
+    style: {
+      border: { fg: "green" },
+      focus: { border: { fg: "white" }, bg: "green" },
+      hover: { bg: "green" },
+    },
+  });
+  // keyboard tab เพื่อสลับปุ่ม
+  btnConfirm.key(["tab"], () => btnCancel.focus());
+  btnCancel.key(["tab"], () => btnConfirm.focus());
+
+  btnConfirm.key(["enter"], () => {
+    closeDialogConfirm();
+    onConfirm?.();
+  });
+  btnCancel.key(["enter"], () => closeDialogConfirm());
+
+  // btnConfirm.on("press", () => {
+  //   closeDialogConfirm();
+  //   onConfirm?.();
+  // });
+  btnCancel.on("press", () => closeDialogConfirm());
+
+  box.key(["escape"], () => closeDialogConfirm());
+
+  screen.append(overlay);
+  screen.append(box);
+  confirmInstance = { overlay, box };
+
+  btnConfirm.focus();
+
+  screen.render();
+}
+
+export function closeDialogConfirm() {
+  if (!confirmInstance) return;
+  const { overlay, box } = confirmInstance;
+  screen.remove(overlay);
+  screen.remove(box);
+  confirmInstance = null;
+  ui.workspace.focus();
   screen.render();
 }
