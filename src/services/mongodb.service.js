@@ -5,6 +5,7 @@ import { state } from "../core/state.js";
 import { EVENTS } from "./enum.js";
 import { clearLoading, startLoading } from "./loading.js";
 import { connect } from "./mongodb.js";
+import { QueryService } from "./query.service.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -34,7 +35,8 @@ eventBus.on(EVENTS.DB_CONNECT, async (uri) => {
       developerMessage: err,
     });
     screen.debug(err.message);
-  } finally {
+
+      } finally {
     clearLoading();
   }
 });
@@ -108,6 +110,10 @@ async function connectMongo(uri) {
   }
 
   state.mongoClient = await connect(uri);
+  //  screen.debug(state.mongoClient.options.hosts[0].host);
+  const clusterName = state.mongoClient.options.hosts[0].host;
+
+  state.queryService = new QueryService(clusterName);
 
   screen.debug("connected!");
 }
@@ -194,6 +200,7 @@ async function fetchQuery(query) {
 
   const filter = parseQuery(query);
   screen.debug(`dbName ==> ${dbName}`);
+  state.queryService.saveQuery(query || `{}`);
   const docs = await state.mongoClient
     .db(dbName)
     .collection(colName)

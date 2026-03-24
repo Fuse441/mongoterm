@@ -1,11 +1,11 @@
 import { MongoClient } from "mongodb";
 
-let client;
+let client = null;
 
 export async function connect(uri) {
   try {
     const client = new MongoClient(uri, {
-      serverSelectionTimeoutMS: 3000, // ดีกว่า connectTimeoutMS
+      serverSelectionTimeoutMS: 3000,
     });
 
     await client.connect();

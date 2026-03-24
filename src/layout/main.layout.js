@@ -5,7 +5,7 @@ import { workspacePanel } from "../panels/workspace.panel.js";
 export const mogonTermLayout = (screen) => {
   const connection = connectionPanel();
   const workspace = workspacePanel();
-  const query = queryInput(workspace);
+  const query = queryInput();
   //const result = resultPanel();
 
   screen.append(connection);
