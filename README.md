@@ -1,3 +1,4 @@
+[![Sponsor](https://img.shields.io/badge/sponsor-❤️-ff69b4)](https://github.com/sponsors/Fuse441)
 # Mongoterm
 
 A lightweight **Terminal User Interface (TUI)** for managing and exploring MongoDB directly from the terminal.
