@@ -5,10 +5,11 @@ const blessed = /** @type {typeof import('blessed')} */ (
 );
 
 import { theme } from "../config/app.config.js";
+import { screen } from "../core/screen.js";
+import { historyPanel } from "./history.panel.js";
 
-export const queryInput = (workspacePanel) => {
+export const queryInput = () => {
   const box = blessed.textbox({
-    //    parent: workspacePanel,
     top: 0,
     left: 47,
     width: "75%",
@@ -17,15 +18,18 @@ export const queryInput = (workspacePanel) => {
     border: "line",
     inputOnFocus: true,
     vi: false,
-    cbreak: false,
     keys: true,
     mouse: true,
     style: {
       border: { fg: theme.border.blur },
-      focus: {
-        border: {},
-      },
+      focus: { border: {} },
     },
+  });
+  //open box history
+  box.key(["C-o"], () => {
+    box.cancel();
+    screen.debug("Open history panel");
+    screen.append(historyPanel());
   });
   return box;
 };

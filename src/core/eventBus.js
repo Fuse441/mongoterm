@@ -25,8 +25,16 @@ export function registerEventBus() {
     renderWorkspace(dialogConnect());
   });
 
-  eventBus.on("db:databasesLoaded", (res) => {
-    ui.childConnection.databaseDD.header.focus();
+  eventBus.on(EVENTS.DB_DATABASES_LOADED, (res) => {
+    const { statusCode, developerMessage } = res;
+    if (statusCode !== 200) {
+      // return showToast(screen, {
+      //   statusCode,
+      //   message: "Failed to load databases",
+      // });
+    } else {
+      ui.childConnection.databaseDD.header.focus();
+    }
     renderWorkspace(dialogConnect(res));
   });
 }

@@ -19,6 +19,7 @@ export const screen = blessed.screen({
   smartCSR: true,
   title: "mongoterm",
   debug: true,
+  keys: true,
 });
 export const ui = mogonTermLayout(screen);
 registerEventBus();
