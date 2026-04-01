@@ -1,3 +1,9 @@
+## ❤️ Support this project
+
+If you like this project, consider sponsoring:
+
+👉 https://github.com/sponsors/Fuse441
+
 # Mongoterm
 
 A lightweight **Terminal User Interface (TUI)** for managing and exploring MongoDB directly from the terminal.
