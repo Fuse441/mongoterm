@@ -9,7 +9,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 ### Core
 
 - [x] Hint action bar
-- [ ] Query history & autocomplete
+- [x] Query history & autocomplete
 - [ ] Fix project structure
 
 ### Editor
