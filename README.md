@@ -116,8 +116,8 @@ MIT License
 ![demo](./demo.gif)
 
 ## Navigation
+<img width="1190" height="759" alt="image" src="https://github.com/user-attachments/assets/b5bdd03f-d4ed-42d9-9839-c21c2e8a3f2b" />
 
-<img width="1410" height="1078" alt="image" src="https://github.com/user-attachments/assets/d71ad6df-389e-4cab-83fc-3926a5bc3208" />
 
 | From       | Key               | To          |
 | ---------- | ----------------- | ----------- |
