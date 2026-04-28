@@ -5,6 +5,8 @@ const blessed = /** @type {typeof import('blessed')} */ (
 );
 
 import { theme } from "../config/app.config.js";
+import { screen } from "../core/screen.js";
+import { openEditor } from "./modal.panel.js";
 
 export const workspacePanel = () => {
   const box = blessed.box({
@@ -16,7 +18,7 @@ export const workspacePanel = () => {
     border: "line",
     tags: true,
 
-    scrollable: true, // เปิด scroll
+    scrollable: true,
     alwaysScroll: true,
     keys: true,
     mouse: true,
@@ -35,6 +37,9 @@ export const workspacePanel = () => {
       border: { fg: theme.border.blur },
       label: {},
     },
+  });
+  box.key(["C-n"], () => {
+    openEditor({});
   });
 
   return box;

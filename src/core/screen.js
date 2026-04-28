@@ -14,13 +14,22 @@ import {
 import { keybindings } from "./keybindings.js";
 import { theme } from "../config/app.config.js";
 import { registerEventBus } from "./eventBus.js";
+let screenInstance = null;
 
-export const screen = blessed.screen({
-  smartCSR: true,
-  title: "mongoterm",
-  debug: true,
-  keys: true,
-});
+function getScreen() {
+  if (!screenInstance) {
+    screenInstance = blessed.screen({
+      smartCSR: true,
+      title: "mongoterm",
+      debug: true,
+      keys: true,
+    });
+  }
+
+  return screenInstance;
+}
+export const screen = getScreen();
+console.log("Initializing screen...");
 export const ui = mogonTermLayout(screen);
 registerEventBus();
 attachFocusStyle(ui.connection, {

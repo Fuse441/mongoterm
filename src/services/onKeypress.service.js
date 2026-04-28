@@ -3,8 +3,6 @@ import { screen } from "../core/screen.js";
 import { closeEditor } from "../panels/modal.panel.js";
 
 export function onKeypress(ch, key, lines, cursor, render) {
-  //  screen.debug(`ch: ${ch} key: ${key}`);
-
   if (!key) return;
   const line = lines[cursor.row] ?? "";
 

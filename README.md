@@ -27,7 +27,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 ### Record Management
 
 - [x] Delete record with confirmation
-- [ ] Insert new record
+- [x] Insert new record
 - [ ] Duplicate record
 - [ ] Bulk delete
 
