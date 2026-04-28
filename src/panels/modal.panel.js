@@ -8,7 +8,8 @@ import { eventBus } from "../core/eventBus.js";
 import { EVENTS } from "../services/enum.js";
 import { onKeypress } from "../services/onKeypress.service.js";
 let editorInstance = null;
-
+const VIEW_HEIGHT = 30;
+let scrollTop = 0;
 export function openEditor(doc) {
   if (editorInstance) closeEditor();
 
@@ -51,17 +52,27 @@ export function openEditor(doc) {
   });
 
   function render() {
-    const rendered = lines.map((line, i) => {
-      if (i !== cursor.row) return line;
-      const left = line.slice(0, cursor.col);
-      const cur = line[cursor.col] ?? " ";
-      const right = line.slice(cursor.col + 1);
-      return `${left}|${cur}${right}`;
-    });
-    box.tags = true;
-    box.setContent(rendered.join("\n"));
-    // auto scroll ตาม cursor
-    box.scrollTo(cursor.row);
+    if (cursor.row < scrollTop) scrollTop = cursor.row;
+
+    if (cursor.row >= scrollTop + VIEW_HEIGHT)
+      scrollTop = cursor.row - VIEW_HEIGHT + 1;
+
+    const visible = lines
+      .slice(scrollTop, scrollTop + VIEW_HEIGHT)
+      .map((line, i) => {
+        const realRow = i + scrollTop;
+
+        if (realRow !== cursor.row) return line;
+
+        const left = line.slice(0, cursor.col);
+        const cur = line[cursor.col] ?? " ";
+        const right = line.slice(cursor.col + 1);
+
+        return `${left}|${cur}${right}`;
+      });
+
+    box.setContent(visible.join("\n"));
+
     screen.render();
   }
 
@@ -79,18 +90,29 @@ export function openEditor(doc) {
   }
 
   box.key(["C-s"], onSave);
+  let pending = false;
+
+  function scheduleRender() {
+    if (pending) return;
+
+    pending = true;
+
+    setImmediate(() => {
+      pending = false;
+      render();
+    });
+  }
+  render();
+  const handler = (ch, key) =>
+    onKeypress(ch, key, lines, cursor, scheduleRender);
 
   box.on("focus", () => {
-    screen.program.on("keypress", (ch, key) =>
-      onKeypress(ch, key, lines, cursor, render),
-    );
-    render();
+    screen.program.on("keypress", handler);
   });
 
   box.on("blur", () => {
-    screen.program.off("keypress", onKeypress);
+    screen.program.off("keypress", handler);
   });
-
   screen.append(overlay);
   screen.append(hint);
   screen.append(box);
