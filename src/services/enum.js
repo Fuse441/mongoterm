@@ -9,4 +9,5 @@ export const EVENTS = Object.freeze({
   RECORD_UPDATE: "record:update",
   TOAST_SHOW: "show:toast",
   RECORD_DELETE: "delete:record",
+  RECORD_DUPLICATE: "duplicate:record",
 });

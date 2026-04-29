@@ -35,8 +35,7 @@ eventBus.on(EVENTS.DB_CONNECT, async (uri) => {
       developerMessage: err,
     });
     screen.debug(err.message);
-
-      } finally {
+  } finally {
     clearLoading();
   }
 });
@@ -63,7 +62,16 @@ eventBus.on(EVENTS.DB_DATABASES_SELECTED, async (dbName) => {
 | EVENT: RUN QUERY
 |--------------------------------------------------------------------------
 */
-
+eventBus.on(EVENTS.RECORD_DUPLICATE, async ({ id, query }) => {
+  try {
+    const duplicateDocs = await fetchQuery({ _id: new ObjectId(id) });
+    //  const docs = await fetchQuery(query || {});
+    await duplicateData(duplicateDocs);
+    eventBus.emit(EVENTS.QUERY_SEND, query);
+  } catch (err) {
+    screen.debug(`[fetchQueryError] ${err.stack} `);
+  }
+});
 eventBus.on(EVENTS.DB_COLLECTIONS_SELECTED, async (colName) => {
   try {
     const docs = await fetchQuery();
@@ -135,7 +143,7 @@ async function fetchCollections(dbName) {
 }
 function parseQuery(queryString) {
   if (!queryString) {
-    return {}; // ← empty = find all
+    return {};
   }
 
   try {
@@ -176,6 +184,25 @@ async function upsertData({ _id, updateFields }) {
     eventBus.emit(EVENTS.TOAST_SHOW, { statusCode: 500, message: err.message });
   }
 }
+async function duplicateData(record) {
+  const dbName = state.databases[state.selectedDatabaseIndex];
+  const colName = state.collections[state.selectedCollectionIndex];
+
+  try {
+    await state.mongoClient
+      .db(dbName)
+      .collection(colName)
+      .insertOne({ ...record, _id: new ObjectId() });
+
+    eventBus.emit(EVENTS.TOAST_SHOW, {
+      statusCode: 200,
+      message: "record duplicated!",
+    });
+  } catch (err) {
+    eventBus.emit(EVENTS.TOAST_SHOW, { statusCode: 500, message: err.message });
+  }
+}
+
 async function deleteData(id) {
   const dbName = state.databases[state.selectedDatabaseIndex];
   const colName = state.collections[state.selectedCollectionIndex];
@@ -197,16 +224,13 @@ async function deleteData(id) {
 async function fetchQuery(query) {
   const dbName = state.databases[state.selectedDatabaseIndex];
   const colName = state.collections[state.selectedCollectionIndex];
-
   const filter = parseQuery(query);
-  screen.debug(`dbName ==> ${dbName}`);
   state.queryService.saveQuery(query || `{}`);
   const docs = await state.mongoClient
     .db(dbName)
     .collection(colName)
     .find(filter || {})
-    .limit(50)
     .toArray();
-
+  //  screen.debug(`fetched ${JSON.stringify(docs)} ${docs.length} documents`);
   return docs;
 }

@@ -184,7 +184,20 @@ function createRecordBox(parent, doc, idx) {
       message: `Delete record ${idx + 1}`,
     });
   });
-
+  box.key(["y"], () => {
+    const query = ui.query.getContent();
+    const strId = String(id);
+    openDialogConfirm(
+      `Are you sure you want to Duplicate this record id: random ?`,
+      () => {
+        duplicateRecord({ id: strId, query });
+      },
+    );
+    showToast(parent.screen, {
+      statusCode: 200,
+      message: `Duplicate record ${idx + 1}`,
+    });
+  });
   // Tab / Shift+Tab → เลื่อนไป box ถัดไป/ก่อนหน้า
   box.key(["tab"], () => parent.screen.focusNext());
   box.key(["S-tab"], () => parent.screen.focusPrevious());
@@ -200,6 +213,9 @@ function createRecordBox(parent, doc, idx) {
 | RENDER RESULT
 |--------------------------------------------------------------------------
 */
+function duplicateRecord({ id, query }) {
+  eventBus.emit(EVENTS.RECORD_DUPLICATE, { id, query });
+}
 function deleteRecord({ id, query }) {
   eventBus.emit(EVENTS.RECORD_DELETE, { id, query });
 }
@@ -234,12 +250,11 @@ export function renderResult(parent, docs) {
   });
 
   // สร้าง record box ทีละอัน
-  docs.forEach((doc, idx) => {
+  screen.debug(`Rendering ${docs.slice(0, 10).length} records...`);
+  docs.slice(0, 10).forEach((doc, idx) => {
     const box = createRecordBox(container, doc, idx);
     box._isRecord = true;
     parent.append(box);
-
-    //    container.append(box);
   });
 
   //  parent.append(container);
