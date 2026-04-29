@@ -17,6 +17,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - [x] Hint action bar
 - [x] Query history & autocomplete
 - [ ] Fix project structure
+- [x] Monitor Panel
 
 ### Editor
 
@@ -28,7 +29,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 
 - [x] Delete record with confirmation
 - [x] Insert new record
-- [ ] Duplicate record
+- [x] Duplicate record
 - [ ] Bulk delete
 
 ### Query
@@ -116,8 +117,8 @@ MIT License
 ![demo](./demo.gif)
 
 ## Navigation
-<img width="1190" height="759" alt="image" src="https://github.com/user-attachments/assets/b5bdd03f-d4ed-42d9-9839-c21c2e8a3f2b" />
 
+<img width="1190" height="759" alt="image" src="https://github.com/user-attachments/assets/b5bdd03f-d4ed-42d9-9839-c21c2e8a3f2b" />
 
 | From       | Key               | To          |
 | ---------- | ----------------- | ----------- |
