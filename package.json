@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
-    "start": "node --watch app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node --import tsx --watch src/app.ts",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/src/app.js"
   },
   "bin": {
     "mongoterm": "./app.js"
@@ -14,11 +15,22 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "blessed": "^0.1.81",
     "copy-paste": "^2.2.0",
-    "mongodb": "^7.1.0",
-    "neo-blessed": "^0.2.0"
+    "mongodb": "^7.2.0",
+    "neo-blessed": "^0.2.0",
+    "nodemon": "^3.1.14",
+    "stack-trace": "^1.0.0"
   },
   "devDependencies": {
-    "@types/blessed": "^0.1.27"
+    "@types/blessed": "^0.1.27",
+    "@types/copy-paste": "^2.1.0",
+    "@types/node": "^25.9.2",
+    "@types/stack-trace": "^0.0.33",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.17",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
   }
 }
