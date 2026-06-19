@@ -16,8 +16,9 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 
 - [x] Hint action bar
 - [x] Query history & autocomplete
-- [ ] Fix project structure
+- [x] Fix project structure
 - [x] Monitor Panel
+- [x] Refactor generate record
 
 ### Editor
 
