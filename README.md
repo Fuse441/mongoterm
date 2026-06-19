@@ -91,12 +91,16 @@ npm install
 ```
 
 ## ▶️ Usage
+Note
 
+At the moment, connections must be configured manually.
+Please edit your MongoDB connection in the Compass configuration file before running the application.
 Run the application:
 
 ```bash
-node index.js
+npm run dev
 ```
+
 
 Then select a connection and start exploring your MongoDB databases from the terminal.
 
