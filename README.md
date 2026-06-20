@@ -139,6 +139,8 @@ MIT License
 | workspace  | `h` / `←`         | connection  |
 | workspace  | `k` / `↑`         | query input |
 | workspace  | `l` / `→`         | records     |
+| workspace  | `shift+l`         | next page   |
+| workspace  | `shift+h`         | prev Page   |
 | query      | `j` / `↓` / `esc` | workspace   |
 | query      | `h` / `←`         | connection  |
 | record     | `j` / `↓`         | next record |
