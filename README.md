@@ -12,6 +12,14 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 
 ## 🎯 Roadmap
 
+### Architecture
+
+- [ ] Remove global singletons
+- [ ] Introduce a Composition Root
+- [ ] Inject dependencies via constructors
+- [ ] Refactor to an OOP architecture
+- [ ] Extract reusable framework into a separate library
+
 ### Core
 
 - [x] Hint action bar
@@ -91,6 +99,7 @@ npm install
 ```
 
 ## ▶️ Usage
+
 Note
 
 At the moment, connections must be configured manually.
@@ -100,7 +109,6 @@ Run the application:
 ```bash
 npm run dev
 ```
-
 
 Then select a connection and start exploring your MongoDB databases from the terminal.
 
