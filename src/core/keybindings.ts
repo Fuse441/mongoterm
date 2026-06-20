@@ -5,6 +5,7 @@ import { appInstance } from "@/app.js";
 import { TResponseLayout } from "@/layout/main.layout.types";
 let currentRecord = 0;
 import blessed from "neo-blessed";
+import { EVENTS } from "@/services/enum";
 // ── config: key → action ──────────────────────────────
 const getBindings = (ui: TResponseLayout) => [
   {
@@ -48,6 +49,43 @@ const getBindings = (ui: TResponseLayout) => [
       currentRecord = 0;
       records[0].focus();
       appInstance.screen.render();
+    },
+  },
+  {
+    keys: ["S-l"],
+    condition: () => appInstance.screen.focused === ui.panels.workspace,
+    action: () => {
+      logger.debug({
+        message: "logs keybindings ==> " + state.page,
+        total: state.totalPages,
+      });
+      if (state.page >= state.totalPages - 1) {
+        appInstance.renderScreen();
+        return;
+      }
+      state.page += 1;
+      appInstance.eventBus.emit(EVENTS.QUERY_SEND);
+      appInstance.renderScreen();
+
+      logger.debug({ message: "Shift+L pressed, focusing last record" });
+    },
+  },
+  {
+    keys: ["S-h"],
+    condition: () => appInstance.screen.focused === ui.panels.workspace,
+    action: () => {
+      if (state.page <= state.totalPages - 1) {
+        logger.debug({
+          message: "logs keybindings ==> " + state.page,
+          total: state.totalPages - 1,
+        });
+        state.page != 1 && (state.page -= 1);
+        appInstance.eventBus.emit(EVENTS.QUERY_SEND);
+
+        appInstance.renderScreen();
+      }
+
+      logger.debug({ message: "Shift+H pressed, focusing last record" });
     },
   },
 

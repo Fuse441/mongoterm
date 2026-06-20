@@ -1,6 +1,5 @@
 import { ObjectId } from "mongodb";
 
-import { eventBus } from "@/core/eventBus";
 import { state } from "@/shared/state";
 
 import { EVENTS, TYPE_LOGGER } from "@/services/enum";
@@ -35,7 +34,7 @@ function loadMongoEvents() {
 export const initEventMongoService = loadMongoEvents();
 
 function registerConnectionEvents() {
-  eventBus.on(EVENTS.DB_CONNECT, async (uri: string) => {
+  appInstance.eventBus.on(EVENTS.DB_CONNECT, async (uri: string) => {
     try {
       startLoading();
 
@@ -45,7 +44,7 @@ function registerConnectionEvents() {
 
       state.databases = databases;
       focusDropdown(appInstance.ui.dropdowns.databaseDD);
-      eventBus.emit(EVENTS.DB_DATABASES_LOADED, {
+      appInstance.eventBus.emit(EVENTS.DB_DATABASES_LOADED, {
         statusCode: 200,
         typeLogger: TYPE_LOGGER.CONNECT_MONGO_DB,
         developerMessage: "connected successfully",
@@ -53,7 +52,7 @@ function registerConnectionEvents() {
     } catch (error: unknown) {
       if (error instanceof Error) {
         logger.error({ message: "Error connecting to MongoDB", error });
-        eventBus.emit(EVENTS.DB_DATABASES_LOADED, {
+        appInstance.eventBus.emit(EVENTS.DB_DATABASES_LOADED, {
           statusCode: 500,
           developerMessage: error,
           typeLogger: TYPE_LOGGER.CONNECT_MONGO_DB,
@@ -65,45 +64,51 @@ function registerConnectionEvents() {
   });
 }
 function registerCollectionLoadedEvent() {
-  eventBus.on(EVENTS.DB_COLLECTIONS_LOADED, (collections) => {
+  appInstance.eventBus.on(EVENTS.DB_COLLECTIONS_LOADED, (collections) => {
     logger.debug({ message: "Collections loaded", collections });
     //    appInstance.renderWorkspace(collections);
   });
 }
 
 function registerDatabaseEvents() {
-  eventBus.on(EVENTS.DB_DATABASES_SELECTED, async (dbName: string) => {
-    const collections = await fetchCollections(dbName);
+  appInstance.eventBus.on(
+    EVENTS.DB_DATABASES_SELECTED,
+    async (dbName: string) => {
+      const collections = await fetchCollections(dbName);
 
-    state.collections = collections;
-    focusDropdown(appInstance.ui.dropdowns.collectionDD);
+      state.collections = collections;
+      focusDropdown(appInstance.ui.dropdowns.collectionDD);
 
-    eventBus.emit(EVENTS.DB_COLLECTIONS_LOADED, collections);
-  });
+      appInstance.eventBus.emit(EVENTS.DB_COLLECTIONS_LOADED, collections);
+    },
+  );
 }
 
 function registerCollectionEvents() {
-  eventBus.on(EVENTS.DB_COLLECTIONS_SELECTED, async () => {
+  appInstance.eventBus.on(EVENTS.DB_COLLECTIONS_SELECTED, async () => {
     const docs = await fetchQuery();
 
-    eventBus.emit(EVENTS.QUERY_RESULT, docs);
+    appInstance.eventBus.emit(EVENTS.QUERY_RESULT, docs);
   });
 }
 
 function registerQueryEvents() {
-  eventBus.on(EVENTS.QUERY_SEND, async (query?: string) => {
-    const docs = await fetchQuery(query);
+  appInstance.eventBus.on(EVENTS.QUERY_SEND, async (query?: string) => {
+    const docs = await fetchQuery(query, {
+      page: state.page,
+      pageSize: state.pageSize,
+    });
 
-    eventBus.emit(EVENTS.QUERY_RESULT, docs);
+    appInstance.eventBus.emit(EVENTS.QUERY_RESULT, docs);
   });
 }
 function registerQueryResultEvent() {
-  eventBus.on(EVENTS.QUERY_RESULT, (result) => {
-    renderResult(appInstance.ui.panels.workspace, result);
+  appInstance.eventBus.on(EVENTS.QUERY_RESULT, (result) => {
+    renderResult(appInstance.ui.panels.workspace!, result);
   });
 }
 function registerDatabaseLoadedEvent() {
-  eventBus.on(EVENTS.DB_DATABASES_LOADED, (res) => {
+  appInstance.eventBus.on(EVENTS.DB_DATABASES_LOADED, (res) => {
     const { statusCode, developerMessage } = res;
     if (statusCode !== 200) {
       logger.error({
@@ -128,19 +133,19 @@ function registerDatabaseLoadedEvent() {
 }
 
 function registerRecordEvents() {
-  eventBus.on(EVENTS.RECORD_DUPLICATE, async ({ id, query }) => {
+  appInstance.eventBus.on(EVENTS.RECORD_DUPLICATE, async ({ id, query }) => {
     await duplicateRecord(id);
 
-    eventBus.emit(EVENTS.QUERY_SEND, query);
+    appInstance.eventBus.emit(EVENTS.QUERY_SEND, query);
   });
 
-  eventBus.on(EVENTS.RECORD_DELETE, async ({ id, query }) => {
+  appInstance.eventBus.on(EVENTS.RECORD_DELETE, async ({ id, query }) => {
     await deleteRecord(id);
 
-    eventBus.emit(EVENTS.QUERY_SEND, query);
+    appInstance.eventBus.emit(EVENTS.QUERY_SEND, query);
   });
 
-  eventBus.on(EVENTS.RECORD_UPDATE, async ({ updated, query }) => {
+  appInstance.eventBus.on(EVENTS.RECORD_UPDATE, async ({ updated, query }) => {
     try {
       const parsed = JSON.parse(updated);
 
@@ -150,7 +155,7 @@ function registerRecordEvents() {
 
       await updateRecord(objectId, updateFields);
 
-      eventBus.emit(EVENTS.QUERY_SEND, query);
+      appInstance.eventBus.emit(EVENTS.QUERY_SEND, query);
     } catch (error: any) {
       showToast({
         statusCode: 400,

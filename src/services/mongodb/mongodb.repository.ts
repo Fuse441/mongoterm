@@ -1,6 +1,5 @@
 import { ObjectId } from "mongodb";
 import { state } from "@/shared/state";
-import { eventBus, EventMongoTerm } from "@/core/eventBus";
 import { EVENTS } from "@/services/enum";
 import { connect } from "./mongodb.connector";
 import { QueryService } from "@/services/query.service";
@@ -67,7 +66,7 @@ export function parseQuery(query?: string): Record<string, unknown> {
     //   query,
     // });
 
-    appInstance.eventBus.emit(EVENTS.TOAST_SHOW, {
+ appInstance.eventBus.emit(EVENTS.TOAST_SHOW, {
       statusCode: 400,
       message: "Invalid query format",
     });
@@ -78,13 +77,14 @@ export function parseQuery(query?: string): Record<string, unknown> {
 export async function fetchQuery(
   query?: string,
   {
-    page = 1,
-    pageSize = 100,
+    page = state.page,
+    pageSize =state.pageSize,
   }: {
     page?: number;
     pageSize?: number;
   } = {},
 ) {
+    logger.debug({ message: "Fetching query", query, page, pageSize });
   const dbName = state.databases[state.selectedDatabaseIndex];
   const colName = state.collections[state.selectedCollectionIndex];
 
@@ -100,15 +100,14 @@ export async function fetchQuery(
     collection.find(filter).skip(skip).limit(pageSize).toArray(),
     collection.countDocuments(filter),
   ]);
-
+   state.totalPages = Math.ceil(total / pageSize); 
   return {
     docs,
     pagination: {
       page,
       pageSize,
       total,
-      totalPages: Math.ceil(total / pageSize),
-    },
+      totalPages: state.totalPages    },
   };
 }
 
@@ -129,7 +128,7 @@ export async function updateRecord(
     },
   );
 
-  eventBus.emit(EVENTS.TOAST_SHOW, {
+  appInstance.eventBus.emit(EVENTS.TOAST_SHOW, {
     statusCode: 200,
     message: "record saved!",
   });
@@ -146,7 +145,7 @@ export async function deleteRecord(id: string) {
       _id: new ObjectId(id),
     });
 
-  eventBus.emit(EVENTS.TOAST_SHOW, {
+  appInstance.eventBus.emit(EVENTS.TOAST_SHOW, {
     statusCode: 200,
     message: "record deleted!",
   });
@@ -162,7 +161,7 @@ export async function duplicateRecord(id: string) {
   const doc = result.docs[0];
 
   if (!doc) {
-    appInstance.eventBus.emit(EVENTS.TOAST_SHOW, {
+   appInstance.eventBus.emit(EVENTS.TOAST_SHOW, {
       statusCode: 404,
       message: "Document not found",
     });

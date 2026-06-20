@@ -3,10 +3,10 @@ import copyPaste from "copy-paste";
 import { theme } from "@/config/app.config";
 import { showToast } from "./toast.panel.js";
 import { openDialogConfirm, openEditor } from "./modal.panel.js";
-import { eventBus } from "../core/eventBus.js";
 import { EVENTS } from "../services/enum.js";
 import { logger } from "@/utils/logger/logger.service";
 import { appInstance } from "@/app.js";
+import { state } from "@/shared/state.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -220,52 +220,63 @@ function handleCopy(parent: any, doc: any) {
 }
 function duplicateRecord({ id, query }: any) {
   logger.debug({ message: "Emitting RECORD_DUPLICATE event", id, query });
-  eventBus.emit(EVENTS.RECORD_DUPLICATE, { id, query });
+  appInstance.eventBus.emit(EVENTS.RECORD_DUPLICATE, { id, query });
 }
 function deleteRecord({ id, query }: any) {
-  eventBus.emit(EVENTS.RECORD_DELETE, { id, query });
+  appInstance.eventBus.emit(EVENTS.RECORD_DELETE, { id, query });
 }
 
-export function renderResult(parent: any, payload: any) {
+export async function renderResult(
+  parent: blessed.Widgets.BoxElement,
+  payload: any,
+) {
   appInstance.ui.panels.workspace?.focus();
+  parent.removeListener("scroll", () => { });
   const docs = payload.docs || [];
 
-  parent.children.slice().forEach((child: any) => {
+  await parent.children.slice().forEach((child: any) => {
     if (child._isRecord) {
       parent.remove(child);
     }
   });
-  parent.setLabel(` Results (${docs.length}) `);
+  parent.setLabel(` Results (${docs.length * state.totalPages}) `);
   const rowHeight = RECORD_HEIGHT + RECORD_GAP;
   //
-  // parent.on("scroll", () => {
-  //   const scrollTop = parent.getScroll();
-  //
-  //   const startIndex = Math.floor(scrollTop / rowHeight);
-  //
-  //   const visibleRows = Math.ceil(parent.height / rowHeight);
-  //
-  //   const endIndex = startIndex + visibleRows;
-  //
-  //   logger.debug(`visible records: ${startIndex} -> ${endIndex}`);
-  // });
-  const visibleRows = Math.ceil(parent.height / rowHeight) + 5;
+  parent.scrollTo(0);
+  const visibleRows = Math.ceil(Number(parent.height) / rowHeight) + 5;
+  let renderedCount = Math.min(docs.length, visibleRows);
 
+  parent.on("scroll", () => {
+    const scrollTop = parent.getScroll();
+    const endIndex =
+      Math.floor(scrollTop / rowHeight) +
+      Math.ceil(Number(parent.height) / rowHeight);
+
+    // เหลืออีก 2 แถวจะโหลดเพิ่ม
+    if (endIndex >= renderedCount - 2 && renderedCount < docs.length) {
+      const next = Math.min(renderedCount + visibleRows, docs.length);
+
+      for (let i = renderedCount; i < next; i++) {
+        const box = createRecordBox(parent, docs[i], i);
+        box._isRecord = true;
+        parent.append(box);
+      }
+
+      renderedCount = next;
+      parent.screen.render();
+    }
+  });
+  logger.debug({
+    message: `visible rows: ${visibleRows}, total docs: ${docs.length}  match: ${Math.min(docs.length, visibleRows)}`,
+  });
   for (let i = 0; i < Math.min(docs.length, visibleRows); i++) {
     const box: blessed.Widgets.BoxElement = createRecordBox(parent, docs[i], i);
     box._isRecord = true;
     parent.append(box);
   }
-  // docs.forEach((doc, idx) => {
-  //   const box = createRecordBox(parent, doc, idx);
-  //   box._isRecord = true;
-  //   parent.append(box);
-  // });
 
   if (docs.length > 0) {
     parent.focus();
-    // parent.children[0]?.focus();
   }
-  //parensetLabel("test");
   parent.screen.render();
 }

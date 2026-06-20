@@ -1,6 +1,5 @@
 import { appInstance } from "@/app";
 import { openInputPanel } from "../input.panel";
-import { eventBus } from "@/core/eventBus";
 import { getConnectionNames } from "@/shared/selectors/connection.selectors";
 import blessed from "neo-blessed";
 import { state } from "@/shared/state";
@@ -60,7 +59,7 @@ const registerEventCollectionDD = () => {
       collectionDD!.header.setContent(` ${name} ▼ `);
       closeDropdown(collectionDD);
 
-      eventBus.emit(EVENTS.DB_COLLECTIONS_SELECTED, name);
+      appInstance.eventBus.emit(EVENTS.DB_COLLECTIONS_SELECTED, name);
       appInstance.renderScreen();
     } catch (err: any) {
       logger.error({ message: "Collection selection error:", err });
@@ -90,7 +89,7 @@ const registerEventDatabaseDD = () => {
 
       //      workspacePanel!.setContent(appInstance.renderWorkspace(dbName));
 
-      eventBus.emit(EVENTS.DB_DATABASES_SELECTED, dbName);
+      appInstance.eventBus.emit(EVENTS.DB_DATABASES_SELECTED, dbName);
 
       resetCollectionSelection(collectionDD!);
       //      collectionDD!.header.focus();
@@ -109,7 +108,7 @@ const registerEventConnectionDD = () => {
   connectionDD!.header.key(["C-e"], () => {
     openInputPanel("Enter Mongo URI", (uri: any) => {
       appInstance.ui.dropdowns.connectionDD!.header.setContent(" Manual ▼ ");
-      eventBus.emit("db:connect", uri);
+      appInstance.eventBus.emit("db:connect", uri);
     });
   });
 
@@ -130,7 +129,7 @@ const registerEventConnectionDD = () => {
         closeDropdown(connectionDD!);
 
         resetDBSelection(databaseDD!, collectionDD!);
-        eventBus.emit(EVENTS.DB_CONNECT, uri);
+        appInstance.eventBus.emit(EVENTS.DB_CONNECT, uri);
 
         appInstance.renderScreen();
       } catch (err: any) {

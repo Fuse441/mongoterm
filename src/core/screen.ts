@@ -24,7 +24,9 @@ export class MongoTermApp {
       await this.createStyle();
 
       await this.registerAppListeners();
-
+      // this._screen.on("keypress", (_, key) => {
+      // logger.debug({message: "log keypress " + JSON.stringify(key)})
+      // });
       //      this.ui.childConnection.connectionDD.header.focus();
     } catch (error) {
       logger.error({ message: "Error initializing MongoTerm", error });
@@ -32,6 +34,7 @@ export class MongoTermApp {
 
     //    this.registerAppListeners();
   }
+
   private async createScreen() {
     this._screen = blessed.screen({
       smartCSR: true,
