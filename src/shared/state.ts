@@ -11,6 +11,9 @@ interface IState {
   collections: string[];
   mongoClient: MongoClient | null;
   queryService: any;
+  pageSize: number;
+  page: number;
+  totalPages: number;
 }
 export const state: IState = {
   connections: config.connections || [],
@@ -21,4 +24,7 @@ export const state: IState = {
   collections: [],
   queryService: null,
   mongoClient: null as MongoClient | null,
+  pageSize: 10,
+  page: 1,
+  totalPages: 0,
 };

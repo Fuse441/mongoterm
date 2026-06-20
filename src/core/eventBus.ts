@@ -5,7 +5,6 @@ import { renderResult } from "../panels/result.panel.js";
 import { showToast } from "../panels/toast.panel.js";
 import { logger } from "@/utils/logger/logger.service.js";
 
-export const eventBus = new EventEmitter();
 export class EventMongoTerm {
   private emitter: EventEmitter;
 
