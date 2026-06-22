@@ -7,7 +7,7 @@ import { EVENTS } from "@/services/enum";
 import { openForm } from "@/panels/form/form.panel";
 import { createTree, TreeNode } from "@/panels/tree/tree.panel";
 import { theme } from "@/config/app.config";
-import { saveConnection } from "@/services/helper";
+import { getConfiguration, saveConnection } from "@/services/helper";
 
 function waitFor(
   check: () => boolean,
@@ -67,6 +67,7 @@ export function registerDirectoryTree(parent: any, top: any) {
         ],
         onSubmit(data) {
           saveConnection(data);
+          state.connections = getConfiguration().connections ?? [];
           appInstance.eventBus.emit(EVENTS.DB_CONNECT, data, true);
 
           buildConnectionNodes();

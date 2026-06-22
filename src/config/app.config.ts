@@ -8,3 +8,10 @@ export const theme = {
     blurBg: "black",
   },
 };
+export const defaultConfig = {
+  type: "Compass Connections",
+  version: {
+    $numberInt: "1",
+  },
+  connections: [],
+};

@@ -7,11 +7,29 @@ import { logger } from "./utils/logger/logger.service";
 import { initEventMongoService } from "./services/mongodb/mongodb.events";
 import { WorkspaceLogger } from "./utils/logger/logger";
 import { getConfiguration } from "./services/helper";
-
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { defaultConfig } from "./config/app.config";
 export let appInstance: MongoTermApp;
 export let appReady: Promise<MongoTermApp>;
+ 
+const APP_ROOT = path.join(os.homedir(), ".mongoterm");
+const configDir = path.join(os.homedir(), ".mongoterm");
+const configPath = path.join(configDir, "compass.json");
 
-const APP_ROOT = path.join(os.homedir(), "mongoterm");
+
+var configuration: any = null;
+
+async function  ensureLoaded() {
+  if (configuration) return;
+
+  mkdirSync(configDir, { recursive: true });
+
+  if (!existsSync(configPath)) {
+    writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), "utf-8");
+  }
+
+  configuration = JSON.parse(readFileSync(configPath, "utf-8"));
+}
 
 async function createApplicationDirectory(): Promise<void> {
   try {
@@ -27,7 +45,6 @@ async function createApplicationDirectory(): Promise<void> {
 }
 
 async function initializeApp(): Promise<MongoTermApp> {
-  getConfiguration()
   const app = new MongoTermApp(new WorkspaceLogger());
   appInstance = app;
   setTimeout(() => {
@@ -50,6 +67,8 @@ async function initializeApp(): Promise<MongoTermApp> {
 async function bootstrap(): Promise<void> {
   try {
     await createApplicationDirectory();
+    await ensureLoaded();
+
     appReady = initializeApp();
 
     // Import services and handle errors
