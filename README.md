@@ -5,6 +5,13 @@ If you like this project, consider sponsoring:
 👉 https://github.com/sponsors/Fuse441
 
 # Mongoterm
+How to Use CLI 
+👉 https://www.npmjs.com/package/mongoterm?activeTab=readme
+```bash
+npm i -g mongoterm@alpha
+mongoterm
+```
+
 
 A lightweight **Terminal User Interface (TUI)** for managing and exploring MongoDB directly from the terminal.
 
