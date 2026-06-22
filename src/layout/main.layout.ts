@@ -6,23 +6,19 @@ import { workspacePanel } from "../panels/workspace.panel.js";
 import { appInstance } from "@/app.js";
 import { logger } from "@/utils/logger/logger.service.js";
 import { IMainLayout } from "./main.layout.types.js";
+import { createTree } from "@/panels/tree/tree.panel.js";
+import { registerDirectoryTree } from "@/panels/tree/tree.event.js";
 export class MognoTermLayout {
   private _panels!: IMainLayout["panels"];
   private _dropdowns!: IMainLayout["dropdowns"];
-  constructor() {
-  }
+  private _tree!: IMainLayout["panels"]["tree"];
+  constructor() { }
   public async initLayout() {
     await this.initPanels();
     await this.initMonitor();
-    await this.appentPanelsToScreen();
-    await this.initDropdowns();
-    await this.appentDropdownToScreen();
 
-//    this._panels.connection!.focus();
-    this._dropdowns.connectionDD!.header.focus();
-    return { panels: this._panels,
-      dropdowns: this._dropdowns,
-    };   
+    await this.appentPanelsToScreen();
+    return { panels: this._panels, dropdowns: this._dropdowns };
   }
   private async appentPanelsToScreen() {
     for (const panel of Object.values(this._panels)) {
@@ -34,8 +30,9 @@ export class MognoTermLayout {
       this._panels.connection!.append(dropdown.header);
       this._panels.connection!.append(dropdown.list);
     }
-   appInstance.renderScreen(); 
+    appInstance.renderScreen();
   }
+
   private async initDropdowns() {
     this._dropdowns = {
       connectionDD: createDropdown(1, this._panels.connection),
@@ -44,10 +41,10 @@ export class MognoTermLayout {
     };
     //    logger.debug({ message: `${Object.entries(this._dropdowns)}` });
   }
-
   private async initPanels() {
     this._panels = {
-      connection: connectionPanel(),
+      tree: registerDirectoryTree(appInstance.screen, {})!.el,
+      //      connection: connectionPanel(),
       workspace: workspacePanel(),
       query: queryInput(),
       monitor: monitorPanel(),

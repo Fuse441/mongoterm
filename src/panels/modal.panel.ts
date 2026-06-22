@@ -1,5 +1,4 @@
 import blessed from "neo-blessed";
-import { eventBus } from "../core/eventBus.js";
 import { EVENTS } from "../services/enum.js";
 import { onKeypress } from "../services/onKeypress.service.js";
 import { appInstance } from "@/app.js";
@@ -76,7 +75,10 @@ export function openEditor(doc: any) {
   function onSave() {
     try {
       const query = appInstance.ui.panels.query!.getContent();
-      eventBus.emit(EVENTS.RECORD_UPDATE, { updated: lines.join("\n"), query });
+      appInstance.eventBus.emit(EVENTS.RECORD_UPDATE, {
+        updated: lines.join("\n"),
+        query,
+      });
 
       closeEditor();
     } catch {

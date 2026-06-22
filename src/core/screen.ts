@@ -14,7 +14,7 @@ export class MongoTermApp {
   private _ui!: TResponseLayout;
   private _style!: any;
   private _eventBus!: EventMongoTerm;
-  constructor(private workspaceLogger: Logger) { }
+  constructor(private workspaceLogger: Logger) {}
   public async init() {
     try {
       logger.info({ message: "Initializing MongoTerm..." });
@@ -71,6 +71,12 @@ export class MongoTermApp {
   public clearScreen(value: any) {
     this._screen.remove(value);
   }
+  public clearWorkerScreen() {
+    this._ui.panels.workspace!.setContent("");
+    this._ui.panels.workspace!.scrollTo(0);
+    this._ui.panels.workspace!.children = [];
+    this.renderScreen();
+  }
   public appendToScreen(element: any) {
     try {
       this._screen.append(element);
@@ -86,7 +92,7 @@ export class MongoTermApp {
 
   private async createUI() {
     this._ui = await new MognoTermLayout().initLayout();
-    initDropdownEvents();
+    //    initDropdownEvents();
     this.renderScreen();
     logger.debug({ message: "UI initialized", details: this._ui });
   }

@@ -1,8 +1,7 @@
+import { appInstance } from "@/app";
 import _blessed from "neo-blessed";
 const blessed /** @type {typeof import('blessed')} */ =
   /** @type {any} */ _blessed;
-
-import { screen } from "../core/screen.js";
 
 const HELP_CONTENT = [
   " {bold}Navigation{/bold}",
@@ -25,9 +24,9 @@ let helpBox: any = null;
 
 export function toggleHelp() {
   if (helpBox) {
-    screen.remove(helpBox);
+    appInstance.removeScreenElement(helpBox);
     helpBox = null;
-    screen.render();
+    appInstance.renderScreen();
     return;
   }
 
@@ -44,7 +43,7 @@ export function toggleHelp() {
     content: HELP_CONTENT,
   });
 
-  screen.append(helpBox);
+  appInstance.appendToScreen(helpBox);
   helpBox.focus();
-  screen.render();
+  appInstance.renderScreen();
 }

@@ -10,7 +10,7 @@
     "start": "node dist/src/app.js"
   },
   "bin": {
-    "mongoterm": "./app.js"
+    "mongoterm": "./dist/src/app.js"
   },
   "author": "",
   "license": "ISC",

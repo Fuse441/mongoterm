@@ -6,8 +6,8 @@ import { MongoTermApp } from "@/core/screen.js";
 import { theme } from "../config/app.config.js";
 import { historyPanel } from "./history.panel.js";
 import { appInstance } from "@/app.js";
-import { eventBus } from "@/core/eventBus.js";
 import { EVENTS } from "@/services/enum.js";
+import { logger } from "@/utils/logger/logger.service.js";
 
 export const queryInput = () => {
   const query = blessed.textbox({
@@ -28,7 +28,12 @@ export const queryInput = () => {
   });
 
   query.on("submit", () => {
-    eventBus.emit(EVENTS.QUERY_SEND, query.getValue() || {});
+    try {
+      appInstance.eventBus.emit(EVENTS.QUERY_SEND, query.getValue());
+    } catch (error) {
+      appInstance.eventBus.emit(EVENTS.QUERY_ERROR, error);
+      logger.error({ message: "Failed to submit query", error });
+    }
   });
 
   //open box history

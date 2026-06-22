@@ -20,7 +20,12 @@ import { showToast } from "@/panels/toast.panel";
 import { appInstance } from "@/app";
 import { renderResult } from "@/panels/result.panel";
 import { focusDropdown } from "@/panels/dropdown/dropdown.event";
-function loadMongoEvents() {
+import { getConfiguration, saveConnection } from "../helper";
+import { IConfigurationMongoConnection } from "@/types/config";
+
+export function initEventMongoService() {
+  logger.debug({ message: "appInstance", appInstance });
+  logger.debug({ message: "eventBus " + appInstance?.eventBus });
   registerConnectionEvents();
   registerDatabaseEvents();
   registerCollectionEvents();
@@ -31,37 +36,40 @@ function loadMongoEvents() {
   registerQueryResultEvent();
   logger.debug({ message: "Mongo events initialized" });
 }
-export const initEventMongoService = loadMongoEvents();
-
 function registerConnectionEvents() {
-  appInstance.eventBus.on(EVENTS.DB_CONNECT, async (uri: string) => {
-    try {
-      startLoading();
-
-      await connectMongo(uri);
-
-      const databases = await fetchDatabases();
-
-      state.databases = databases;
-      focusDropdown(appInstance.ui.dropdowns.databaseDD);
-      appInstance.eventBus.emit(EVENTS.DB_DATABASES_LOADED, {
-        statusCode: 200,
-        typeLogger: TYPE_LOGGER.CONNECT_MONGO_DB,
-        developerMessage: "connected successfully",
-      });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        logger.error({ message: "Error connecting to MongoDB", error });
+  appInstance.eventBus.on(
+    EVENTS.DB_CONNECT,
+    async (connections: Record<string, any>, onSave: boolean) => {
+      const { connectionString } = connections;
+      try {
+        appInstance.clearWorkerScreen();
+        startLoading();
+        await connectMongo(connectionString);
+        if (onSave) {
+          getConfiguration().connections.push(saveConnection(connections));
+        }
+        const databases = await fetchDatabases();
+        state.databases = databases;
+        //        focusDropdown(appInstance.ui.dropdowns.databaseDD);
         appInstance.eventBus.emit(EVENTS.DB_DATABASES_LOADED, {
-          statusCode: 500,
-          developerMessage: error,
+          statusCode: 200,
           typeLogger: TYPE_LOGGER.CONNECT_MONGO_DB,
+          developerMessage: "connected successfully",
         });
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          logger.error({ message: "Error connecting to MongoDB", error });
+          appInstance.eventBus.emit(EVENTS.DB_DATABASES_LOADED, {
+            statusCode: 500,
+            developerMessage: error,
+            typeLogger: TYPE_LOGGER.CONNECT_MONGO_DB,
+          });
+        }
+      } finally {
+        clearLoading();
       }
-    } finally {
-      clearLoading();
-    }
-  });
+    },
+  );
 }
 function registerCollectionLoadedEvent() {
   appInstance.eventBus.on(EVENTS.DB_COLLECTIONS_LOADED, (collections) => {
@@ -77,7 +85,7 @@ function registerDatabaseEvents() {
       const collections = await fetchCollections(dbName);
 
       state.collections = collections;
-      focusDropdown(appInstance.ui.dropdowns.collectionDD);
+      //     focusDropdown(appInstance.ui.dropdowns.collectionDD);
 
       appInstance.eventBus.emit(EVENTS.DB_COLLECTIONS_LOADED, collections);
     },
@@ -100,6 +108,14 @@ function registerQueryEvents() {
     });
 
     appInstance.eventBus.emit(EVENTS.QUERY_RESULT, docs);
+  });
+
+  appInstance.eventBus.on(EVENTS.QUERY_ERROR, (error) => {
+    logger.error({ message: "Query error", error });
+    showToast({
+      statusCode: 400,
+      message: String(error),
+    });
   });
 }
 function registerQueryResultEvent() {

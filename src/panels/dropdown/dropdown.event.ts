@@ -1,10 +1,10 @@
 import { appInstance } from "@/app";
-import { openInputPanel } from "../input.panel";
 import { getConnectionNames } from "@/shared/selectors/connection.selectors";
 import blessed from "neo-blessed";
 import { state } from "@/shared/state";
 import { logger } from "@/utils/logger/logger.service";
 import { EVENTS } from "@/services/enum";
+import { openForm } from "../form/form.panel";
 function resetCollectionSelection(collectionDD: blessed.Widgets.BoxOptions) {
   state.collections = [];
   collectionDD.header.setContent(" Select Collection ▼ ");
@@ -106,10 +106,31 @@ const registerEventConnectionDD = () => {
   const workspacePanel = appInstance.ui.panels.workspace;
   connectionDD!.header.setContent(" Select Connection ▼ ");
   connectionDD!.header.key(["C-e"], () => {
-    openInputPanel("Enter Mongo URI", (uri: any) => {
-      appInstance.ui.dropdowns.connectionDD!.header.setContent(" Manual ▼ ");
-      appInstance.eventBus.emit("db:connect", uri);
+    openForm({
+      title: "MongoDB Connection",
+      fields: [
+        {
+          name: "connectionName",
+          label: "connectionName",
+          value: "localhost",
+        },
+        {
+          name: "connectionString",
+          label: "connectionString",
+          value: "mongodb://localhost:27017",
+        },
+      ],
+      onSubmit(data) {
+        appInstance.ui.dropdowns.connectionDD!.header.setContent(" Manual ▼ ");
+        appInstance.ui.dropdowns.connectionDD!.header.render();
+        appInstance.eventBus.emit(EVENTS.DB_CONNECT, data, true);
+      },
     });
+    // openInputPanel("Enter Mongo URI", (uri: any) => {
+    //   appInstance.ui.dropdowns.connectionDD!.header.setContent(" Manual ▼ ");
+    //   appInstance.ui.dropdowns.connectionDD!.header.render();
+    //   appInstance.eventBus.emit(EVENTS.DB_CONNECT, uri, true);
+    // });
   });
 
   connectionDD!.header.key("enter", () => {
@@ -129,7 +150,11 @@ const registerEventConnectionDD = () => {
         closeDropdown(connectionDD!);
 
         resetDBSelection(databaseDD!, collectionDD!);
-        appInstance.eventBus.emit(EVENTS.DB_CONNECT, uri);
+        appInstance.eventBus.emit(
+          EVENTS.DB_CONNECT,
+          { connectionString: uri },
+          false,
+        );
 
         appInstance.renderScreen();
       } catch (err: any) {

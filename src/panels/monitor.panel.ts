@@ -1,5 +1,6 @@
 import os from "os";
 import blessed from "neo-blessed";
+import { appInstance } from "@/app";
 
 export function monitorPanel() {
   const box = blessed.box({
@@ -48,7 +49,6 @@ Heap: ${(mem.heapUsed / 1024 / 1024).toFixed(1)} MB
 EventLoop: ${elapsedMs.toFixed(1)}ms
 Load: ${os.loadavg()[0].toFixed(2)}
 `);
-
-    // screen.render();
+    appInstance.renderScreen();
   }, 500);
 }

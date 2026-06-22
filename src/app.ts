@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import fs from "fs/promises";
 import os from "os";
 import path from "path";
@@ -5,6 +6,7 @@ import { MongoTermApp } from "@/core/screen";
 import { logger } from "./utils/logger/logger.service";
 import { initEventMongoService } from "./services/mongodb/mongodb.events";
 import { WorkspaceLogger } from "./utils/logger/logger";
+import { getConfiguration } from "./services/helper";
 
 export let appInstance: MongoTermApp;
 export let appReady: Promise<MongoTermApp>;
@@ -25,8 +27,13 @@ async function createApplicationDirectory(): Promise<void> {
 }
 
 async function initializeApp(): Promise<MongoTermApp> {
+  getConfiguration()
   const app = new MongoTermApp(new WorkspaceLogger());
   appInstance = app;
+  setTimeout(() => {
+    initEventMongoService();
+
+  },3000);
 
   try {
     await app.init();

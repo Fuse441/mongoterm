@@ -1,5 +1,3 @@
-import { screen } from "../core/screen.js";
-
 import { closeEditor } from "../panels/modal.panel.js";
 
 export function onKeypress(

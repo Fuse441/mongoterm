@@ -1,3 +1,4 @@
+import { TreeNode } from "@/panels/tree/tree.panel";
 import blessed from "blessed";
 export type TResponseLayout = {
   panels: Partial<TLayoutScreen["_panels"]>;
@@ -7,8 +8,14 @@ type TDropdown = {
   header: blessed.Widgets.BoxElement;
   list: blessed.Widgets.ListElement;
 };
+type TTree = {
+  el: blessed.Widgets.ListElement;
+  render(): void;
+  setRoots(...nodes: TreeNode[]): void;
+};
 export type TLayoutScreen = {
   _panels: {
+    tree: any;
     connection: blessed.Widgets.BoxElement;
     workspace: blessed.Widgets.BoxElement;
     query: blessed.Widgets.BoxElement;

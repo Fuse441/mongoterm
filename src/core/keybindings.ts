@@ -19,8 +19,7 @@ const getBindings = (ui: TResponseLayout) => [
   // ── connection ────────────────────────────────────
   {
     keys: ["l", "right"],
-    condition: () =>
-      appInstance.screen.focused === ui.dropdowns.connectionDD!.header,
+    condition: () => appInstance.screen.focused === ui.panels.tree,
     action: () => {
       logger.debug({ message: "Focusing workspace from connection header" });
       ui.panels.workspace!.focus();
@@ -32,7 +31,7 @@ const getBindings = (ui: TResponseLayout) => [
   {
     keys: ["h", "left"],
     condition: () => appInstance.screen.focused === ui.panels.workspace,
-    action: () => ui.dropdowns.connectionDD!.header.focus(),
+    action: () => ui.panels.tree.focus(),
   },
   {
     keys: ["k", "up"],

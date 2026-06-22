@@ -2,7 +2,7 @@ import blessed from "neo-blessed";
 
 import { theme } from "../config/app.config.js";
 import { QueryService } from "@/services/query.service";
-import { screen, ui } from "../core/screen.js";
+import { appInstance } from "@/app.js";
 // const queryService = new QueryService();
 // queryService.clearHistory();
 // console.log(queryService.viewHistory());
@@ -65,50 +65,47 @@ export const historyPanel = () => {
     const result = (filtered.length != 0 &&
       filtered.map((q) => `${q.query}`)) || ["No results"];
     list.setItems(result);
-    screen.render();
+    appInstance.renderScreen();
   });
   //
   // // Tab สลับไป list
   search.key(["enter"], () => {
-    screen.debug("Tab or Down pressed, moving focus to list");
     list.focus();
-    screen.render();
+    appInstance.renderScreen();
   });
   //
   // // Tab สลับกลับ search
   list.key(["tab"], () => {
     search.focus();
-    screen.render();
+    appInstance.renderScreen();
   });
 
   list.on("select", (item, index) => {
-    ui.query.setValue(history[index]?.query || JSON.stringify({}));
-    //   screen.debug(`Selected query: ${(item.getText(), index)}`);
-    screen.render();
+    // appInstance.ui.panels.query!.setValue(history[index]?.query || JSON.stringify({}));
+    //   //   screen.debug(`Selected query: ${(item.getText(), index)}`);
+    //   screen.render();
   });
   //
   // // ESC ปิด
   container.key(["escape"], () => {
     container.destroy();
-    screen.render();
-    ui.query.focus();
+    appInstance.renderScreen();
+    appInstance.ui.panels.query!.focus();
   });
   search.key(["escape"], () => {
     container.destroy();
-    ui.query.focus();
-
-    screen.render();
+    appInstance.ui.panels.query!.focus();
+    appInstance.renderScreen();
   });
   list.key(["escape"], () => {
     container.destroy();
-    ui.query.focus();
+    appInstance.ui.panels.query!.focus();
 
-    screen.render();
+    appInstance.renderScreen();
   });
   //
-
-  screen.append(container);
+  appInstance.appendToScreen(container);
   search.focus();
-  screen.render();
+  appInstance.renderScreen();
   return container;
 };

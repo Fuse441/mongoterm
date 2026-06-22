@@ -3,8 +3,6 @@ import { logger } from "@/utils/logger/logger.service";
 import { appInstance } from "@/app";
 export function showToast(toast: Record<string, any>) {
   const { statusCode, message } = toast;
-  logger.debug(toast);
-  logger.debug({ show: "Showing toast", statusCode, tml: message.length });
   const color = statusCode != 200 ? "red" : "green";
   const box = blessed.box({
     bottom: 1,
@@ -22,17 +20,22 @@ export function showToast(toast: Record<string, any>) {
   });
   box.focus();
 
-  if (statusCode != 200) {
-    box.on("keypress", () => {
-      appInstance.removeScreenElement(box);
-      appInstance.renderScreen();
-    });
-  } else {
-    setTimeout(() => {
-      appInstance.removeScreenElement(box);
-      appInstance.renderScreen();
-    }, 1500);
-  }
+  // if (statusCode != 200) {
+  //   box.on("keypress", () => {
+  //     appInstance.removeScreenElement(box);
+  //     appInstance.renderScreen();
+  //   });
+  // } else {
+  //   setTimeout(() => {
+  //     appInstance.removeScreenElement(box);
+  //     appInstance.renderScreen();
+  //   }, 1500);
+  // }
+  setTimeout(() => {
+    appInstance.removeScreenElement(box);
+    appInstance.renderScreen();
+  }, 2500);
+
   appInstance.appendToScreen(box);
   appInstance.renderScreen();
 }

@@ -201,7 +201,10 @@ function handleDuplicate(parent: any, id: any, idx: any) {
 }
 function handleEdit(parent: any, doc: any, idx: any) {
   try {
+    const currentFocus = parent.screen.focused;
+    logger.debug({message : "handleEdit ==> " + currentFocus?.options?.id})
     openEditor(doc);
+    currentFocus?.focus();
   } catch (error) {
     logger.error({ message: "Error opening editor", error });
   }

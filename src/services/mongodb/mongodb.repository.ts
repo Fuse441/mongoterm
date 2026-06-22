@@ -75,7 +75,7 @@ export function parseQuery(query?: string): Record<string, unknown> {
   }
 }
 export async function fetchQuery(
-  query?: string,
+  query?:  string, 
   {
     page = state.page,
     pageSize =state.pageSize,
@@ -93,13 +93,14 @@ export async function fetchQuery(
   state.queryService.saveQuery(query ?? "{}");
 
   const collection = getClient().db(dbName).collection(colName);
-
+  logger.debug({ message: "Fetching documents from collection", dbName, colName, filter });
   const skip = (page - 1) * pageSize;
 
   const [docs, total] = await Promise.all([
     collection.find(filter).skip(skip).limit(pageSize).toArray(),
     collection.countDocuments(filter),
   ]);
+  logger.debug({ message: "Query result", docs, total });
    state.totalPages = Math.ceil(total / pageSize); 
   return {
     docs,

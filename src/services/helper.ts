@@ -1,29 +1,47 @@
-import blessed from "neo-blessed";
-import config from "../../compass.json";
-import { state } from "@/shared/state";
-
+import defaultConfig from "../../compass.json";
+import { IConfigurationMongoConnection } from "@/types/config";
+import { MongoClient, ObjectId } from "mongodb";
+import { logger } from "@/utils/logger/logger.service";
+import fs from "fs";
+import os from "os";
+import path from "path";
+let configuration = structuredClone(defaultConfig);
 export function getConfiguration() {
-  return config;
+  return configuration;
 }
+export function saveConnection(
+  connection: Record<string, any>,
+): IConfigurationMongoConnection {
+  const newConnection: IConfigurationMongoConnection = {
+    id: new ObjectId().toHexString(),
+    lastUsed: {
+      $date: {
+        $numberLong: Date.now().toString(),
+      },
+    },
+    favorite: {
+      name: connection.connectionName,
+    },
+    savedConnectionType: "recent",
+    connectionOptions: {
+      connectionString: connection.connectionString,
+      oidc: {},
+    },
+  };
 
-export function getTimestamp() {
+  configuration = {
+    ...configuration,
+    connections: [...configuration.connections, newConnection],
+  };
+
+  fs.writeFileSync(
+    path.join("compass.json"),
+    JSON.stringify(configuration, null, 2),
+  );
+logger.debug({message: path.join("compass.json")})
+  return newConnection;
+}export function getTimestamp() {
   return new Date().toISOString();
 }
 
-export function resetDBSelection(
-  databaseDD: blessed.Widgets.BoxOptions,
-  collectionDD: blessed.Widgets.BoxOptions,
-) {
-  state.databases = [];
-  state.collections = [];
 
-  databaseDD.header.setContent(" Select Database ▼ ");
-  collectionDD.header.setContent(" Select Collection ▼ ");
-}
-
-export function resetCollectionSelection(
-  collectionDD: blessed.Widgets.BoxOptions,
-) {
-  state.collections = [];
-  collectionDD.header.setContent(" Select Collection ▼ ");
-}
