@@ -29,7 +29,7 @@ export function openForm(options: IFormOptions) {
       border: "line",
       keys: true,
       mouse: true,
-      inputOnFocus: false,
+      inputOnFocus: true,
       value: field.value ?? "",
       padding: {
         left: 1,
