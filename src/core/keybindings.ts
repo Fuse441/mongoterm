@@ -6,6 +6,7 @@ import { TResponseLayout } from "@/layout/main.layout.types";
 let currentRecord = 0;
 import blessed from "neo-blessed";
 import { EVENTS } from "@/services/enum";
+
 // ── config: key → action ──────────────────────────────
 const getBindings = (ui: TResponseLayout) => [
   {
@@ -21,7 +22,6 @@ const getBindings = (ui: TResponseLayout) => [
     keys: ["l", "right"],
     condition: () => appInstance.screen.focused === ui.panels.tree,
     action: () => {
-      logger.debug({ message: "Focusing workspace from connection header" });
       ui.panels.workspace!.focus();
       appInstance.renderWorkspacePanel();
     },
@@ -107,10 +107,18 @@ const getBindings = (ui: TResponseLayout) => [
     action: () => {
       const records: blessed.Widgets.BoxOptions[] =
         ui.panels.workspace!.children.filter((c: any) => c._isRecord);
+      logger.debug({
+        message: `records length: ${records.length}, currentRecord: ${currentRecord}`,
+      });
+
       if (!records.length) return;
       currentRecord = Math.min(currentRecord + 1, records.length - 1);
-      records[currentRecord].focus();
-      appInstance.screen.render();
+      if (appInstance.screen.focused !== records[currentRecord].focus()) {
+        logger.debug({
+          message: `Focusing record ${currentRecord}`,
+        });
+        records[currentRecord].focus();
+      }
     },
   },
   {
@@ -144,14 +152,6 @@ const getBindings = (ui: TResponseLayout) => [
       toggleHelp();
     },
   },
-  {
-    keys: ["j", "k,", "h", "l"],
-    action: () => {
-      // logger.debug(
-      //   `Key pressed: ${screen._lastKey}, focused element: ${screen.focused?.type}`,
-      // );
-    },
-  },
 ];
 
 export const keybindings = (ui: any) => {
@@ -167,7 +167,7 @@ export const keybindings = (ui: any) => {
       for (const { condition, action } of handlers) {
         if (condition && !condition()) continue;
         action();
-        return; // ← ทำแค่ตัวแรกที่ condition pass
+        return;
       }
     });
   });

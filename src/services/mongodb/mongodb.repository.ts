@@ -5,8 +5,18 @@ import { connect } from "./mongodb.connector";
 import { QueryService } from "@/services/query.service";
 import { logger } from "@/utils/logger/logger.service";
 import { appInstance } from "@/app";
+import { EventMongoTerm } from "@/core/eventBus";
 
-function getClient() {
+export class MongoRepository {
+  private eventBus: EventMongoTerm;
+  constructor(eventBus: EventMongoTerm) {
+    this.eventBus = eventBus;
+  }
+    
+
+
+
+public getClient() {
   if (!state.mongoClient) {
     throw new Error("MongoDB not connected");
   }
@@ -14,7 +24,7 @@ function getClient() {
   return state.mongoClient;
 }
 
-export async function connectMongo(uri: string) {
+public async connectMongo(uri: string) {
   if (state.mongoClient) {
     await state.mongoClient.close();
   }
@@ -26,23 +36,23 @@ export async function connectMongo(uri: string) {
   state.queryService = new QueryService(clusterName);
 }
 
-export async function fetchDatabases() {
-  const admin = getClient().db().admin();
+public async  fetchDatabases() {
+  const admin = this.getClient().db().admin();
 
   const result = await admin.listDatabases();
 
   return result.databases.map((db) => db.name);
 }
 
-export async function fetchCollections(dbName: string) {
-  const db = getClient().db(dbName);
+public async  fetchCollections(dbName: string) {
+  const db = this.getClient().db(dbName);
 
   const collections = await db.listCollections().toArray();
 
   return collections.map((c) => c.name);
 }
 
-export function parseQuery(query?: string): Record<string, unknown> {
+public parseQuery(query?: string): Record<string, unknown> {
   if (!query?.trim()) {
     return {};
   }
@@ -66,7 +76,7 @@ export function parseQuery(query?: string): Record<string, unknown> {
     //   query,
     // });
 
- appInstance.eventBus.emit(EVENTS.TOAST_SHOW, {
+ this.eventBus.emit(EVENTS.TOAST_SHOW, {
       statusCode: 400,
       message: "Invalid query format",
     });
@@ -74,7 +84,7 @@ export function parseQuery(query?: string): Record<string, unknown> {
     return {};
   }
 }
-export async function fetchQuery(
+public async fetchQuery(
   query?:  string, 
   {
     page = state.page,
@@ -88,11 +98,11 @@ export async function fetchQuery(
   const dbName = state.databases[state.selectedDatabaseIndex];
   const colName = state.collections[state.selectedCollectionIndex];
 
-  const filter = parseQuery(query);
+  const filter = this.parseQuery(query);
   logger.debug({ message: "Parsed query filter", filter });
   state.queryService.saveQuery(query ?? "{}");
 
-  const collection = getClient().db(dbName).collection(colName);
+  const collection = this.getClient().db(dbName).collection(colName);
   logger.debug({ message: "Fetching documents from collection", dbName, colName, filter });
   const skip = (page - 1) * pageSize;
 
@@ -112,14 +122,14 @@ export async function fetchQuery(
   };
 }
 
-export async function updateRecord(
+public async updateRecord(
   _id: ObjectId,
   updateFields: Record<string, unknown>,
 ) {
   const dbName = state.databases[state.selectedDatabaseIndex];
   const colName = state.collections[state.selectedCollectionIndex];
 
-  await getClient().db(dbName).collection(colName).updateOne(
+  await this.getClient().db(dbName).collection(colName).updateOne(
     { _id },
     {
       $set: updateFields,
@@ -135,25 +145,25 @@ export async function updateRecord(
   });
 }
 
-export async function deleteRecord(id: string) {
+public async  deleteRecord(id: string) {
   const dbName = state.databases[state.selectedDatabaseIndex];
   const colName = state.collections[state.selectedCollectionIndex];
 
-  await getClient()
+  await this.getClient()
     .db(dbName)
     .collection(colName)
     .deleteOne({
       _id: new ObjectId(id),
     });
 
-  appInstance.eventBus.emit(EVENTS.TOAST_SHOW, {
+  this.eventBus.emit(EVENTS.TOAST_SHOW, {
     statusCode: 200,
     message: "record deleted!",
   });
 }
 
-export async function duplicateRecord(id: string) {
-  const result = await fetchQuery(
+public async duplicateRecord(id: string) {
+  const result = await this.fetchQuery(
     JSON.stringify({
       _id: id,
     }),
@@ -162,7 +172,7 @@ export async function duplicateRecord(id: string) {
   const doc = result.docs[0];
 
   if (!doc) {
-   appInstance.eventBus.emit(EVENTS.TOAST_SHOW, {
+   this.eventBus.emit(EVENTS.TOAST_SHOW, {
       statusCode: 404,
       message: "Document not found",
     });
@@ -172,15 +182,16 @@ export async function duplicateRecord(id: string) {
   const dbName = state.databases[state.selectedDatabaseIndex];
   const colName = state.collections[state.selectedCollectionIndex];
 
-  await getClient()
+  await this.getClient()
     .db(dbName)
     .collection(colName)
     .insertOne({
       ...(doc as object),
       _id: new ObjectId(),
     });
-  appInstance.eventBus.emit(EVENTS.TOAST_SHOW, {
+  this.eventBus.emit(EVENTS.TOAST_SHOW, {
     statusCode: 200,
     message: "record duplicated!",
   });
+}
 }

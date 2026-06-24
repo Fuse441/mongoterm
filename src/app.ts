@@ -4,11 +4,12 @@ import os from "os";
 import path from "path";
 import { MongoTermApp } from "@/core/screen";
 import { logger } from "./utils/logger/logger.service";
-import { initEventMongoService } from "./services/mongodb/mongodb.events";
 import { WorkspaceLogger } from "./utils/logger/logger";
 import { getConfiguration } from "./services/helper";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { defaultConfig } from "./config/app.config";
+import { MongodbBuilder } from "./services/mongodb/mongodb.builder";
+import { EventMongoTerm } from "./core/eventBus";
 export let appInstance: MongoTermApp;
 export let appReady: Promise<MongoTermApp>;
  
@@ -45,13 +46,13 @@ async function createApplicationDirectory(): Promise<void> {
 }
 
 async function initializeApp(): Promise<MongoTermApp> {
-  const app = new MongoTermApp(new WorkspaceLogger());
+ const eventBus = new EventMongoTerm();
+const app = new MongoTermApp(eventBus,
+  new WorkspaceLogger(),new MongodbBuilder(eventBus));
   appInstance = app;
-  setTimeout(() => {
-    initEventMongoService();
+//  await initEventMongoService();
 
-  },3000);
-
+ 
   try {
     await app.init();
     logger.debug({ message: "Application initialized successfully." });

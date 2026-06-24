@@ -10,7 +10,9 @@ import { EVENTS } from "@/services/enum.js";
 import { logger } from "@/utils/logger/logger.service.js";
 
 export const queryInput = () => {
+  const id = "query";
   const query = blessed.textbox({
+    id,
     top: 0,
     left: 47,
     width: "75%",
@@ -35,7 +37,9 @@ export const queryInput = () => {
       logger.error({ message: "Failed to submit query", error });
     }
   });
-
+  query.on("focus", () => {
+    appInstance.setKeybindbarContent(id);
+  });
   //open box history
   query.key(["C-o"], () => {
     query.cancel();

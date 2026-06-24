@@ -4,7 +4,7 @@ import { appInstance } from "@/app";
 
 export function monitorPanel() {
   const box = blessed.box({
-    bottom: 1,
+    bottom: 5,
     left: 1,
     width: 30,
     height: 10,

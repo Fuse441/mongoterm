@@ -148,6 +148,10 @@ function bindRecordEvents({ box, parent, doc, id, idx }: any) {
   // box.on("focus", () => {
   //   logger.debug(`Focused on record ${idx + 1} with id: ${id}`);
   // });
+
+  box.on("focus", () => {
+      appInstance.setKeybindbarContent("record"); 
+  })
   box.key("c", () => handleCopy(parent, doc));
 
   box.key("e", () => handleEdit(parent, doc, idx));
@@ -202,9 +206,7 @@ function handleDuplicate(parent: any, id: any, idx: any) {
 function handleEdit(parent: any, doc: any, idx: any) {
   try {
     const currentFocus = parent.screen.focused;
-    logger.debug({message : "handleEdit ==> " + currentFocus?.options?.id})
     openEditor(doc);
-    currentFocus?.focus();
   } catch (error) {
     logger.error({ message: "Error opening editor", error });
   }
@@ -242,7 +244,7 @@ export async function renderResult(
       parent.remove(child);
     }
   });
-  parent.setLabel(` Results (${docs.length * state.totalPages}) `);
+  parent.setLabel(` Results (${docs.length * state.totalPages}) page ${state.page} of ${state.totalPages} `);
   const rowHeight = RECORD_HEIGHT + RECORD_GAP;
   //
   parent.scrollTo(0);

@@ -20,6 +20,7 @@ export type TLayoutScreen = {
     workspace: blessed.Widgets.BoxElement;
     query: blessed.Widgets.BoxElement;
     monitor: blessed.Widgets.BoxElement;
+    keybindbar: blessed.Widgets.BoxElement;
   };
   _dropdowns: {
     connectionDD: TDropdown;

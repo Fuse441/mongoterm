@@ -9,25 +9,23 @@ import { initPluginsStyle } from "@/components/plugins/register";
 import { initDropdownEvents } from "@/panels/dropdown/dropdown.event";
 import { Logger } from "@/utils/logger/logger";
 import { IWorkspaceLogger } from "@/utils/logger/logger.interface";
+import { TKeybindName } from "@/panels/keybingbar/keybindbar.interface";
+import { keybindbarConfig } from "@/panels/keybingbar/keybindbar.config";
+import { MongodbBuilder } from "@/services/mongodb/mongodb.builder";
 export class MongoTermApp {
   private _screen!: blessed.Widgets.Screen;
   private _ui!: TResponseLayout;
   private _style!: any;
-  private _eventBus!: EventMongoTerm;
-  constructor(private workspaceLogger: Logger) {}
+    constructor(private _eventBus:EventMongoTerm, private workspaceLogger: Logger,private mongodbBuilder: MongodbBuilder) {}
   public async init() {
     try {
       logger.info({ message: "Initializing MongoTerm..." });
+      await this.mongodbBuilder.initMongoBuilder();
       await this.createScreen();
       await this.createUI();
-      await this.createEventBus();
       await this.createStyle();
 
       await this.registerAppListeners();
-      // this._screen.on("keypress", (_, key) => {
-      // logger.debug({message: "log keypress " + JSON.stringify(key)})
-      // });
-      //      this.ui.childConnection.connectionDD.header.focus();
     } catch (error) {
       logger.error({ message: "Error initializing MongoTerm", error });
     }
@@ -40,6 +38,8 @@ export class MongoTermApp {
       smartCSR: true,
       title: "MongoTerm",
     });
+    
+
   }
   private async createEventBus() {
     this._eventBus = new EventMongoTerm();
@@ -55,6 +55,7 @@ export class MongoTermApp {
   public renderWorkspace(content: IWorkspaceLogger) {
     const response = this.workspaceLogger.log(content);
     this._ui.panels.workspace!.setContent(String(response));
+    // this._ui.panels.workspace!.setLabel(` {bold}asdasd{/bold} `);
     this.renderScreen();
   }
   public removeScreenElement(element: any) {
@@ -92,9 +93,18 @@ export class MongoTermApp {
 
   private async createUI() {
     this._ui = await new MognoTermLayout().initLayout();
-    //    initDropdownEvents();
-    this.renderScreen();
+    this._ui.panels.tree!.focus();
+        this.renderScreen();
     logger.debug({ message: "UI initialized", details: this._ui });
+  }
+  public setKeybindbarContent(id:TKeybindName) {
+    let content = ``;
+    const config  = keybindbarConfig[id]
+    for (const keybind of config) {
+      content += `[{bold}${keybind.key}{/bold}] - ${keybind.description}  `;
+    }
+    this._ui.panels.keybindbar!.setContent(content);
+    this.renderScreen();
   }
   get style() {
     return this._style;

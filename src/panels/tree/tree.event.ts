@@ -17,7 +17,10 @@ function waitFor(
   return new Promise((resolve) => {
     const start = Date.now();
     const id = setInterval(() => {
-      if (check() || Date.now() - start > timeoutMs) {
+      // logger.debug({
+      //   message: `Polling for condition... elapsed: ${state.databases.length} ${Date.now() - start}ms`,
+      // });
+      if (state.databases.length || Date.now() - start > timeoutMs) {
         clearInterval(id);
         resolve();
       }
@@ -32,7 +35,7 @@ export function registerDirectoryTree(parent: any, top: any) {
       top: 0,
       left: 0,
       width: "25%",
-      height: "100%",
+      height: "92%",
       label: " Connection ",
       border: "line",
       style: {
@@ -40,7 +43,6 @@ export function registerDirectoryTree(parent: any, top: any) {
         label: {},
       },
     });
-
     function buildConnectionNodes() {
       const names = getConnectionNames();
       const nodes = names.map((name: string, index: number) =>
@@ -111,6 +113,7 @@ export function registerDirectoryTree(parent: any, top: any) {
           node.children = state.databases.map((dbName: string) =>
             tree.makeNode("database", dbName, node, { dbName }),
           );
+          appInstance.renderScreen();
         }
 
         if (node.type === "database") {

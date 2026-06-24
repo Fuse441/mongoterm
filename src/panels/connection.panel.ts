@@ -1,11 +1,12 @@
 import blessed from "neo-blessed";
 import { theme } from "../config/app.config.js";
+import { keybindbarConfig } from "./keybingbar/keybindbar.config.js";
 export const connectionPanel: any = () => {
   const box = blessed.box({
     top: 0,
     left: 0,
     width: "25%",
-    height: "100%",
+    height: "90%",
     label: " Connection ",
     border: "line",
     style: {
@@ -13,7 +14,6 @@ export const connectionPanel: any = () => {
       label: {},
     },
   });
-
   return box;
 };
 

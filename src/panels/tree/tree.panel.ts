@@ -1,5 +1,7 @@
 import blessed from "neo-blessed";
 import { theme } from "@/config/app.config";
+import { logger } from "@/utils/logger/logger.service";
+import { appInstance } from "@/app";
 
 export type TreeNodeType = "connection" | "database" | "collection";
 
@@ -35,7 +37,9 @@ const NODE_STYLE: Record<
 };
 
 export function createTree(parent: any, options: any) {
+  const id = "tree";
   const list: any = blessed.list({
+    id,
     parent,
     keys: true,
     mouse: true,
@@ -55,6 +59,7 @@ export function createTree(parent: any, options: any) {
 
   list.on("focus", () => {
     list.style.border.fg = theme.border.focus;
+    appInstance.setKeybindbarContent(id);
     list.screen.render();
   });
   list.on("blur", () => {
