@@ -14,10 +14,12 @@ and this project follows Semantic Versioning (SemVer).
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (fd9cc3e)
+- Update CHANGELOG.md [skip ci] (6e71873)
 
 ### Other
 
 - Add manual auto-tag version workflow (major/minor/patch/prerelease) (1e3da64)
+- Bump version from 0.1.2-alpha to 0.2.0-alpha (ce27c9f)
 
 ## [0.1.2-alpha] - 2026-06-24
 
