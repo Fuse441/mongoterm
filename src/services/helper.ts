@@ -2,7 +2,6 @@ import fs, { readFileSync } from "fs";
 import { ObjectId } from "mongodb";
 import { IConfigurationMongoConnection } from "@/types/config";
 import { logger } from "@/utils/logger/logger.service";
-import { state } from "@/shared/state";
 import { CONFIG_PATH } from "@/config/app.paths";
 
 export function getConfiguration() {
@@ -42,7 +41,7 @@ export function saveConnection(
       JSON.stringify(newConfig, null, 2),
       "utf-8",
     );
-    logger.debug({ message: `Configuration saved: ${JSON.stringify(state.connections)}` });
+    logger.debug({ message: `Configuration saved: ${JSON.stringify(updatedConnections)}` });
     return newConnection;
   } catch (err: any) {
     logger.error({
