@@ -7,9 +7,19 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Other
+
+- Change GitHub token to thanos-for-developer (8e9548a)
+
+## [0.2.4] - 2026-07-20
+
 ### Added
 
 - Validate JSON before save (30c0a20)
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (4cbf0ae)
 
 ### Fixed
 
