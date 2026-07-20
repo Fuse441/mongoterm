@@ -5,11 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is inspired by [Keep a Changelog](https://keepachangelog.com/)
 and this project follows Semantic Versioning (SemVer).
 
-## [Unreleased]
+## [0.2.6] - 2026-07-20
+
+### Other
+
+- 0.2.6 (167c050)
+
+## [0.2.5] - 2026-07-20
 
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (43b5d0f)
+- Update CHANGELOG.md [skip ci] (fb6b1dd)
 
 ### Other
 
