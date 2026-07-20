@@ -38,13 +38,16 @@ export function openEditor(doc: any) {
     },
   });
 
+  const DEFAULT_HINT =
+    " {grey-fg}esc{/grey-fg} close   {grey-fg}C-s{/grey-fg} save ";
+
   const hint = blessed.box({
     bottom: 0,
     left: "center",
     width: "70%",
     height: 1,
     tags: true,
-    content: " {grey-fg}esc{/grey-fg} close   {grey-fg}C-s{/grey-fg} save ",
+    content: DEFAULT_HINT,
   });
 
   function render() {
@@ -73,24 +76,38 @@ export function openEditor(doc: any) {
 
   // save
   function onSave() {
-    try {
-      const query = appInstance.ui.panels.query!.getContent();
-      appInstance.eventBus.emit(EVENTS.RECORD_UPDATE, {
-        updated: lines.join("\n"),
-        query,
-      });
+    const content = lines.join("\n");
 
-      closeEditor();
-    } catch {
-      hint.setContent(" {red-fg}invalid JSON — fix before saving{/red-fg} ");
+    try {
+      JSON.parse(content);
+    } catch (error: any) {
+      hasError = true;
+      hint.setContent(
+        ` {red-fg}invalid JSON — fix before saving: ${error.message}{/red-fg} `,
+      );
       appInstance.renderScreen();
+      return;
     }
+
+    const query = appInstance.ui.panels.query!.getContent();
+    appInstance.eventBus.emit(EVENTS.RECORD_UPDATE, {
+      updated: content,
+      query,
+    });
+
+    closeEditor();
   }
 
   box.key(["C-s"], onSave);
   let pending = false;
+  let hasError = false;
 
   function scheduleRender() {
+    if (hasError) {
+      hasError = false;
+      hint.setContent(DEFAULT_HINT);
+    }
+
     if (pending) return;
 
     pending = true;

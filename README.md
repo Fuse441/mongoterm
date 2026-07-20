@@ -45,8 +45,8 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 <details>
 <summary><strong>📝 Editor</strong></summary>
 
+- [x] Validate JSON before save
 - [ ] Syntax highlighting in record editor
-- [ ] Validate JSON before save
 - [ ] Undo / redo support
 
 </details>
