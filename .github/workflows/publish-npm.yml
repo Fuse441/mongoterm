@@ -1,70 +1,80 @@
 name: Publish to npm
 
-# Manual publish workflow.
-
-# Run from:
-
-# Actions -> Publish to npm -> Run workflow
+# Manual, on-demand publish workflow.
+#
+# You choose exactly which version gets published (no auto-publish on tag
+# push), so a bad tag/version bump never accidentally ships to npm.
+#
+# Run from: Actions -> Publish to npm -> Run workflow
+#   - "Use workflow from": pick the branch/tag to build & publish (defaults
+#     to master, but you can pick a specific vX.Y.Z tag).
+#   - "version": type the exact version you expect to publish (e.g. 0.2.11).
+#     Must match package.json on the selected ref, or the run fails before
+#     anything is published.
 
 on:
-workflow_dispatch:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (must match package.json, e.g. 0.2.11)"
+        required: true
+        type: string
 
 permissions:
-contents: read
-id-token: write # required for npm provenance
+  contents: read
+  id-token: write # required for npm provenance
 
 jobs:
-publish:
-runs-on: ubuntu-latest
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-```
-steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
 
-  - name: Setup Node.js
-    uses: actions/setup-node@v4
-    with:
-      node-version: 22
-      registry-url: "https://registry.npmjs.org"
-      cache: npm
+      - name: Install dependencies
+        run: npm ci
 
-  - name: Install dependencies
-    run: npm ci
+      - name: Build project
+        run: npm run build
 
-  - name: Build project
-    run: npm run build
+      - name: Verify input version matches package.json
+        run: |
+          set -euo pipefail
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          INPUT_VERSION="${{ inputs.version }}"
+          INPUT_VERSION="${INPUT_VERSION#v}"
+          if [ "$PKG_VERSION" != "$INPUT_VERSION" ]; then
+            echo "::error::Requested version ${INPUT_VERSION} does not match package.json version ${PKG_VERSION} on this ref"
+            exit 1
+          fi
 
-  - name: Determine npm dist-tag
-    id: dist-tag
-    run: |
-      set -euo pipefail
+      - name: Determine npm dist-tag
+        id: dist-tag
+        run: |
+          set -euo pipefail
+          VERSION="$(node -p "require('./package.json').version")"
+          if [[ "$VERSION" == *-* ]]; then
+            # e.g. 1.2.3-alpha.0 -> "alpha"
+            PRE_ID="$(echo "$VERSION" | sed -E 's/^[^-]+-([a-zA-Z]+).*/\1/')"
+            echo "tag=${PRE_ID:-alpha}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=latest" >> "$GITHUB_OUTPUT"
+          fi
 
-      VERSION="$(node -p "require('./package.json').version")"
+      - name: Publish to npm
+        run: npm publish --tag "${{ steps.dist-tag.outputs.tag }}" --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      if [[ "$VERSION" == *-* ]]; then
-        # e.g. 1.2.3-alpha.0 -> alpha
-        PRE_ID="$(echo "$VERSION" | sed -E 's/^[^-]+-([a-zA-Z]+).*/\1/')"
-        echo "tag=${PRE_ID:-alpha}" >> "$GITHUB_OUTPUT"
-      else
-        echo "tag=latest" >> "$GITHUB_OUTPUT"
-      fi
-
-      echo "Version: $VERSION"
-      echo "Dist Tag: $(cat $GITHUB_OUTPUT | tail -n1)"
-
-  - name: Publish to npm
-    run: npm publish --tag "${{ steps.dist-tag.outputs.tag }}" --access public --provenance
-    env:
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  - name: Summary
-    run: |
-      VERSION="$(node -p "require('./package.json').version")"
-
-      echo "### 📦 Published mongoterm@${VERSION}" >> "$GITHUB_STEP_SUMMARY"
-      echo "" >> "$GITHUB_STEP_SUMMARY"
-      echo "- npm dist-tag: \`${{ steps.dist-tag.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
-      echo "- package version: \`${VERSION}\`" >> "$GITHUB_STEP_SUMMARY"
-      echo "- npm package: https://www.npmjs.com/package/mongoterm/v/${VERSION}" >> "$GITHUB_STEP_SUMMARY"
-```
+      - name: Summary
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          echo "### 📦 Published mongoterm@${VERSION} (dist-tag: ${{ steps.dist-tag.outputs.tag }})" >> "$GITHUB_STEP_SUMMARY"
+          echo "https://www.npmjs.com/package/mongoterm/v/${VERSION}" >> "$GITHUB_STEP_SUMMARY"
