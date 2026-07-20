@@ -7,6 +7,14 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Chore
+
+- Update CHANGELOG.md [skip ci] (453d8e2)
+
+### Fixed
+
+- Rewrite corrupted publish-npm.yml as manual workflow_dispatch (892cad4)
+
 ### Other
 
 - Update npm publish workflow for manual triggering (8284acc)
