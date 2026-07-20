@@ -7,9 +7,18 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Other
+
+- Add repository field to package.json
+
+Added repository information to package.json (491869d)
+
+## [0.2.13] - 2026-07-20
+
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (453d8e2)
+- Update CHANGELOG.md [skip ci] (823db85)
 
 ### Fixed
 
