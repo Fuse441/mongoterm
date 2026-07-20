@@ -9,6 +9,16 @@ and this project follows Semantic Versioning (SemVer).
 
 ### Other
 
+- Fix secret token casing in tag-release.yml (cef4f9a)
+
+## [0.2.9] - 2026-07-20
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (b53b6ce)
+
+### Other
+
 - Rename npm-publish.yml to publish-npm.yml (db480bf)
 
 ## [0.2.8] - 2026-07-20
