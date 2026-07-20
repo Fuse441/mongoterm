@@ -7,6 +7,12 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Other
+
+- Add npm publish workflow, fix broken package (missing dist/LICENSE) (e71eeb3)
+
+## [0.2.0] - 2026-07-20
+
 ### Changed
 
 - Centralize cross-platform app paths, restructure README roadmap, add auto changelog CI (0fee72f)
@@ -15,6 +21,7 @@ and this project follows Semantic Versioning (SemVer).
 
 - Update CHANGELOG.md [skip ci] (fd9cc3e)
 - Update CHANGELOG.md [skip ci] (6e71873)
+- Update CHANGELOG.md [skip ci] (0ffca99)
 
 ### Other
 
