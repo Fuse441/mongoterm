@@ -14,6 +14,8 @@ export const EVENTS = Object.freeze({
   RECORD_DUPLICATE: "duplicate:record",
   CONNECTION_UPDATE: "connection:update",
   CONNECTION_DELETE: "connection:delete",
+  DATABASE_CREATE: "database:create",
+  DATABASE_DROP: "database:drop",
 });
 
 export enum TYPE_LOGGER {

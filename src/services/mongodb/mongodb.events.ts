@@ -98,6 +98,47 @@ export class EventMongoService {
 
       this.eventBus.emit(EVENTS.DB_COLLECTIONS_LOADED, collections);
     });
+
+    this.eventBus.on(
+      EVENTS.DATABASE_CREATE,
+      async (dbName: string, collectionName?: string) => {
+        try {
+          state.databases = await this.mongoRepository.createDatabase(
+            dbName,
+            collectionName,
+          );
+          appInstance.ui.dropdowns.databaseDD!.list.setItems(state.databases);
+          appInstance.renderScreen();
+        } catch (error: any) {
+          logger.error({ message: "Failed to create database", error });
+          showToast({
+            statusCode: 500,
+            message: `Failed to create database: ${error.message}`,
+          });
+        }
+      },
+    );
+
+    this.eventBus.on(EVENTS.DATABASE_DROP, async (dbName: string) => {
+      try {
+        state.databases = await this.mongoRepository.dropDatabase(dbName);
+
+        if (state.selectedDatabaseIndex >= state.databases.length) {
+          state.selectedDatabaseIndex = 0;
+        }
+        appInstance.ui.dropdowns.databaseDD!.list.setItems(state.databases);
+        appInstance.ui.dropdowns.databaseDD!.header.setContent(
+          " Select Database ▼ ",
+        );
+        appInstance.renderScreen();
+      } catch (error: any) {
+        logger.error({ message: "Failed to drop database", error });
+        showToast({
+          statusCode: 500,
+          message: `Failed to drop database: ${error.message}`,
+        });
+      }
+    });
   }
 
   private registerCollectionEvents() {

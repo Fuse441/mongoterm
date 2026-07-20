@@ -44,6 +44,30 @@ public async  fetchDatabases() {
   return result.databases.map((db) => db.name);
 }
 
+public async createDatabase(dbName: string, collectionName = "default") {
+  // MongoDB only persists a database once it has at least one collection,
+  // so "creating" a database means creating a placeholder collection in it.
+  await this.getClient().db(dbName).createCollection(collectionName);
+
+  this.eventBus.emit(EVENTS.TOAST_SHOW, {
+    statusCode: 200,
+    message: `Database "${dbName}" created`,
+  });
+
+  return this.fetchDatabases();
+}
+
+public async dropDatabase(dbName: string) {
+  await this.getClient().db(dbName).dropDatabase();
+
+  this.eventBus.emit(EVENTS.TOAST_SHOW, {
+    statusCode: 200,
+    message: `Database "${dbName}" dropped`,
+  });
+
+  return this.fetchDatabases();
+}
+
 public async  fetchCollections(dbName: string) {
   const db = this.getClient().db(dbName);
 

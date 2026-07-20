@@ -80,6 +80,30 @@ const registerEventDatabaseDD = () => {
     openDropdown(databaseDD, state.databases);
   });
 
+  // 🔹 create a new database (requires an initial collection, since
+  // MongoDB doesn't persist an empty database)
+  databaseDD!.header.key(["C-e"], () => {
+    openForm({
+      title: "New Database",
+      fields: [
+        { name: "databaseName", label: "databaseName", value: "" },
+        {
+          name: "collectionName",
+          label: "initial collection",
+          value: "default",
+        },
+      ],
+      onSubmit(data) {
+        if (!data.databaseName?.trim()) return;
+        appInstance.eventBus.emit(
+          EVENTS.DATABASE_CREATE,
+          data.databaseName.trim(),
+          data.collectionName?.trim() || "default",
+        );
+      },
+    });
+  });
+
   databaseDD!.list.on("select", (_: any, index: number) => {
     try {
       const dbName = state.databases[index];
@@ -100,6 +124,20 @@ const registerEventDatabaseDD = () => {
       workspacePanel!.setContent(`Error: ${err.message}`);
       appInstance.renderScreen();
     }
+  });
+
+  // 🔹 drop the highlighted database
+  databaseDD!.list.key(["d"], () => {
+    const index = (databaseDD!.list as any).selected ?? 0;
+    const dbName = state.databases[index];
+    if (!dbName) return;
+
+    openDialogConfirm(
+      `Drop database "${dbName}"? This cannot be undone.`,
+      () => {
+        appInstance.eventBus.emit(EVENTS.DATABASE_DROP, dbName);
+      },
+    );
   });
 };
 const registerEventConnectionDD = () => {

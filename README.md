@@ -104,7 +104,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 ## ✨ Features
 
 - Manage MongoDB connections
-- Browse databases
+- Browse, create, and drop databases
 - Browse collections
 - View documents from collections
 - Interactive dropdown navigation
@@ -237,3 +237,11 @@ MIT License
 | `C-e`   | create a new connection                     |
 | `e`     | edit the highlighted saved connection       |
 | `d`     | delete the highlighted saved connection (confirm) |
+
+### Database manager (dropdown list)
+
+| Key     | Action                                   |
+| ------- | ----------------------------------------- |
+| `enter` | select the highlighted database             |
+| `C-e`   | create a new database (initial collection required) |
+| `d`     | drop the highlighted database (confirm)     |
