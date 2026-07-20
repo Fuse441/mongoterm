@@ -7,11 +7,18 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Chore
+
+- Update CHANGELOG.md [skip ci] (7ab0944)
+
 ### Other
 
 - Update npm-publish workflow trigger
 
 Change trigger from workflow_run to push on tags. (560e182)
+- Change token to NPM_mongoterm in tag-release.yml
+
+Updated GitHub Actions workflow to use NPM_mongoterm token. (37d4fd5)
 
 ## [0.2.7] - 2026-07-20
 
