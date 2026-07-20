@@ -7,6 +7,16 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Testing
+
+- Add scratch tag-trigger workflow for diagnosis (4692c9d)
+
+## [0.2.13-test2] - 2026-07-20
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (5278f86)
+
 ### Other
 
 - Fix secret token casing in tag-release.yml (cef4f9a)
