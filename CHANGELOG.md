@@ -7,9 +7,18 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Other
+
+- Update npm-publish workflow trigger
+
+Change trigger from workflow_run to push on tags. (560e182)
+
+## [0.2.7] - 2026-07-20
+
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (a58e7d2)
+- Update CHANGELOG.md [skip ci] (2a4a252)
 
 ### Other
 
