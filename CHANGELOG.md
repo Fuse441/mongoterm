@@ -10,13 +10,15 @@ and this project follows Semantic Versioning (SemVer).
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (1fc04e1)
+- Update CHANGELOG.md [skip ci] (cd10101)
+- Remove scratch diagnostic workflows (f10222e)
 
 ### Testing
 
 - Add scratch tag-trigger workflow for diagnosis (4692c9d)
 - Add scratch v* tag-trigger workflow for diagnosis (2b28ce4)
 
-## [0.2.13-test2] - 2026-07-20
+## [0.2.11] - 2026-07-20
 
 ### Chore
 
