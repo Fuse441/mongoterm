@@ -1,0 +1,51 @@
+name: Auto Changelog
+
+# Automatically regenerates CHANGELOG.md from Conventional Commits
+# (feat, fix, refactor, docs, chore, ...) whenever commits land on master,
+# and whenever a new version tag is pushed. Keeps CHANGELOG.md always
+# up to date without manual editing.
+
+on:
+  push:
+    branches: [ "master" ]
+    tags:
+      - "v*"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-changelog
+  cancel-in-progress: false
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'chore(changelog)')"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate CHANGELOG.md
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --verbose
+        env:
+          OUTPUT: CHANGELOG.md
+
+      - name: Commit and push updated changelog
+        run: |
+          if git diff --quiet -- CHANGELOG.md; then
+            echo "No changelog changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "chore(changelog): update CHANGELOG.md [skip ci]"
+          git push origin HEAD:master

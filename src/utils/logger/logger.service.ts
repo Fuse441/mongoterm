@@ -1,16 +1,19 @@
 import { state } from "@/shared/state";
 import util from "util";
 import { getTimestamp } from "@/services/helper";
-import path from "path";
 import fs from "fs";
-import os from "os";
 import { ILevelLogger, TLogLevel } from "@/utils/logger/logger.interface";
 import { getCaller } from "../stack/stack.service";
+import { APP_ROOT, LOG_PATH } from "@/config/app.paths";
 let currentConn: any = null;
 
-const streamLog = fs.createWriteStream(
-  path.join(os.homedir(), "mongoterm", "app.log"),
-);
+// Use the same ".mongoterm" app directory as the rest of the app (helper.ts, app.ts)
+// so logging works consistently across macOS, Linux, and Windows (any drive/home path).
+fs.mkdirSync(APP_ROOT, { recursive: true });
+
+const streamLog = fs.createWriteStream(LOG_PATH, {
+  flags: "a",
+});
 function formatLog(level: TLogLevel, args: Record<string, any>[]) {
   const timestamp = getTimestamp();
   const message = util.format(...args);

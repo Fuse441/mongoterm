@@ -19,15 +19,20 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 
 ## 🎯 Roadmap
 
-### Architecture
+<details open>
+<summary><strong>🏗️ Architecture</strong></summary>
 
 - [ ] Remove global singletons
 - [ ] Introduce a Composition Root
 - [ ] Inject dependencies via constructors
 - [ ] Refactor to an OOP architecture
 - [ ] Extract reusable framework into a separate library
+- [x] Centralize cross-platform app paths (macOS / Linux / Windows, any drive)
 
-### Core
+</details>
+
+<details>
+<summary><strong>⚙️ Core</strong></summary>
 
 - [x] Hint action bar
 - [x] Query history & autocomplete
@@ -35,37 +40,65 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - [x] Monitor Panel
 - [x] Refactor generate record
 
-### Editor
+</details>
+
+<details>
+<summary><strong>📝 Editor</strong></summary>
 
 - [ ] Syntax highlighting in record editor
 - [ ] Validate JSON before save
 - [ ] Undo / redo support
 
-### Record Management
+</details>
+
+<details>
+<summary><strong>🗂️ Record Management</strong></summary>
 
 - [x] Delete record with confirmation
 - [x] Insert new record
 - [x] Duplicate record
 - [ ] Bulk delete
 
-### Query
+</details>
+
+<details>
+<summary><strong>🔎 Query</strong></summary>
 
 - [ ] Query builder (no need to type raw JSON)
 - [ ] Save favorite queries
 - [ ] Pagination / limit results
 - [ ] Sort & filter UI
 
-### UX
+</details>
+
+<details>
+<summary><strong>🎨 UX</strong></summary>
 
 - [x] Keybinding help popup (`?`)
 - [ ] Connection manager (multiple connections)
 - [ ] Dark / light theme toggle
 - [ ] Loading indicator for slow queries
 
-### Export
+</details>
+
+<details>
+<summary><strong>📤 Export</strong></summary>
 
 - [ ] Export result as JSON file
 - [ ] Export result as CSV
+
+</details>
+
+<details>
+<summary><strong>🚀 CI / CD</strong></summary>
+
+- [x] Automated CHANGELOG.md generation from Conventional Commits
+- [x] CodeQL security analysis
+- [x] SLSA provenance publishing on release
+- [ ] Automated release workflow (build + publish to npm)
+- [ ] Cross-platform smoke tests (macOS / Linux / Windows)
+
+</details>
 
 ## ✨ Features
 
@@ -76,6 +109,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - Interactive dropdown navigation
 - Keyboard-driven interface
 - Lightweight terminal UI
+- Cross-platform: works the same on **macOS**, **Linux**, and **Windows** (config/log paths resolve to the user's home directory regardless of OS or drive)
 
 ## 🚧 Project Status
 
@@ -87,8 +121,21 @@ New features and improvements are continuously being added, and the interface or
 ## 🛠 Tech Stack
 
 - Node.js
+- TypeScript
 - neo-blessed (Terminal UI library)
 - MongoDB Node.js Driver
+
+## 🖥️ Cross-Platform Support
+
+Mongoterm stores its configuration (`compass.json`) and logs (`app.log`) under a single
+`~/.mongoterm` directory, resolved via Node's `os.homedir()`. This means it works
+consistently across:
+
+- **macOS** — `~/.mongoterm`
+- **Linux** — `~/.mongoterm`
+- **Windows** — `C:\Users\<you>\.mongoterm` (or whichever drive hosts your user profile)
+
+No manual path configuration is required on any platform.
 
 ## 📦 Installation
 
@@ -127,6 +174,17 @@ The main goal of this project is to create a **fast and minimal MongoDB client f
 
 Contributions, suggestions, and feedback are welcome.
 Feel free to open issues or submit pull requests.
+
+Please follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `refactor:`, `chore:`, `docs:`, ...)
+for your commit messages — [CHANGELOG.md](./CHANGELOG.md) is generated automatically from them via CI on every push to `master`.
+
+## 🔄 CI/CD
+
+| Workflow | Trigger | Purpose |
+| --- | --- | --- |
+| `changelog.yml` | Push to `master`, new `v*` tag | Regenerates `CHANGELOG.md` from Conventional Commits using [git-cliff](https://git-cliff.org) and commits it back |
+| `codeql.yml` | Push/PR to `master`, weekly schedule | Static security analysis (CodeQL) |
+| `generator-generic-ossf-slsa3-publish.yml` | GitHub Release published | Builds the project and publishes SLSA level 3 provenance for release artifacts |
 
 ## 📄 License
 

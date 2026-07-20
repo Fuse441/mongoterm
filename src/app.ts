@@ -1,35 +1,29 @@
 #!/usr/bin/env node
 import fs from "fs/promises";
-import os from "os";
-import path from "path";
 import { MongoTermApp } from "@/core/screen";
 import { logger } from "./utils/logger/logger.service";
 import { WorkspaceLogger } from "./utils/logger/logger";
 import { getConfiguration } from "./services/helper";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { defaultConfig } from "./config/app.config";
+import { APP_ROOT, CONFIG_DIR, CONFIG_PATH } from "./config/app.paths";
 import { MongodbBuilder } from "./services/mongodb/mongodb.builder";
 import { EventMongoTerm } from "./core/eventBus";
 export let appInstance: MongoTermApp;
 export let appReady: Promise<MongoTermApp>;
- 
-const APP_ROOT = path.join(os.homedir(), ".mongoterm");
-const configDir = path.join(os.homedir(), ".mongoterm");
-const configPath = path.join(configDir, "compass.json");
-
 
 var configuration: any = null;
 
 async function  ensureLoaded() {
   if (configuration) return;
 
-  mkdirSync(configDir, { recursive: true });
+  mkdirSync(CONFIG_DIR, { recursive: true });
 
-  if (!existsSync(configPath)) {
-    writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), "utf-8");
+  if (!existsSync(CONFIG_PATH)) {
+    writeFileSync(CONFIG_PATH, JSON.stringify(defaultConfig, null, 2), "utf-8");
   }
 
-  configuration = JSON.parse(readFileSync(configPath, "utf-8"));
+  configuration = JSON.parse(readFileSync(CONFIG_PATH, "utf-8"));
 }
 
 async function createApplicationDirectory(): Promise<void> {

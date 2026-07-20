@@ -1,18 +1,15 @@
 import fs, { readFileSync } from "fs";
-import os from "os";
-import path from "path";
 import { ObjectId } from "mongodb";
 import { IConfigurationMongoConnection } from "@/types/config";
 import { logger } from "@/utils/logger/logger.service";
 import { state } from "@/shared/state";
+import { CONFIG_PATH } from "@/config/app.paths";
 
 export function getConfiguration() {
-const configDir = path.join(os.homedir(), ".mongoterm");
-const configPath = path.join(configDir, "compass.json");
-if(!fs.existsSync(configPath)) {
+if(!fs.existsSync(CONFIG_PATH)) {
   return {};
 }
-return JSON.parse(readFileSync(configPath, "utf-8"));
+return JSON.parse(readFileSync(CONFIG_PATH, "utf-8"));
 }
 
 export function saveConnection(
@@ -20,8 +17,6 @@ export function saveConnection(
 ): IConfigurationMongoConnection {
   try {
     logger.debug({ message: `Saving connection: ${JSON.stringify(connection)}` });
-    const configDir = path.join(os.homedir(), ".mongoterm");
-const configPath = path.join(configDir, "compass.json");
 
     const newConnection: IConfigurationMongoConnection = {
       id: new ObjectId().toHexString(),
@@ -43,7 +38,7 @@ const configPath = path.join(configDir, "compass.json");
     const updatedConnections = [...(currentConfig.connections || []), newConnection];
     const newConfig = { ...currentConfig, connections: updatedConnections };
    fs.writeFileSync(
-      configPath,
+      CONFIG_PATH,
       JSON.stringify(newConfig, null, 2),
       "utf-8",
     );
