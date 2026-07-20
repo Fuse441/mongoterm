@@ -7,10 +7,9 @@ name: Publish to npm
 # resolves to the last stable release.
 
 on:
-  workflow_run:
-    workflows: ["Tag Release"]
-    types:
-      - completed
+  push:
+    tags:
+      - "v*"
 
 permissions:
   contents: read
