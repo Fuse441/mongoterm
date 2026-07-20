@@ -11,6 +11,14 @@ and this project follows Semantic Versioning (SemVer).
 
 - Centralize cross-platform app paths, restructure README roadmap, add auto changelog CI (0fee72f)
 
+### Chore
+
+- Update CHANGELOG.md [skip ci] (fd9cc3e)
+
+### Other
+
+- Add manual auto-tag version workflow (major/minor/patch/prerelease) (1e3da64)
+
 ## [0.1.2-alpha] - 2026-06-24
 
 ### Changed
