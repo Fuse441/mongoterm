@@ -7,11 +7,18 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Other
+
+- Update npm publish workflow for manual triggering (8284acc)
+
+## [0.2.12] - 2026-07-20
+
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (1fc04e1)
 - Update CHANGELOG.md [skip ci] (cd10101)
 - Remove scratch diagnostic workflows (f10222e)
+- Update CHANGELOG.md [skip ci] (fc942e8)
 
 ### Testing
 
