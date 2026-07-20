@@ -184,14 +184,14 @@ for your commit messages — [CHANGELOG.md](./CHANGELOG.md) is generated automat
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
 | `tag-release.yml` | Manual (`workflow_dispatch`), pick `major` / `minor` / `patch` / `prerelease` | Bumps `package.json`/`package-lock.json`, commits, and pushes a matching `vX.Y.Z` git tag |
-| `npm-publish.yml` | Push of a `v*` tag | Builds the project and publishes it to [npm](https://www.npmjs.com/package/mongoterm) under the correct dist-tag (`latest` for stable, e.g. `alpha`/`beta` for prereleases). Requires an `NPM_TOKEN` repository secret |
+| `publish-npm.yml` | Push of a `v*` tag | Builds the project and publishes it to [npm](https://www.npmjs.com/package/mongoterm) under the correct dist-tag (`latest` for stable, e.g. `alpha`/`beta` for prereleases). Requires an `NPM_TOKEN` repository secret |
 | `changelog.yml` | Push to `master`, new `v*` tag | Regenerates `CHANGELOG.md` from Conventional Commits using [git-cliff](https://git-cliff.org) and commits it back |
 | `codeql.yml` | Push/PR to `master`, weekly schedule | Static security analysis (CodeQL) |
 | `generator-generic-ossf-slsa3-publish.yml` | GitHub Release published | Builds the project and publishes SLSA level 3 provenance for release artifacts |
 
-**Release flow:** run `tag-release.yml` to bump the version and push a `vX.Y.Z` tag → this automatically triggers `npm-publish.yml` and `changelog.yml`.
+**Release flow:** run `tag-release.yml` to bump the version and push a `vX.Y.Z` tag → this automatically triggers `publish-npm.yml` and `changelog.yml`.
 
-> **Setup:** `npm-publish.yml` requires an `NPM_TOKEN` secret (an npm [automation/granular access token](https://docs.npmjs.com/creating-and-viewing-access-tokens) with publish rights) configured under *Settings → Secrets and variables → Actions*.
+> **Setup:** `publish-npm.yml` requires an `NPM_TOKEN` secret (an npm [automation/granular access token](https://docs.npmjs.com/creating-and-viewing-access-tokens) with publish rights) configured under *Settings → Secrets and variables → Actions*.
 
 ## 📄 License
 
