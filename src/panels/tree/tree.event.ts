@@ -110,7 +110,9 @@ export function registerDirectoryTree(parent: any, top: any) {
 
       openForm({
         title: `New Collection in ${dbName}`,
-        fields: [{ name: "collectionName", label: "collectionName", value: "" }],
+        fields: [
+          { name: "collectionName", label: "collectionName", value: "" },
+        ],
         onSubmit(data) {
           if (!data.collectionName?.trim()) return;
           appInstance.eventBus.emit(
@@ -121,15 +123,33 @@ export function registerDirectoryTree(parent: any, top: any) {
         },
       });
     }
+    function openNewDatabaseForm(connNode: TreeNode) {
+      const conn = state.connections[connNode.meta.index];
+      logger.debug({ message: "openNewDatabaseForm", conn });
+      if (!conn) return;
 
+      openForm({
+        title: `New Database in ${conn.favorite.name}`,
+        fields: [{ name: "databaseName", label: "databaseName", value: "" }],
+        onSubmit(data) {
+          if (!data.databaseName?.trim()) return;
+          appInstance.eventBus.emit(
+            EVENTS.DATABASE_CREATE,
+            data.databaseName.trim(),
+          );
+        },
+      });
+    }
     // 🔹 create: context-aware based on the highlighted node
     tree.el.key(["C-e"], () => {
       const selected = tree.getSelectedNode();
-
+      logger.debug({ message: "Create new item", type: selected?.type });
       if (!selected || selected.type === "connection") {
         openNewConnectionForm();
       } else if (selected.type === "database") {
-        openNewCollectionForm(selected);
+        // create a sibling database within the same connection, mirroring
+        // how a "collection" node creates a sibling collection below
+        openNewDatabaseForm(selected.parent!);
       } else if (selected.type === "collection") {
         openNewCollectionForm(selected.parent!);
       }
@@ -177,8 +197,12 @@ export function registerDirectoryTree(parent: any, top: any) {
     });
 
     // 🔹 keep the tree in sync once a CRUD operation completes
-    appInstance.eventBus.on(EVENTS.CONNECTION_UPDATED, () => buildConnectionNodes());
-    appInstance.eventBus.on(EVENTS.CONNECTION_DELETED, () => buildConnectionNodes());
+    appInstance.eventBus.on(EVENTS.CONNECTION_UPDATED, () =>
+      buildConnectionNodes(),
+    );
+    appInstance.eventBus.on(EVENTS.CONNECTION_DELETED, () =>
+      buildConnectionNodes(),
+    );
 
     appInstance.eventBus.on(
       EVENTS.DATABASE_CREATED,

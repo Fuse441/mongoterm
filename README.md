@@ -238,6 +238,6 @@ they act on whatever node is currently highlighted.
 | Key     | On a **connection**          | On a **database**                          | On a **collection**            |
 | ------- | ----------------------------- | -------------------------------------------- | --------------------------------- |
 | `enter` | expand / connect               | expand / select                               | open (browse documents)           |
-| `ctrl+e`| create a new connection        | create a new collection in this database      | create a new collection (sibling) |
+| `ctrl+e`| create a new connection (sibling) | create a new database in this connection (sibling) | create a new collection in this database (sibling) |
 | `e`     | edit this connection           | —                                              | —                                  |
 | `d`     | delete this connection (confirm) | drop this database (confirm)                | drop this collection (confirm)    |
