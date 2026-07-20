@@ -7,6 +7,20 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Added
+
+- Validate JSON before save (30c0a20)
+
+### Fixed
+
+- Remove circular import crash in helper.ts (Cannot read CONFIG_PATH) (8754a16)
+
+## [0.2.2] - 2026-07-20
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (71205a8)
+
 ### Other
 
 - Add npm publish workflow, fix broken package (missing dist/LICENSE) (e71eeb3)
