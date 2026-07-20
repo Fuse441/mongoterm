@@ -7,6 +7,14 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Added
+
+- Add edit/delete for saved connections (connection CRUD) (8631447)
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (a11341a)
+
 ### Other
 
 - Update installation command to use latest version (e774ee2)
