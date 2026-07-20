@@ -2,8 +2,13 @@
   "name": "mongoterm",
   "version": "0.2.1",
   "description": "",
-  "main": "app.js",
+  "main": "dist/src/app.js",
   "type": "commonjs",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "node --import tsx --watch src/app.ts",
     "build": "tsc && tsc-alias",
@@ -13,7 +18,7 @@
     "mongoterm": "./dist/src/app.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "blessed": "^0.1.81",
     "copy-paste": "^2.2.0",
