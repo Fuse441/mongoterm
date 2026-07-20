@@ -9,6 +9,16 @@ and this project follows Semantic Versioning (SemVer).
 
 ### Other
 
+- Update installation command to use latest version (e774ee2)
+
+## [0.2.14] - 2026-07-20
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (a48ad90)
+
+### Other
+
 - Add repository field to package.json
 
 Added repository information to package.json (491869d)
