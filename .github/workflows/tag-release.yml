@@ -1,0 +1,76 @@
+name: Tag Release
+
+# Manually bump the version (package.json + package-lock.json), create a
+# matching git tag (e.g. v1.2.3 mirrors the "version" field), and push both
+# back to master. Pushing the tag automatically triggers:
+#   - changelog.yml (regenerates CHANGELOG.md for the new version)
+#   - generator-generic-ossf-slsa3-publish.yml (on the subsequent GitHub Release)
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump type"
+        required: true
+        type: choice
+        default: "patch"
+        options:
+          - major
+          - minor
+          - patch
+          - prerelease
+      preid:
+        description: "Prerelease identifier (only used when bump = prerelease)"
+        required: false
+        default: "alpha"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tag-release
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version and create tag
+        id: bump
+        run: |
+          set -euo pipefail
+
+          if [ "${{ inputs.bump }}" = "prerelease" ]; then
+            NEW_VERSION=$(npm version prerelease --preid="${{ inputs.preid }}" -m "chore(release): v%s [skip ci]")
+          else
+            NEW_VERSION=$(npm version "${{ inputs.bump }}" -m "chore(release): v%s [skip ci]")
+          fi
+
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Bumped to ${NEW_VERSION}"
+
+      - name: Push commit and tag
+        run: |
+          git push origin HEAD:master
+          git push origin "${{ steps.bump.outputs.version }}"
+
+      - name: Summary
+        run: |
+          echo "### 🏷️ Released ${{ steps.bump.outputs.version }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Tag pushed to master. The changelog workflow will pick it up automatically." >> "$GITHUB_STEP_SUMMARY"

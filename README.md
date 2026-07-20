@@ -93,6 +93,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 <summary><strong>🚀 CI / CD</strong></summary>
 
 - [x] Automated CHANGELOG.md generation from Conventional Commits
+- [x] Auto-tag version bump (major / minor / patch / prerelease) via `workflow_dispatch`
 - [x] CodeQL security analysis
 - [x] SLSA provenance publishing on release
 - [ ] Automated release workflow (build + publish to npm)
@@ -182,6 +183,7 @@ for your commit messages — [CHANGELOG.md](./CHANGELOG.md) is generated automat
 
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
+| `tag-release.yml` | Manual (`workflow_dispatch`), pick `major` / `minor` / `patch` / `prerelease` | Bumps `package.json`/`package-lock.json`, commits, and pushes a matching `vX.Y.Z` git tag |
 | `changelog.yml` | Push to `master`, new `v*` tag | Regenerates `CHANGELOG.md` from Conventional Commits using [git-cliff](https://git-cliff.org) and commits it back |
 | `codeql.yml` | Push/PR to `master`, weekly schedule | Static security analysis (CodeQL) |
 | `generator-generic-ossf-slsa3-publish.yml` | GitHub Release published | Builds the project and publishes SLSA level 3 provenance for release artifacts |
