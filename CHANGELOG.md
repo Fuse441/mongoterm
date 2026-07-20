@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is inspired by [Keep a Changelog](https://keepachangelog.com/)
 and this project follows Semantic Versioning (SemVer).
 
+## [Unreleased]
+
+### Changed
+
+- Centralize cross-platform app paths, restructure README roadmap, add auto changelog CI (0fee72f)
+
 ## [0.1.2-alpha] - 2026-06-24
 
 ### Changed
