@@ -16,6 +16,11 @@ and this project follows Semantic Versioning (SemVer).
 
 - Update CHANGELOG.md [skip ci] (a11341a)
 - Update CHANGELOG.md [skip ci] (e4c8bd7)
+- Update CHANGELOG.md [skip ci] (f16aa04)
+
+### Fixed
+
+- Wire connection/database/collection CRUD into the real tree UI (34aebd4)
 
 ### Other
 
