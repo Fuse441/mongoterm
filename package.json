@@ -1,6 +1,6 @@
 {
   "name": "mongoterm",
-  "version": "0.2.0-alpha",
+  "version": "0.2.0",
   "description": "",
   "main": "app.js",
   "type": "commonjs",
