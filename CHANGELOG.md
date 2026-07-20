@@ -7,9 +7,14 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Chore
+
+- Update CHANGELOG.md [skip ci] (1fc04e1)
+
 ### Testing
 
 - Add scratch tag-trigger workflow for diagnosis (4692c9d)
+- Add scratch v* tag-trigger workflow for diagnosis (2b28ce4)
 
 ## [0.2.13-test2] - 2026-07-20
 
