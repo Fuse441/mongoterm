@@ -9,6 +9,10 @@
     "README.md",
     "LICENSE"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Fuse441/mongoterm.git"
+  },
   "scripts": {
     "dev": "node --import tsx --watch src/app.ts",
     "build": "tsc && tsc-alias",
