@@ -10,10 +10,12 @@ and this project follows Semantic Versioning (SemVer).
 ### Added
 
 - Add edit/delete for saved connections (connection CRUD) (8631447)
+- Add create/drop for databases (database CRUD) (db0754b)
 
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (a11341a)
+- Update CHANGELOG.md [skip ci] (e4c8bd7)
 
 ### Other
 
