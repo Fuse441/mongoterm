@@ -75,7 +75,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 <summary><strong>🎨 UX</strong></summary>
 
 - [x] Keybinding help popup (`?`)
-- [ ] Connection manager (multiple connections)
+- [x] Connection manager (multiple connections)
 - [ ] Dark / light theme toggle
 - [ ] Loading indicator for slow queries
 
@@ -225,6 +225,15 @@ MIT License
 | ----------- | ----------------------------- |
 | `enter`     | submit query (in query panel) |
 | `S-c`       | focus connection panel        |
-| `S-w`       | focus workspace               |
+| `S-w`       | focus workspace                |
 | `c`         | copy record to clipboard      |
 | `q` / `C-c` | quit                          |
+
+### Connection manager (dropdown list)
+
+| Key     | Action                                   |
+| ------- | ----------------------------------------- |
+| `enter` | connect to the highlighted saved connection |
+| `C-e`   | create a new connection                     |
+| `e`     | edit the highlighted saved connection       |
+| `d`     | delete the highlighted saved connection (confirm) |

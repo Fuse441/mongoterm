@@ -12,6 +12,8 @@ export const EVENTS = Object.freeze({
   TOAST_SHOW: "show:toast",
   RECORD_DELETE: "delete:record",
   RECORD_DUPLICATE: "duplicate:record",
+  CONNECTION_UPDATE: "connection:update",
+  CONNECTION_DELETE: "connection:delete",
 });
 
 export enum TYPE_LOGGER {

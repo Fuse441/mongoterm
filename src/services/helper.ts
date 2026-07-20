@@ -49,7 +49,72 @@ export function saveConnection(
     });
     throw err;
   }
-}export function getTimestamp() {
+}
+
+export function updateConnection(
+  id: string,
+  connection: Record<string, any>,
+): IConfigurationMongoConnection[] {
+  try {
+    const currentConfig = getConfiguration();
+    const connections: IConfigurationMongoConnection[] =
+      currentConfig.connections || [];
+
+    const index = connections.findIndex((c) => c.id === id);
+    if (index === -1) {
+      throw new Error(`Connection with id ${id} not found`);
+    }
+
+    const updatedConnection: IConfigurationMongoConnection = {
+      ...connections[index],
+      favorite: { name: connection.connectionName },
+      connectionOptions: {
+        ...connections[index].connectionOptions,
+        connectionString: connection.connectionString,
+      },
+    };
+
+    const updatedConnections = [...connections];
+    updatedConnections[index] = updatedConnection;
+
+    const newConfig = { ...currentConfig, connections: updatedConnections };
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(newConfig, null, 2), "utf-8");
+
+    logger.debug({ message: `Connection updated: ${JSON.stringify(updatedConnection)}` });
+    return updatedConnections;
+  } catch (err: any) {
+    logger.error({
+      message: `Failed to update connection: ${err.message}`,
+    });
+    throw err;
+  }
+}
+
+export function deleteConnection(id: string): IConfigurationMongoConnection[] {
+  try {
+    const currentConfig = getConfiguration();
+    const connections: IConfigurationMongoConnection[] =
+      currentConfig.connections || [];
+
+    const updatedConnections = connections.filter((c) => c.id !== id);
+    if (updatedConnections.length === connections.length) {
+      throw new Error(`Connection with id ${id} not found`);
+    }
+
+    const newConfig = { ...currentConfig, connections: updatedConnections };
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(newConfig, null, 2), "utf-8");
+
+    logger.debug({ message: `Connection deleted: ${id}` });
+    return updatedConnections;
+  } catch (err: any) {
+    logger.error({
+      message: `Failed to delete connection: ${err.message}`,
+    });
+    throw err;
+  }
+}
+
+export function getTimestamp() {
   return new Date().toISOString();
 }
 

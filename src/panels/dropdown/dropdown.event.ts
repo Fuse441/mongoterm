@@ -5,6 +5,7 @@ import { state } from "@/shared/state";
 import { logger } from "@/utils/logger/logger.service";
 import { EVENTS } from "@/services/enum";
 import { openForm } from "../form/form.panel";
+import { openDialogConfirm } from "../modal.panel";
 function resetCollectionSelection(collectionDD: blessed.Widgets.BoxOptions) {
   state.collections = [];
   collectionDD.header.setContent(" Select Collection ▼ ");
@@ -164,6 +165,61 @@ const registerEventConnectionDD = () => {
       }
     },
   );
+
+  // 🔹 edit the highlighted saved connection (Compass-style connection CRUD)
+  connectionDD!.list.key(["e"], () => {
+    const index = (connectionDD!.list as any).selected ?? 0;
+    const conn = state.connections[index];
+    if (!conn) return;
+
+    openForm({
+      title: "Edit Connection",
+      fields: [
+        {
+          name: "connectionName",
+          label: "connectionName",
+          value: conn.favorite.name,
+        },
+        {
+          name: "connectionString",
+          label: "connectionString",
+          value: conn.connectionOptions.connectionString,
+        },
+      ],
+      onSubmit(data) {
+        appInstance.eventBus.emit(EVENTS.CONNECTION_UPDATE, {
+          id: conn.id,
+          data,
+        });
+
+        connectionDD!.list.setItems(getConnectionNames());
+        if (index === state.selectedConnectionIndex) {
+          connectionDD!.header.setContent(` ${data.connectionName} ▼ `);
+        }
+        appInstance.renderScreen();
+      },
+    });
+  });
+
+  // 🔹 delete the highlighted saved connection
+  connectionDD!.list.key(["d"], () => {
+    const index = (connectionDD!.list as any).selected ?? 0;
+    const conn = state.connections[index];
+    if (!conn) return;
+
+    openDialogConfirm(
+      `Delete connection "${conn.favorite.name}"?`,
+      () => {
+        appInstance.eventBus.emit(EVENTS.CONNECTION_DELETE, conn.id);
+
+        connectionDD!.list.setItems(getConnectionNames());
+        if (index === state.selectedConnectionIndex) {
+          connectionDD!.header.setContent(" Select Connection ▼ ");
+        }
+        appInstance.renderScreen();
+      },
+    );
+  });
 };
 
 //

@@ -11,7 +11,11 @@ import { showToast } from "@/panels/toast.panel";
 import { appInstance } from "@/app";
 import { renderResult } from "@/panels/result.panel";
 import { focusDropdown } from "@/panels/dropdown/dropdown.event";
-import { getConfiguration, saveConnection } from "../helper";
+import {
+  deleteConnection,
+  saveConnection,
+  updateConnection,
+} from "../helper";
 import { IConfigurationMongoConnection } from "@/types/config";
 import { EventMongoTerm } from "@/core/eventBus";
 import { MongoRepository } from "./mongodb.repository";
@@ -30,6 +34,7 @@ export class EventMongoService {
     this.registerCollectionEvents();
     this.registerQueryEvents();
     this.registerRecordEvents();
+    this.registerConnectionCrudEvents();
     this.registerCollectionLoadedEvent();
     this.registerDatabaseLoadedEvent();
     this.registerQueryResultEvent();
@@ -50,7 +55,8 @@ export class EventMongoService {
           startLoading();
           await this.mongoRepository.connectMongo(connectionString);
           if (onSave) {
-            getConfiguration().connections.push(saveConnection(connections));
+            const savedConnection = saveConnection(connections);
+            state.connections.push(savedConnection);
           }
           const databases = await this.mongoRepository.fetchDatabases();
           state.databases = databases;
@@ -147,6 +153,40 @@ export class EventMongoService {
           "Check your MongoDB connection URI and ensure the database server is running.",
         typeLogger: res.typeLogger,
       });
+    });
+  }
+
+  private registerConnectionCrudEvents() {
+    this.eventBus.on(
+      EVENTS.CONNECTION_UPDATE,
+      ({ id, data }: { id: string; data: Record<string, any> }) => {
+        try {
+          state.connections = updateConnection(id, data);
+          showToast({ statusCode: 200, message: "Connection updated" });
+        } catch (error: any) {
+          logger.error({ message: "Failed to update connection", error });
+          showToast({
+            statusCode: 500,
+            message: `Failed to update connection: ${error.message}`,
+          });
+        }
+      },
+    );
+
+    this.eventBus.on(EVENTS.CONNECTION_DELETE, (id: string) => {
+      try {
+        state.connections = deleteConnection(id);
+        if (state.selectedConnectionIndex >= state.connections.length) {
+          state.selectedConnectionIndex = 0;
+        }
+        showToast({ statusCode: 200, message: "Connection deleted" });
+      } catch (error: any) {
+        logger.error({ message: "Failed to delete connection", error });
+        showToast({
+          statusCode: 500,
+          message: `Failed to delete connection: ${error.message}`,
+        });
+      }
     });
   }
 
