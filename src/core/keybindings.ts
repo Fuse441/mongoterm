@@ -97,7 +97,7 @@ const getBindings = (ui: TResponseLayout) => [
   {
     keys: ["h", "left"],
     condition: () => appInstance.screen.focused === ui.panels.query,
-    action: () => ui.dropdowns.connectionDD!.header.focus(),
+    action: () => ui.panels.tree!.focus(),
   },
 
   // ── record ────────────────────────────────────────

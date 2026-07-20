@@ -207,11 +207,27 @@ export function createTree(parent: any, options: any) {
     if (node && node.expanded) toggleNode(node);
   });
 
+  function getSelectedNode(): TreeNode | undefined {
+    return visible[list.selected];
+  }
+
+  function removeNode(node: TreeNode) {
+    if (node.parent) {
+      node.parent.children = node.parent.children.filter((c) => c !== node);
+    } else {
+      const idx = roots.indexOf(node);
+      if (idx !== -1) roots.splice(idx, 1);
+    }
+    render();
+  }
+
   return {
     el: list as blessed.Widgets.ListElement,
     setRoots,
     makeNode,
     getRoots: () => roots,
+    getSelectedNode,
+    removeNode,
     setCallbacks: (cb: TreeCallbacks) => (callbacks = cb),
     render,
   };

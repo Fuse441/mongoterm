@@ -10,7 +10,6 @@ import { logger } from "@/utils/logger/logger.service";
 import { showToast } from "@/panels/toast.panel";
 import { appInstance } from "@/app";
 import { renderResult } from "@/panels/result.panel";
-import { focusDropdown } from "@/panels/dropdown/dropdown.event";
 import {
   deleteConnection,
   saveConnection,
@@ -35,6 +34,7 @@ export class EventMongoService {
     this.registerQueryEvents();
     this.registerRecordEvents();
     this.registerConnectionCrudEvents();
+    this.registerCollectionCrudEvents();
     this.registerCollectionLoadedEvent();
     this.registerDatabaseLoadedEvent();
     this.registerQueryResultEvent();
@@ -107,8 +107,10 @@ export class EventMongoService {
             dbName,
             collectionName,
           );
-          appInstance.ui.dropdowns.databaseDD!.list.setItems(state.databases);
-          appInstance.renderScreen();
+          this.eventBus.emit(EVENTS.DATABASE_CREATED, {
+            dbName,
+            databases: state.databases,
+          });
         } catch (error: any) {
           logger.error({ message: "Failed to create database", error });
           showToast({
@@ -126,11 +128,10 @@ export class EventMongoService {
         if (state.selectedDatabaseIndex >= state.databases.length) {
           state.selectedDatabaseIndex = 0;
         }
-        appInstance.ui.dropdowns.databaseDD!.list.setItems(state.databases);
-        appInstance.ui.dropdowns.databaseDD!.header.setContent(
-          " Select Database ▼ ",
-        );
-        appInstance.renderScreen();
+        this.eventBus.emit(EVENTS.DATABASE_DROPPED, {
+          dbName,
+          databases: state.databases,
+        });
       } catch (error: any) {
         logger.error({ message: "Failed to drop database", error });
         showToast({
@@ -197,12 +198,67 @@ export class EventMongoService {
     });
   }
 
+  private registerCollectionCrudEvents() {
+    this.eventBus.on(
+      EVENTS.COLLECTION_CREATE,
+      async (dbName: string, collectionName: string) => {
+        try {
+          state.collections = await this.mongoRepository.createCollection(
+            dbName,
+            collectionName,
+          );
+          this.eventBus.emit(EVENTS.COLLECTION_CREATED, {
+            dbName,
+            colName: collectionName,
+            collections: state.collections,
+          });
+        } catch (error: any) {
+          logger.error({ message: "Failed to create collection", error });
+          showToast({
+            statusCode: 500,
+            message: `Failed to create collection: ${error.message}`,
+          });
+        }
+      },
+    );
+
+    this.eventBus.on(
+      EVENTS.COLLECTION_DROP,
+      async (dbName: string, collectionName: string) => {
+        try {
+          state.collections = await this.mongoRepository.dropCollection(
+            dbName,
+            collectionName,
+          );
+          if (state.selectedCollectionIndex >= state.collections.length) {
+            state.selectedCollectionIndex = 0;
+          }
+          this.eventBus.emit(EVENTS.COLLECTION_DROPPED, {
+            dbName,
+            colName: collectionName,
+            collections: state.collections,
+          });
+        } catch (error: any) {
+          logger.error({ message: "Failed to drop collection", error });
+          showToast({
+            statusCode: 500,
+            message: `Failed to drop collection: ${error.message}`,
+          });
+        }
+      },
+    );
+  }
+
   private registerConnectionCrudEvents() {
     this.eventBus.on(
       EVENTS.CONNECTION_UPDATE,
       ({ id, data }: { id: string; data: Record<string, any> }) => {
         try {
           state.connections = updateConnection(id, data);
+          this.eventBus.emit(EVENTS.CONNECTION_UPDATED, {
+            id,
+            connections: state.connections,
+          });
           showToast({ statusCode: 200, message: "Connection updated" });
         } catch (error: any) {
           logger.error({ message: "Failed to update connection", error });
@@ -220,6 +276,10 @@ export class EventMongoService {
         if (state.selectedConnectionIndex >= state.connections.length) {
           state.selectedConnectionIndex = 0;
         }
+        this.eventBus.emit(EVENTS.CONNECTION_DELETED, {
+          id,
+          connections: state.connections,
+        });
         showToast({ statusCode: 200, message: "Connection deleted" });
       } catch (error: any) {
         logger.error({ message: "Failed to delete connection", error });

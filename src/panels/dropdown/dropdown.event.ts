@@ -245,18 +245,15 @@ const registerEventConnectionDD = () => {
     const conn = state.connections[index];
     if (!conn) return;
 
-    openDialogConfirm(
-      `Delete connection "${conn.favorite.name}"?`,
-      () => {
-        appInstance.eventBus.emit(EVENTS.CONNECTION_DELETE, conn.id);
+    openDialogConfirm(`Delete connection "${conn.favorite.name}"?`, () => {
+      appInstance.eventBus.emit(EVENTS.CONNECTION_DELETE, conn.id);
 
-        connectionDD!.list.setItems(getConnectionNames());
-        if (index === state.selectedConnectionIndex) {
-          connectionDD!.header.setContent(" Select Connection ▼ ");
-        }
-        appInstance.renderScreen();
-      },
-    );
+      connectionDD!.list.setItems(getConnectionNames());
+      if (index === state.selectedConnectionIndex) {
+        connectionDD!.header.setContent(" Select Connection ▼ ");
+      }
+      appInstance.renderScreen();
+    });
   });
 };
 

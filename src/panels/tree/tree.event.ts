@@ -5,6 +5,7 @@ import { state } from "@/shared/state";
 import { logger } from "@/utils/logger/logger.service";
 import { EVENTS } from "@/services/enum";
 import { openForm } from "@/panels/form/form.panel";
+import { openDialogConfirm } from "@/panels/modal.panel";
 import { createTree, TreeNode } from "@/panels/tree/tree.panel";
 import { theme } from "@/config/app.config";
 import { getConfiguration, saveConnection } from "@/services/helper";
@@ -52,7 +53,7 @@ export function registerDirectoryTree(parent: any, top: any) {
     }
     buildConnectionNodes();
 
-    tree.el.key(["C-e"], () => {
+    function openNewConnectionForm() {
       openForm({
         title: "MongoDB Connection",
         fields: [
@@ -75,7 +76,182 @@ export function registerDirectoryTree(parent: any, top: any) {
           buildConnectionNodes();
         },
       });
+    }
+
+    function openEditConnectionForm(node: TreeNode) {
+      const conn = state.connections[node.meta.index];
+      if (!conn) return;
+
+      openForm({
+        title: "Edit Connection",
+        fields: [
+          {
+            name: "connectionName",
+            label: "connectionName",
+            value: conn.favorite.name,
+          },
+          {
+            name: "connectionString",
+            label: "connectionString",
+            value: conn.connectionOptions.connectionString,
+          },
+        ],
+        onSubmit(data) {
+          appInstance.eventBus.emit(EVENTS.CONNECTION_UPDATE, {
+            id: conn.id,
+            data,
+          });
+        },
+      });
+    }
+
+    function openNewCollectionForm(dbNode: TreeNode) {
+      const { dbName } = dbNode.meta;
+
+      openForm({
+        title: `New Collection in ${dbName}`,
+        fields: [{ name: "collectionName", label: "collectionName", value: "" }],
+        onSubmit(data) {
+          if (!data.collectionName?.trim()) return;
+          appInstance.eventBus.emit(
+            EVENTS.COLLECTION_CREATE,
+            dbName,
+            data.collectionName.trim(),
+          );
+        },
+      });
+    }
+
+    // 🔹 create: context-aware based on the highlighted node
+    tree.el.key(["C-e"], () => {
+      const selected = tree.getSelectedNode();
+
+      if (!selected || selected.type === "connection") {
+        openNewConnectionForm();
+      } else if (selected.type === "database") {
+        openNewCollectionForm(selected);
+      } else if (selected.type === "collection") {
+        openNewCollectionForm(selected.parent!);
+      }
     });
+
+    // 🔹 edit the highlighted connection
+    tree.el.key(["e"], () => {
+      const selected = tree.getSelectedNode();
+      if (selected?.type === "connection") {
+        openEditConnectionForm(selected);
+      }
+    });
+
+    // 🔹 delete/drop the highlighted node (connection / database / collection)
+    tree.el.key(["d"], () => {
+      const selected = tree.getSelectedNode();
+      if (!selected) return;
+
+      if (selected.type === "connection") {
+        const conn = state.connections[selected.meta.index];
+        if (!conn) return;
+
+        openDialogConfirm(`Delete connection "${conn.favorite.name}"?`, () => {
+          appInstance.eventBus.emit(EVENTS.CONNECTION_DELETE, conn.id);
+        });
+      } else if (selected.type === "database") {
+        const { dbName } = selected.meta;
+
+        openDialogConfirm(
+          `Drop database "${dbName}"? This cannot be undone.`,
+          () => {
+            appInstance.eventBus.emit(EVENTS.DATABASE_DROP, dbName);
+          },
+        );
+      } else if (selected.type === "collection") {
+        const { dbName, colName } = selected.meta;
+
+        openDialogConfirm(
+          `Drop collection "${colName}"? This cannot be undone.`,
+          () => {
+            appInstance.eventBus.emit(EVENTS.COLLECTION_DROP, dbName, colName);
+          },
+        );
+      }
+    });
+
+    // 🔹 keep the tree in sync once a CRUD operation completes
+    appInstance.eventBus.on(EVENTS.CONNECTION_UPDATED, () => buildConnectionNodes());
+    appInstance.eventBus.on(EVENTS.CONNECTION_DELETED, () => buildConnectionNodes());
+
+    appInstance.eventBus.on(
+      EVENTS.DATABASE_CREATED,
+      ({ databases }: { dbName: string; databases: string[] }) => {
+        const connNode = tree.getRoots().find((r) => r.expanded);
+        if (!connNode) return;
+
+        connNode.children = databases.map((name) =>
+          tree.makeNode("database", name, connNode, { dbName: name }),
+        );
+        tree.render();
+      },
+    );
+
+    appInstance.eventBus.on(
+      EVENTS.DATABASE_DROPPED,
+      ({ databases }: { dbName: string; databases: string[] }) => {
+        const connNode = tree.getRoots().find((r) => r.expanded);
+        if (!connNode) return;
+
+        connNode.children = databases.map((name) =>
+          tree.makeNode("database", name, connNode, { dbName: name }),
+        );
+        tree.render();
+      },
+    );
+
+    appInstance.eventBus.on(
+      EVENTS.COLLECTION_CREATED,
+      ({
+        dbName,
+        collections,
+      }: {
+        dbName: string;
+        colName: string;
+        collections: string[];
+      }) => {
+        const connNode = tree.getRoots().find((r) => r.expanded);
+        const dbNode = connNode?.children.find(
+          (c) => c.meta?.dbName === dbName,
+        );
+        if (!dbNode) return;
+
+        dbNode.children = collections.map((name) =>
+          tree.makeNode("collection", name, dbNode, { dbName, colName: name }),
+        );
+        dbNode.loaded = true;
+        tree.render();
+      },
+    );
+
+    appInstance.eventBus.on(
+      EVENTS.COLLECTION_DROPPED,
+      ({
+        dbName,
+        collections,
+      }: {
+        dbName: string;
+        colName: string;
+        collections: string[];
+      }) => {
+        const connNode = tree.getRoots().find((r) => r.expanded);
+        const dbNode = connNode?.children.find(
+          (c) => c.meta?.dbName === dbName,
+        );
+        if (!dbNode) return;
+
+        dbNode.children = collections.map((name) =>
+          tree.makeNode("collection", name, dbNode, { dbName, colName: name }),
+        );
+        tree.render();
+      },
+    );
 
     tree.setCallbacks({
       onExpand: async (node: TreeNode) => {

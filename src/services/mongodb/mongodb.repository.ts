@@ -76,6 +76,28 @@ public async  fetchCollections(dbName: string) {
   return collections.map((c) => c.name);
 }
 
+public async createCollection(dbName: string, collectionName: string) {
+  await this.getClient().db(dbName).createCollection(collectionName);
+
+  this.eventBus.emit(EVENTS.TOAST_SHOW, {
+    statusCode: 200,
+    message: `Collection "${collectionName}" created`,
+  });
+
+  return this.fetchCollections(dbName);
+}
+
+public async dropCollection(dbName: string, collectionName: string) {
+  await this.getClient().db(dbName).collection(collectionName).drop();
+
+  this.eventBus.emit(EVENTS.TOAST_SHOW, {
+    statusCode: 200,
+    message: `Collection "${collectionName}" dropped`,
+  });
+
+  return this.fetchCollections(dbName);
+}
+
 public parseQuery(query?: string): Record<string, unknown> {
   if (!query?.trim()) {
     return {};

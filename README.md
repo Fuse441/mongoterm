@@ -105,7 +105,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 
 - Manage MongoDB connections
 - Browse, create, and drop databases
-- Browse collections
+- Browse, create, and drop collections
 - View documents from collections
 - Interactive dropdown navigation
 - Keyboard-driven interface
@@ -229,19 +229,15 @@ MIT License
 | `c`         | copy record to clipboard      |
 | `q` / `C-c` | quit                          |
 
-### Connection manager (dropdown list)
+### Connection / database / collection tree (`ctrl+e`, `e`, `d`)
 
-| Key     | Action                                   |
-| ------- | ----------------------------------------- |
-| `enter` | connect to the highlighted saved connection |
-| `C-e`   | create a new connection                     |
-| `e`     | edit the highlighted saved connection       |
-| `d`     | delete the highlighted saved connection (confirm) |
+The connection tree on the left is the single source of truth for connections, databases,
+and collections — everything is one navigable list. `ctrl+e`, `e`, and `d` are context-aware:
+they act on whatever node is currently highlighted.
 
-### Database manager (dropdown list)
-
-| Key     | Action                                   |
-| ------- | ----------------------------------------- |
-| `enter` | select the highlighted database             |
-| `C-e`   | create a new database (initial collection required) |
-| `d`     | drop the highlighted database (confirm)     |
+| Key     | On a **connection**          | On a **database**                          | On a **collection**            |
+| ------- | ----------------------------- | -------------------------------------------- | --------------------------------- |
+| `enter` | expand / connect               | expand / select                               | open (browse documents)           |
+| `ctrl+e`| create a new connection        | create a new collection in this database      | create a new collection (sibling) |
+| `e`     | edit this connection           | —                                              | —                                  |
+| `d`     | delete this connection (confirm) | drop this database (confirm)                | drop this collection (confirm)    |

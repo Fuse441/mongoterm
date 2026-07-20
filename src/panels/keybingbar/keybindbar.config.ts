@@ -8,7 +8,15 @@ export const keybindbarConfig: TKeybind = {
     },
     {
       key: "ctrl+e",
-      description: "new Connection",
+      description: "new connection/database/collection",
+    },
+    {
+      key: "e",
+      description: "edit connection",
+    },
+    {
+      key: "d",
+      description: "delete/drop selected",
     },
     {
       key: "j k",
