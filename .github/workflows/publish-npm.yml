@@ -1,70 +1,70 @@
 name: Publish to npm
 
-# Automatically publishes the package to npm whenever a vX.Y.Z tag is
-# pushed (created by tag-release.yml or manually). Prerelease versions
-# (e.g. v1.2.3-alpha.0) are published under the matching npm dist-tag
-# (e.g. "alpha") instead of "latest", so `npm i -g mongoterm` always
-# resolves to the last stable release.
+# Manual publish workflow.
+
+# Run from:
+
+# Actions -> Publish to npm -> Run workflow
 
 on:
-  push:
-    tags:
-      - "v*"
+workflow_dispatch:
 
 permissions:
-  contents: read
-  id-token: write # required for npm provenance
+contents: read
+id-token: write # required for npm provenance
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+publish:
+runs-on: ubuntu-latest
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: "https://registry.npmjs.org"
-          cache: npm
+```
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: npm ci
+  - name: Setup Node.js
+    uses: actions/setup-node@v4
+    with:
+      node-version: 22
+      registry-url: "https://registry.npmjs.org"
+      cache: npm
 
-      - name: Build project
-        run: npm run build
+  - name: Install dependencies
+    run: npm ci
 
-      - name: Verify tag matches package.json version
-        run: |
-          set -euo pipefail
-          PKG_VERSION="$(node -p "require('./package.json').version")"
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
-            echo "::error::Tag ${GITHUB_REF_NAME} does not match package.json version ${PKG_VERSION}"
-            exit 1
-          fi
+  - name: Build project
+    run: npm run build
 
-      - name: Determine npm dist-tag
-        id: dist-tag
-        run: |
-          set -euo pipefail
-          VERSION="$(node -p "require('./package.json').version")"
-          if [[ "$VERSION" == *-* ]]; then
-            # e.g. 1.2.3-alpha.0 -> "alpha"
-            PRE_ID="$(echo "$VERSION" | sed -E 's/^[^-]+-([a-zA-Z]+).*/\1/')"
-            echo "tag=${PRE_ID:-alpha}" >> "$GITHUB_OUTPUT"
-          else
-            echo "tag=latest" >> "$GITHUB_OUTPUT"
-          fi
+  - name: Determine npm dist-tag
+    id: dist-tag
+    run: |
+      set -euo pipefail
 
-      - name: Publish to npm
-        run: npm publish --tag "${{ steps.dist-tag.outputs.tag }}" --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      VERSION="$(node -p "require('./package.json').version")"
 
-      - name: Summary
-        run: |
-          VERSION="$(node -p "require('./package.json').version")"
-          echo "### 📦 Published mongoterm@${VERSION} (dist-tag: ${{ steps.dist-tag.outputs.tag }})" >> "$GITHUB_STEP_SUMMARY"
-          echo "https://www.npmjs.com/package/mongoterm/v/${VERSION}" >> "$GITHUB_STEP_SUMMARY"
+      if [[ "$VERSION" == *-* ]]; then
+        # e.g. 1.2.3-alpha.0 -> alpha
+        PRE_ID="$(echo "$VERSION" | sed -E 's/^[^-]+-([a-zA-Z]+).*/\1/')"
+        echo "tag=${PRE_ID:-alpha}" >> "$GITHUB_OUTPUT"
+      else
+        echo "tag=latest" >> "$GITHUB_OUTPUT"
+      fi
+
+      echo "Version: $VERSION"
+      echo "Dist Tag: $(cat $GITHUB_OUTPUT | tail -n1)"
+
+  - name: Publish to npm
+    run: npm publish --tag "${{ steps.dist-tag.outputs.tag }}" --access public --provenance
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  - name: Summary
+    run: |
+      VERSION="$(node -p "require('./package.json').version")"
+
+      echo "### 📦 Published mongoterm@${VERSION}" >> "$GITHUB_STEP_SUMMARY"
+      echo "" >> "$GITHUB_STEP_SUMMARY"
+      echo "- npm dist-tag: \`${{ steps.dist-tag.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+      echo "- package version: \`${VERSION}\`" >> "$GITHUB_STEP_SUMMARY"
+      echo "- npm package: https://www.npmjs.com/package/mongoterm/v/${VERSION}" >> "$GITHUB_STEP_SUMMARY"
+```
