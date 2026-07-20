@@ -7,9 +7,16 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Other
+
+- Rename npm-publish.yml to publish-npm.yml (db480bf)
+
+## [0.2.8] - 2026-07-20
+
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (7ab0944)
+- Update CHANGELOG.md [skip ci] (a5656bb)
 
 ### Other
 
