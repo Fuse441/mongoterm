@@ -7,9 +7,14 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Chore
+
+- Update CHANGELOG.md [skip ci] (43b5d0f)
+
 ### Other
 
 - Change GitHub token to thanos-for-developer (8e9548a)
+- Update token in tag-release workflow (6f24cf1)
 
 ## [0.2.4] - 2026-07-20
 
