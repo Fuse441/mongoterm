@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is inspired by [Keep a Changelog](https://keepachangelog.com/)
 and this project follows Semantic Versioning (SemVer).
 
+## [Unreleased]
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (a58e7d2)
+
+### Other
+
+- Update npm-publish workflow trigger
+
+Change trigger from push tags to workflow_run for Tag Release. (a6b9698)
+
 ## [0.2.6] - 2026-07-20
 
 ### Other
