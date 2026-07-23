@@ -9,6 +9,18 @@ and this project follows Semantic Versioning (SemVer).
 
 ### Added
 
+- Fix record editor/query input, add autocomplete, sort/paging, and query shell (7ae1a19)
+
+### Other
+
+- Merge pull request #9 from Fuse441/fix/editor-query-shell
+
+Fix record editor/query input, add autocomplete, sort/paging, and query shell (883c043)
+
+## [0.3.0] - 2026-07-20
+
+### Added
+
 - Add edit/delete for saved connections (connection CRUD) (8631447)
 - Add create/drop for databases (database CRUD) (db0754b)
 
@@ -18,6 +30,7 @@ and this project follows Semantic Versioning (SemVer).
 - Update CHANGELOG.md [skip ci] (e4c8bd7)
 - Update CHANGELOG.md [skip ci] (f16aa04)
 - Update CHANGELOG.md [skip ci] (00fa2c2)
+- Update CHANGELOG.md [skip ci] (bf7d46a)
 
 ### Fixed
 
