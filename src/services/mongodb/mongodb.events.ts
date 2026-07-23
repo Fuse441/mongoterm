@@ -306,7 +306,8 @@ export class EventMongoService {
 
     this.eventBus.on(EVENTS.RECORD_UPDATE, async ({ updated, query }) => {
       try {
-        const parsed = JSON.parse(updated);
+        const parsed =
+          typeof updated === "string" ? JSON.parse(updated) : updated;
 
         const { _id, ...updateFields } = parsed;
 
@@ -318,7 +319,20 @@ export class EventMongoService {
       } catch (error: any) {
         showToast({
           statusCode: 400,
-          message: String(`Invalid JSON: ${error.message}`),
+          message: String(`Invalid record: ${error.message}`),
+        });
+      }
+    });
+
+    this.eventBus.on(EVENTS.RECORD_INSERT, async ({ doc, query }) => {
+      try {
+        await this.mongoRepository.insertRecord(doc);
+
+        this.eventBus.emit(EVENTS.QUERY_SEND, query);
+      } catch (error: any) {
+        showToast({
+          statusCode: 400,
+          message: String(`Failed to insert record: ${error.message}`),
         });
       }
     });

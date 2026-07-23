@@ -160,6 +160,8 @@ function bindRecordEvents({ box, parent, doc, id, idx }: any) {
 
   box.key("y", () => handleDuplicate(parent, id, idx));
 
+  box.key("C-n", () => handleInsert());
+
   box.key("tab", () => parent.screen.focusNext());
 
   box.key("S-tab", () => parent.screen.focusPrevious());
@@ -211,6 +213,13 @@ function handleEdit(parent: any, doc: any, idx: any) {
     logger.error({ message: "Error opening editor", error });
   }
 }
+function handleInsert() {
+  try {
+    openEditor({}, { isInsert: true });
+  } catch (error) {
+    logger.error({ message: "Error opening insert editor", error });
+  }
+}
 function handleCopy(parent: any, doc: any) {
   try {
     copyPaste.copy(JSON.stringify(doc, null, 2), () => {
@@ -238,16 +247,40 @@ export async function renderResult(
   appInstance.ui.panels.workspace?.focus();
   parent.removeListener("scroll", () => { });
   const docs = payload.docs || [];
+  const total = payload.pagination?.total ?? docs.length;
 
   await parent.children.slice().forEach((child: any) => {
-    if (child._isRecord) {
+    if (child._isRecord || child._isEmptyState) {
       parent.remove(child);
     }
   });
-  parent.setLabel(` Results (${docs.length * state.totalPages}) page ${state.page} of ${state.totalPages} `);
+  const sortLabel = state.sort
+    ? `  sort:${Object.entries(state.sort).map(([f, d]) => `${f}:${d}`).join(",")}`
+    : "";
+  parent.setLabel(
+    ` Results (${total}) page ${state.page} of ${state.totalPages || 1}  size:${state.pageSize}${sortLabel} `,
+  );
   const rowHeight = RECORD_HEIGHT + RECORD_GAP;
   //
   parent.scrollTo(0);
+
+  if (docs.length === 0) {
+    const emptyBox = blessed.box({
+      top: 1,
+      left: "center",
+      width: "80%",
+      height: 3,
+      align: "center",
+      tags: true,
+      content:
+        "{grey-fg}No records match this query.{/grey-fg}\n{grey-fg}Adjust the query, or press {/grey-fg}{cyan-fg}C-n{/cyan-fg}{grey-fg} to insert one.{/grey-fg}",
+    });
+    emptyBox._isEmptyState = true;
+    parent.append(emptyBox);
+    parent.focus();
+    parent.screen.render();
+    return;
+  }
   const visibleRows = Math.ceil(Number(parent.height) / rowHeight) + 5;
   let renderedCount = Math.min(docs.length, visibleRows);
 
@@ -280,8 +313,6 @@ export async function renderResult(
     parent.append(box);
   }
 
-  if (docs.length > 0) {
-    parent.focus();
-  }
+  parent.focus();
   parent.screen.render();
 }

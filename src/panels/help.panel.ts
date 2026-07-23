@@ -3,44 +3,91 @@ import _blessed from "neo-blessed";
 const blessed /** @type {typeof import('blessed')} */ =
   /** @type {any} */ _blessed;
 
-const HELP_CONTENT = [
-  " {bold}Navigation{/bold}",
-  " {cyan-fg}l / →{/cyan-fg}    move right",
-  " {cyan-fg}h / ←{/cyan-fg}    move left",
-  " {cyan-fg}k / ↑{/cyan-fg}    move up",
-  " {cyan-fg}j / ↓{/cyan-fg}    move down",
-  "",
-  " {bold}Record{/bold}",
-  " {cyan-fg}e{/cyan-fg}        edit record",
-  " {cyan-fg}c{/cyan-fg}        copy record",
-  " {cyan-fg}d{/cyan-fg}        delete record",
-  "",
-  " {bold}Global{/bold}",
-  " {cyan-fg}?{/cyan-fg}        toggle help",
-  " {cyan-fg}q / C-c{/cyan-fg}  quit",
-].join("\n");
+import { keybindbarConfig, helpOnlyConfig } from "./keybingbar/keybindbar.config.js";
+import { IKeybind } from "./keybingbar/keybindbar.interface.js";
+
+/*
+|--------------------------------------------------------------------------
+| HELP POPUP
+|--------------------------------------------------------------------------
+| The keybind list here is generated from keybindbarConfig/helpOnlyConfig
+| (also the source for the bottom keybindbar) instead of a hardcoded copy,
+| so editing a keybind in one place updates both.
+*/
+
+const SECTION_TITLES: Record<string, string> = {
+  tree: "Connection Tree",
+  workspace: "Workspace",
+  record: "Record",
+  query: "Query",
+  editor: "Record Editor",
+  autocomplete: "Query Autocomplete",
+  global: "Global",
+};
+
+const SECTION_ORDER = [
+  "tree",
+  "workspace",
+  "record",
+  "query",
+  "editor",
+  "autocomplete",
+  "global",
+] as const;
+
+function renderSection(title: string, binds: IKeybind[]): string[] {
+  const lines = [` {bold}${title}{/bold}`];
+  for (const bind of binds) {
+    lines.push(` {cyan-fg}${bind.key}{/cyan-fg}    ${bind.description}`);
+  }
+  return lines;
+}
+
+function buildHelpContent(): string {
+  const sections: Record<string, IKeybind[]> = {
+    ...keybindbarConfig,
+    ...helpOnlyConfig,
+  };
+
+  const lines: string[] = [];
+  for (const name of SECTION_ORDER) {
+    const binds = sections[name];
+    if (!binds || !binds.length) continue;
+    if (lines.length) lines.push("");
+    lines.push(...renderSection(SECTION_TITLES[name] ?? name, binds));
+  }
+  return lines.join("\n");
+}
 
 let helpBox: any = null;
+let previouslyFocused: any = null;
 
 export function toggleHelp() {
   if (helpBox) {
     appInstance.removeScreenElement(helpBox);
     helpBox = null;
+    previouslyFocused?.focus();
+    previouslyFocused = null;
     appInstance.renderScreen();
     return;
   }
 
+  previouslyFocused = appInstance.screen.focused;
+
   helpBox = blessed.box({
     top: "center",
     left: "center",
-    width: 40,
-    height: 20,
+    width: 48,
+    height: "80%",
     label: " Keybindings ",
     border: "line",
     tags: true,
     keys: true,
+    scrollable: true,
+    alwaysScroll: true,
+    scrollbar: { ch: " ", style: { bg: "blue" } },
     style: { border: { fg: "cyan" } },
-    content: HELP_CONTENT,
+    content: buildHelpContent(),
   });
 
   appInstance.appendToScreen(helpBox);
