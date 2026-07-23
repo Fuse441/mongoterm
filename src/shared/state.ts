@@ -14,6 +14,7 @@ interface IState {
   pageSize: number;
   page: number;
   totalPages: number;
+  sort: Record<string, 1 | -1> | null;
 }
 export const state: IState = {
   connections: config.connections || [],
@@ -27,4 +28,5 @@ export const state: IState = {
   pageSize: 10,
   page: 1,
   totalPages: 0,
+  sort: null,
 };

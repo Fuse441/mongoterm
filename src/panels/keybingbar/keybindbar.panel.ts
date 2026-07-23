@@ -5,7 +5,7 @@ export function keybindbarPanel() {
     bottom: 0,
     left: 0,
     width: "100%",
-    height: "10%",
+    height: 3,
     label: " keybindbar ",
     tags: true,
     border: "line",

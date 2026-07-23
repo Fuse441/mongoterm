@@ -9,6 +9,7 @@ export const EVENTS = Object.freeze({
   QUERY_SEND: "query:send",
   QUERY_ERROR: "query:error",
   RECORD_UPDATE: "record:update",
+  RECORD_INSERT: "record:insert",
   TOAST_SHOW: "show:toast",
   RECORD_DELETE: "delete:record",
   RECORD_DUPLICATE: "duplicate:record",

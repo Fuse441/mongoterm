@@ -131,18 +131,28 @@ public parseQuery(query?: string): Record<string, unknown> {
   }
 }
 public async fetchQuery(
-  query?:  string, 
+  query?:  string,
   {
     page = state.page,
     pageSize =state.pageSize,
+    sort = state.sort,
   }: {
     page?: number;
     pageSize?: number;
+    sort?: Record<string, 1 | -1> | null;
   } = {},
 ) {
-    logger.debug({ message: "Fetching query", query, page, pageSize });
+    logger.debug({ message: "Fetching query", query, page, pageSize, sort });
   const dbName = state.databases[state.selectedDatabaseIndex];
   const colName = state.collections[state.selectedCollectionIndex];
+
+  if (!dbName || !colName) {
+    state.totalPages = 0;
+    return {
+      docs: [],
+      pagination: { page, pageSize, total: 0, totalPages: 0 },
+    };
+  }
 
   const filter = this.parseQuery(query);
   logger.debug({ message: "Parsed query filter", filter });
@@ -153,7 +163,7 @@ public async fetchQuery(
   const skip = (page - 1) * pageSize;
 
   const [docs, total] = await Promise.all([
-    collection.find(filter).skip(skip).limit(pageSize).toArray(),
+    collection.find(filter).sort(sort ?? {}).skip(skip).limit(pageSize).toArray(),
     collection.countDocuments(filter),
   ]);
   logger.debug({ message: "Query result", docs, total });
@@ -205,6 +215,26 @@ public async  deleteRecord(id: string) {
   this.eventBus.emit(EVENTS.TOAST_SHOW, {
     statusCode: 200,
     message: "record deleted!",
+  });
+}
+
+public async insertRecord(doc: Record<string, unknown>) {
+  const dbName = state.databases[state.selectedDatabaseIndex];
+  const colName = state.collections[state.selectedCollectionIndex];
+
+  const { _id, ...rest } = doc as { _id?: unknown; [key: string]: unknown };
+
+  await this.getClient()
+    .db(dbName)
+    .collection(colName)
+    .insertOne({
+      _id: (_id instanceof ObjectId ? _id : new ObjectId()) as any,
+      ...rest,
+    });
+
+  this.eventBus.emit(EVENTS.TOAST_SHOW, {
+    statusCode: 200,
+    message: "record inserted!",
   });
 }
 

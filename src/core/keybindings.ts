@@ -1,4 +1,5 @@
 import { toggleHelp } from "@/panels/help.panel";
+import { toggleShell } from "@/panels/shell.panel";
 import { logger } from "@/utils/logger/logger.service";
 import { state } from "@/shared/state";
 import { appInstance } from "@/app.js";
@@ -150,6 +151,12 @@ const getBindings = (ui: TResponseLayout) => [
     keys: ["?"],
     action: () => {
       toggleHelp();
+    },
+  },
+  {
+    keys: [":"],
+    action: () => {
+      toggleShell();
     },
   },
 ];

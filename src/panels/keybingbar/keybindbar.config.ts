@@ -1,4 +1,4 @@
-import { TKeybind } from "./keybindbar.interface";
+import { THelpSections, TKeybind } from "./keybindbar.interface";
 
 export const keybindbarConfig: TKeybind = {
   tree: [
@@ -50,6 +50,18 @@ export const keybindbarConfig: TKeybind = {
 
       description: "previous page",
     },
+    {
+      key: "ctrl+n",
+      description: "insert record",
+    },
+    {
+      key: "s",
+      description: "sort",
+    },
+    {
+      key: "Shift+s",
+      description: "page size",
+    },
   ],
   record: [
     {
@@ -76,11 +88,46 @@ export const keybindbarConfig: TKeybind = {
       key: "c",
       description: "copy",
     },
+    {
+      key: "ctrl+n",
+      description: "insert record",
+    },
   ],
   query: [
     {
       key: "esc",
       description: "workspace",
     },
+  ],
+};
+
+/*
+|--------------------------------------------------------------------------
+| HELP-ONLY SECTIONS
+|--------------------------------------------------------------------------
+| Not tied to a specific panel focus, so they don't belong in the bottom
+| keybindbar, but they do belong in the full "?" help popup. Keeping them
+| here means keybindbar.config.ts stays the single source of truth for
+| every keybind shown anywhere in the app — see help.panel.ts.
+*/
+export const helpOnlyConfig: THelpSections = {
+  editor: [
+    { key: "enter", description: "edit field value" },
+    { key: "←/→", description: "change field dataType" },
+    { key: "a", description: "add field" },
+    { key: "d", description: "remove field" },
+    { key: "C-s", description: "save" },
+    { key: "esc", description: "cancel" },
+  ],
+  autocomplete: [
+    { key: "$...", description: "typing $ starts operator suggestions (query/shell boxes)" },
+    { key: "up/down", description: "navigate suggestions" },
+    { key: "tab / enter", description: "accept suggestion" },
+    { key: "esc", description: "dismiss suggestions" },
+  ],
+  global: [
+    { key: "?", description: "toggle help" },
+    { key: ":", description: "open query shell" },
+    { key: "q / C-c", description: "quit" },
   ],
 };

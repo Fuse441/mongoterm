@@ -36,7 +36,7 @@ export function registerDirectoryTree(parent: any, top: any) {
       top: 0,
       left: 0,
       width: "25%",
-      height: "92%",
+      height: "100%-3",
       label: " Connection ",
       border: "line",
       style: {
