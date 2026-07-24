@@ -19,6 +19,14 @@ export const keybindbarConfig: TKeybind = {
       description: "delete/drop selected",
     },
     {
+      key: "x",
+      description: "export connection(s)",
+    },
+    {
+      key: "i",
+      description: "import connections",
+    },
+    {
       key: "j k",
       description: "navigate",
     },

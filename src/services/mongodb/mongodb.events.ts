@@ -12,6 +12,8 @@ import { appInstance } from "@/app";
 import { renderResult } from "@/panels/result.panel";
 import {
   deleteConnection,
+  exportConnections,
+  importConnections,
   saveConnection,
   updateConnection,
 } from "../helper";
@@ -289,6 +291,64 @@ export class EventMongoService {
         });
       }
     });
+
+    this.eventBus.on(
+      EVENTS.CONNECTION_EXPORT,
+      ({
+        filePath,
+        format,
+        connections,
+      }: {
+        filePath: string;
+        format: "compass" | "uri";
+        connections: IConfigurationMongoConnection[];
+      }) => {
+        try {
+          exportConnections(filePath, format, connections);
+          this.eventBus.emit(EVENTS.CONNECTION_EXPORTED, { filePath });
+          showToast({
+            statusCode: 200,
+            message: `Exported ${connections.length} connection(s) to ${filePath}`,
+          });
+        } catch (error: any) {
+          logger.error({ message: "Failed to export connections", error });
+          showToast({
+            statusCode: 500,
+            message: `Failed to export connections: ${error.message}`,
+          });
+        }
+      },
+    );
+
+    this.eventBus.on(
+      EVENTS.CONNECTION_IMPORT,
+      ({
+        filePath,
+        format,
+      }: {
+        filePath: string;
+        format: "compass" | "uri";
+      }) => {
+        try {
+          const before = state.connections.length;
+          state.connections = importConnections(filePath, format);
+          const added = state.connections.length - before;
+          this.eventBus.emit(EVENTS.CONNECTION_IMPORTED, {
+            connections: state.connections,
+          });
+          showToast({
+            statusCode: 200,
+            message: `Imported ${added} new connection(s)`,
+          });
+        } catch (error: any) {
+          logger.error({ message: "Failed to import connections", error });
+          showToast({
+            statusCode: 500,
+            message: `Failed to import connections: ${error.message}`,
+          });
+        }
+      },
+    );
   }
 
   private registerRecordEvents() {
