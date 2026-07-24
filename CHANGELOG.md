@@ -7,6 +7,11 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Chore
+
+- Update CHANGELOG.md [skip ci] (7e042a2)
+- Bump esbuild (a8c06a3)
+
 ### Documentation
 
 - Expand roadmap with Compass-parity feature gaps, mark import/export done (3720b58)
@@ -16,6 +21,9 @@ and this project follows Semantic Versioning (SemVer).
 - Merge pull request #11 from Fuse441/fix/editor-query-shell
 
 docs: expand roadmap with Compass-parity feature gaps, mark import/ex… (8d21308)
+- Merge pull request #8 from Fuse441/dependabot/npm_and_yarn/npm_and_yarn-53cbaf2a5b
+
+chore(deps-dev): bump esbuild from 0.28.0 to 0.28.1 in the npm_and_yarn group across 1 directory (f0c0b7b)
 
 ## [0.4.1] - 2026-07-24
 
