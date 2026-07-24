@@ -1,0 +1,7 @@
+Read CLAUDE.md in full before making any change in this repository.
+
+CLAUDE.md is the single source of truth for architecture, conventions, and
+known neo-blessed gotchas — not a separate or lighter set of rules. When a
+change touches an area CLAUDE.md documents (keybinds, panels, the event bus,
+percentage-based layout math, etc.), update the matching section in
+CLAUDE.md in the same change, per its own "Keeping this file in sync" table.

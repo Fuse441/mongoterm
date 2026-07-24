@@ -2,6 +2,12 @@
 
 Guidance for Claude Code (and future contributors) working in this repository.
 
+This is the single source of truth for architecture/conventions regardless
+of which AI tool a contributor uses — `AGENTS.md`, `.cursorrules`, and
+`.github/copilot-instructions.md` are thin pointers back to this file, not
+separate rule sets. If you rename or move this file, update those three
+pointers in the same change; otherwise they need no edits of their own.
+
 ## Keeping this file in sync
 
 This file is documentation-as-code: treat an out-of-date section here as a
