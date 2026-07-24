@@ -59,7 +59,11 @@ const getBindings = (ui: TResponseLayout) => [
         message: "logs keybindings ==> " + state.page,
         total: state.totalPages,
       });
-      if (state.page >= state.totalPages - 1) {
+      // state.page/totalPages are both 1-indexed, so the last page is
+      // reachable exactly when page === totalPages — this used to compare
+      // against `totalPages - 1`, which blocked ever reaching a final
+      // (possibly partial/remainder) page.
+      if (state.page >= state.totalPages) {
         appInstance.renderScreen();
         return;
       }
@@ -74,16 +78,17 @@ const getBindings = (ui: TResponseLayout) => [
     keys: ["S-h"],
     condition: () => appInstance.screen.focused === ui.panels.workspace,
     action: () => {
-      if (state.page <= state.totalPages - 1) {
-        logger.debug({
-          message: "logs keybindings ==> " + state.page,
-          total: state.totalPages - 1,
-        });
-        state.page != 1 && (state.page -= 1);
-        appInstance.eventBus.emit(EVENTS.QUERY_SEND);
-
+      if (state.page <= 1) {
         appInstance.renderScreen();
+        return;
       }
+      logger.debug({
+        message: "logs keybindings ==> " + state.page,
+        total: state.totalPages,
+      });
+      state.page -= 1;
+      appInstance.eventBus.emit(EVENTS.QUERY_SEND);
+      appInstance.renderScreen();
 
       logger.debug({ message: "Shift+H pressed, focusing last record" });
     },
@@ -142,6 +147,50 @@ const getBindings = (ui: TResponseLayout) => [
     condition: () => appInstance.screen.focused?._isRecord,
     action: () => {
       ui.panels.workspace!.focus();
+      appInstance.screen.render();
+    },
+  },
+  // vim-style jump to first/last record — the only reliable way back to a
+  // known scroll position, since nothing else auto-scrolls the workspace
+  // into view as focus moves between record boxes (see CLAUDE.md's
+  // "Known neo-blessed gotchas").
+  {
+    keys: ["g"],
+    condition: () =>
+      appInstance.screen.focused === ui.panels.workspace ||
+      appInstance.screen.focused?._isRecord,
+    action: () => {
+      const workspace = ui.panels.workspace!;
+      const records = workspace.children.filter(
+        (c: any) => c._isRecord,
+      ) as blessed.Widgets.BoxElement[];
+      workspace.scrollTo(0);
+      if (records.length) {
+        currentRecord = 0;
+        records[0].focus();
+      } else {
+        workspace.focus();
+      }
+      appInstance.screen.render();
+    },
+  },
+  {
+    keys: ["S-g"],
+    condition: () =>
+      appInstance.screen.focused === ui.panels.workspace ||
+      appInstance.screen.focused?._isRecord,
+    action: () => {
+      const workspace = ui.panels.workspace!;
+      const records = workspace.children.filter(
+        (c: any) => c._isRecord,
+      ) as blessed.Widgets.BoxElement[];
+      workspace.scrollTo(workspace.getScrollHeight());
+      if (records.length) {
+        currentRecord = records.length - 1;
+        records[currentRecord].focus();
+      } else {
+        workspace.focus();
+      }
       appInstance.screen.render();
     },
   },
