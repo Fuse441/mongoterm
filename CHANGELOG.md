@@ -7,9 +7,25 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Documentation
+
+- Expand roadmap with Compass-parity feature gaps, mark import/export done (3720b58)
+
+### Other
+
+- Merge pull request #11 from Fuse441/fix/editor-query-shell
+
+docs: expand roadmap with Compass-parity feature gaps, mark import/ex… (8d21308)
+
+## [0.4.1] - 2026-07-24
+
 ### Added
 
 - Add Compass/mongosh-URI import and export for connections (2cffbbc)
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (f9356c9)
 
 ### Fixed
 
