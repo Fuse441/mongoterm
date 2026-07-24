@@ -81,7 +81,10 @@ src/
     mongodb/                  MongodbBuilder, EventMongoService (event ->
                                Mongo operation glue), MongodbRepository
                                (actual driver calls), types
-    helper.ts                 ~/.mongoterm/compass.json read/write
+    helper.ts                 ~/.mongoterm/compass.json read/write, plus
+                               exportConnections/importConnections
+                               (Compass-JSON or mongosh-URI-list files,
+                               triggered by the tree panel's `x`/`i` keys)
     query.service.ts           query history (save/read ~/.mongoterm_history)
                                — NOT query parsing; that's
                                MongodbRepository.parseQuery (JSON.parse with

@@ -19,6 +19,14 @@ export const keybindbarConfig: TKeybind = {
       description: "delete/drop selected",
     },
     {
+      key: "x",
+      description: "export connection(s)",
+    },
+    {
+      key: "i",
+      description: "import connections",
+    },
+    {
       key: "j k",
       description: "navigate",
     },
@@ -62,6 +70,14 @@ export const keybindbarConfig: TKeybind = {
       key: "Shift+s",
       description: "page size",
     },
+    {
+      key: "g",
+      description: "first record",
+    },
+    {
+      key: "Shift+g",
+      description: "last record",
+    },
   ],
   record: [
     {
@@ -71,6 +87,14 @@ export const keybindbarConfig: TKeybind = {
     {
       key: "j k",
       description: "navigate",
+    },
+    {
+      key: "g",
+      description: "first record",
+    },
+    {
+      key: "Shift+g",
+      description: "last record",
     },
     {
       key: "e",

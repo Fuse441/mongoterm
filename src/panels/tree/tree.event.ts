@@ -1,14 +1,24 @@
 import { appInstance } from "@/app";
 import { getConnectionNames } from "@/shared/selectors/connection.selectors";
 import blessed from "neo-blessed";
+import os from "os";
+import path from "path";
 import { state } from "@/shared/state";
 import { logger } from "@/utils/logger/logger.service";
 import { EVENTS } from "@/services/enum";
 import { openForm } from "@/panels/form/form.panel";
-import { openDialogConfirm } from "@/panels/modal.panel";
+import { openDialogConfirm, promptInline } from "@/panels/modal.panel";
 import { createTree, TreeNode } from "@/panels/tree/tree.panel";
 import { theme } from "@/config/app.config";
 import { getConfiguration, saveConnection } from "@/services/helper";
+
+// ".json" -> the Compass-compatible `{ connections: [...] }` shape (also
+// what this app itself uses for ~/.mongoterm/compass.json); anything else
+// -> a plain mongosh-style URI list. Keeps import/export to a single
+// file-path prompt instead of a separate format picker.
+function detectConnectionFileFormat(filePath: string): "compass" | "uri" {
+  return filePath.trim().toLowerCase().endsWith(".json") ? "compass" : "uri";
+}
 
 function waitFor(
   check: () => boolean,
@@ -140,6 +150,66 @@ export function registerDirectoryTree(parent: any, top: any) {
         },
       });
     }
+    // 🔹 export: the highlighted connection, or all of them if none/other
+    // node type is selected
+    function exportConnectionsFlow(selected: TreeNode | null | undefined) {
+      const single =
+        selected?.type === "connection"
+          ? state.connections[selected.meta.index]
+          : null;
+      const toExport = single ? [single] : state.connections;
+      if (!toExport.length) return;
+
+      const defaultPath = path.join(
+        os.homedir(),
+        single ? `${single.favorite.name}.json` : "mongoterm-connections.json",
+      );
+
+      promptInline(
+        `Export ${toExport.length} connection(s) to (.json = Compass, else = URI list)`,
+        defaultPath,
+        (filePath) => {
+          if (filePath?.trim()) {
+            appInstance.eventBus.emit(EVENTS.CONNECTION_EXPORT, {
+              filePath: filePath.trim(),
+              format: detectConnectionFileFormat(filePath),
+              connections: toExport,
+            });
+          }
+          tree.el.focus();
+          appInstance.renderScreen();
+        },
+      );
+    }
+
+    // 🔹 import: merge connections from a Compass JSON or URI-list file
+    function importConnectionsFlow() {
+      const defaultPath = path.join(os.homedir(), "mongoterm-connections.json");
+
+      promptInline(
+        "Import connections from (.json = Compass, else = URI list)",
+        defaultPath,
+        (filePath) => {
+          if (filePath?.trim()) {
+            appInstance.eventBus.emit(EVENTS.CONNECTION_IMPORT, {
+              filePath: filePath.trim(),
+              format: detectConnectionFileFormat(filePath),
+            });
+          }
+          tree.el.focus();
+          appInstance.renderScreen();
+        },
+      );
+    }
+
+    tree.el.key(["x"], () => {
+      exportConnectionsFlow(tree.getSelectedNode());
+    });
+
+    tree.el.key(["i"], () => {
+      importConnectionsFlow();
+    });
+
     // 🔹 create: context-aware based on the highlighted node
     tree.el.key(["C-e"], () => {
       const selected = tree.getSelectedNode();
@@ -201,6 +271,9 @@ export function registerDirectoryTree(parent: any, top: any) {
       buildConnectionNodes(),
     );
     appInstance.eventBus.on(EVENTS.CONNECTION_DELETED, () =>
+      buildConnectionNodes(),
+    );
+    appInstance.eventBus.on(EVENTS.CONNECTION_IMPORTED, () =>
       buildConnectionNodes(),
     );
 
