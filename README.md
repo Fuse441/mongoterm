@@ -66,8 +66,10 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 
 - [ ] Query builder (no need to type raw JSON)
 - [ ] Save favorite queries
-- [ ] Pagination / limit results
-- [ ] Sort & filter UI
+- [x] Pagination / limit results
+- [x] Sort UI (`s` key)
+- [ ] Aggregation pipeline builder
+- [ ] Explain plan viewer
 
 </details>
 
@@ -82,10 +84,50 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 </details>
 
 <details>
+<summary><strong>🔌 Connections</strong></summary>
+
+- [x] Multiple saved connections
+- [x] Import / export connections (Compass JSON or mongosh URI list — `x`/`i` keys on the tree panel)
+- [ ] SSH tunnel support
+- [ ] TLS / X.509 / Kerberos / LDAP auth options
+- [ ] Connection favorites color-coding / grouping
+
+</details>
+
+<details>
+<summary><strong>🗄️ Data Browsing</strong></summary>
+
+- [x] Browse databases / collections, view documents (tree-formatted)
+- [ ] Table / grid view (alternative to the tree layout)
+- [ ] Schema analysis (field type + frequency distribution across a sample)
+- [ ] Collection stats (storage size, doc count, avg doc size, index size)
+
+</details>
+
+<details>
+<summary><strong>📇 Indexes</strong></summary>
+
+- [ ] View / create / drop indexes
+- [ ] Index usage stats
+
+</details>
+
+<details>
+<summary><strong>🔐 Admin / Security</strong></summary>
+
+- [ ] User / role management
+- [ ] Server / replica-set / sharding topology view
+
+</details>
+
+<details>
 <summary><strong>📤 Export</strong></summary>
 
-- [ ] Export result as JSON file
-- [ ] Export result as CSV
+- [x] Import / export connections (Compass JSON / mongosh URI list)
+- [ ] Export query results as JSON file
+- [ ] Export query results as CSV
+- [ ] Import documents from JSON/CSV into a collection
+- [ ] Bulk operations (bulk delete/update by filter)
 
 </details>
 
@@ -104,9 +146,11 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 ## ✨ Features
 
 - Manage MongoDB connections
+- Import / export connections (Compass JSON or mongosh URI list)
 - Browse, create, and drop databases
 - Browse, create, and drop collections
-- View documents from collections
+- View, insert, edit, delete, and duplicate documents
+- Query with pagination and sort
 - Interactive dropdown navigation
 - Keyboard-driven interface
 - Lightweight terminal UI
