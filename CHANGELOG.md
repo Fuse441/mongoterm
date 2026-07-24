@@ -7,6 +7,62 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Chore
+
+- Update CHANGELOG.md [skip ci] (7e042a2)
+- Bump esbuild (a8c06a3)
+
+### Documentation
+
+- Expand roadmap with Compass-parity feature gaps, mark import/export done (3720b58)
+
+### Other
+
+- Merge pull request #11 from Fuse441/fix/editor-query-shell
+
+docs: expand roadmap with Compass-parity feature gaps, mark import/ex… (8d21308)
+- Merge pull request #8 from Fuse441/dependabot/npm_and_yarn/npm_and_yarn-53cbaf2a5b
+
+chore(deps-dev): bump esbuild from 0.28.0 to 0.28.1 in the npm_and_yarn group across 1 directory (f0c0b7b)
+
+## [0.4.1] - 2026-07-24
+
+### Added
+
+- Add Compass/mongosh-URI import and export for connections (2cffbbc)
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (f9356c9)
+
+### Fixed
+
+- Reachable last page and vim g/G jump-to-top/bottom in workspace (4d4a6a0)
+
+### Other
+
+- Merge pull request #10 from Fuse441/fix/editor-query-shell
+
+Connection import/export + pagination and scroll fixes (25e7fb7)
+
+## [0.4.0] - 2026-07-23
+
+### Added
+
+- Fix record editor/query input, add autocomplete, sort/paging, and query shell (7ae1a19)
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (2299b84)
+
+### Other
+
+- Merge pull request #9 from Fuse441/fix/editor-query-shell
+
+Fix record editor/query input, add autocomplete, sort/paging, and query shell (883c043)
+
+## [0.3.0] - 2026-07-20
+
 ### Added
 
 - Add edit/delete for saved connections (connection CRUD) (8631447)
@@ -17,10 +73,13 @@ and this project follows Semantic Versioning (SemVer).
 - Update CHANGELOG.md [skip ci] (a11341a)
 - Update CHANGELOG.md [skip ci] (e4c8bd7)
 - Update CHANGELOG.md [skip ci] (f16aa04)
+- Update CHANGELOG.md [skip ci] (00fa2c2)
+- Update CHANGELOG.md [skip ci] (bf7d46a)
 
 ### Fixed
 
 - Wire connection/database/collection CRUD into the real tree UI (34aebd4)
+- Creating a database from the tree used the wrong node (5b02d4d)
 
 ### Other
 
