@@ -9,7 +9,27 @@ and this project follows Semantic Versioning (SemVer).
 
 ### Added
 
+- Add Compass/mongosh-URI import and export for connections (2cffbbc)
+
+### Fixed
+
+- Reachable last page and vim g/G jump-to-top/bottom in workspace (4d4a6a0)
+
+### Other
+
+- Merge pull request #10 from Fuse441/fix/editor-query-shell
+
+Connection import/export + pagination and scroll fixes (25e7fb7)
+
+## [0.4.0] - 2026-07-23
+
+### Added
+
 - Fix record editor/query input, add autocomplete, sort/paging, and query shell (7ae1a19)
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (2299b84)
 
 ### Other
 
