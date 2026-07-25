@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import { IConfigurationMongoConnection } from "@/types/config";
 import { logger } from "@/utils/logger/logger.service";
 import { CONFIG_PATH } from "@/config/app.paths";
+import { writeFileSecure } from "@/utils/secureFs";
 
 export function getConfiguration() {
 if(!fs.existsSync(CONFIG_PATH)) {
@@ -15,7 +16,7 @@ export function saveConnection(
   connection: Record<string, any>,
 ): IConfigurationMongoConnection {
   try {
-    logger.debug({ message: `Saving connection: ${JSON.stringify(connection)}` });
+    logger.debug({ message: `Saving connection: ${connection.connectionName ?? "(unnamed)"}` });
 
     const newConnection: IConfigurationMongoConnection = {
       id: new ObjectId().toHexString(),
@@ -36,12 +37,8 @@ export function saveConnection(
     const currentConfig = getConfiguration();
     const updatedConnections = [...(currentConfig.connections || []), newConnection];
     const newConfig = { ...currentConfig, connections: updatedConnections };
-   fs.writeFileSync(
-      CONFIG_PATH,
-      JSON.stringify(newConfig, null, 2),
-      "utf-8",
-    );
-    logger.debug({ message: `Configuration saved: ${JSON.stringify(updatedConnections)}` });
+    writeFileSecure(CONFIG_PATH, JSON.stringify(newConfig, null, 2));
+    logger.debug({ message: `Configuration saved with ${updatedConnections.length} connection(s)` });
     return newConnection;
   } catch (err: any) {
     logger.error({
@@ -78,9 +75,9 @@ export function updateConnection(
     updatedConnections[index] = updatedConnection;
 
     const newConfig = { ...currentConfig, connections: updatedConnections };
-    fs.writeFileSync(CONFIG_PATH, JSON.stringify(newConfig, null, 2), "utf-8");
+    writeFileSecure(CONFIG_PATH, JSON.stringify(newConfig, null, 2));
 
-    logger.debug({ message: `Connection updated: ${JSON.stringify(updatedConnection)}` });
+    logger.debug({ message: `Connection updated: ${id}` });
     return updatedConnections;
   } catch (err: any) {
     logger.error({
@@ -102,7 +99,7 @@ export function deleteConnection(id: string): IConfigurationMongoConnection[] {
     }
 
     const newConfig = { ...currentConfig, connections: updatedConnections };
-    fs.writeFileSync(CONFIG_PATH, JSON.stringify(newConfig, null, 2), "utf-8");
+    writeFileSecure(CONFIG_PATH, JSON.stringify(newConfig, null, 2));
 
     logger.debug({ message: `Connection deleted: ${id}` });
     return updatedConnections;
@@ -129,18 +126,14 @@ export function exportConnections(
   connections: IConfigurationMongoConnection[],
 ): void {
   if (format === "compass") {
-    fs.writeFileSync(
-      filePath,
-      JSON.stringify({ connections }, null, 2),
-      "utf-8",
-    );
+    writeFileSecure(filePath, JSON.stringify({ connections }, null, 2));
   } else {
     const lines = connections.flatMap((c) => [
       `# ${c.favorite.name}`,
       c.connectionOptions.connectionString,
       "",
     ]);
-    fs.writeFileSync(filePath, lines.join("\n"), "utf-8");
+    writeFileSecure(filePath, lines.join("\n"));
   }
 }
 
@@ -206,7 +199,7 @@ export function importConnections(
 
   const updatedConnections = [...existing, ...newConnections];
   const newConfig = { ...currentConfig, connections: updatedConnections };
-  fs.writeFileSync(CONFIG_PATH, JSON.stringify(newConfig, null, 2), "utf-8");
+  writeFileSecure(CONFIG_PATH, JSON.stringify(newConfig, null, 2));
 
   logger.debug({
     message: `Imported ${newConnections.length} new connection(s) from ${filePath}`,
