@@ -1,19 +1,18 @@
 import { state } from "@/shared/state";
 import util from "util";
 import { getTimestamp } from "@/services/helper";
-import fs from "fs";
 import { ILevelLogger, TLogLevel } from "@/utils/logger/logger.interface";
 import { getCaller } from "../stack/stack.service";
 import { APP_ROOT, LOG_PATH } from "@/config/app.paths";
+import { ensureSecureDir, createSecureAppendStream } from "@/utils/secureFs";
 let currentConn: any = null;
 
 // Use the same ".mongoterm" app directory as the rest of the app (helper.ts, app.ts)
 // so logging works consistently across macOS, Linux, and Windows (any drive/home path).
-fs.mkdirSync(APP_ROOT, { recursive: true });
+// Restricted to the owner since app.log can contain connection details.
+ensureSecureDir(APP_ROOT);
 
-const streamLog = fs.createWriteStream(LOG_PATH, {
-  flags: "a",
-});
+const streamLog = createSecureAppendStream(LOG_PATH);
 function formatLog(level: TLogLevel, args: Record<string, any>[]) {
   const timestamp = getTimestamp();
   const message = util.format(...args);

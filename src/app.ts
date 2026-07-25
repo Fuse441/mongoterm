@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-import fs from "fs/promises";
 import { MongoTermApp } from "@/core/screen";
 import { logger } from "./utils/logger/logger.service";
 import { WorkspaceLogger } from "./utils/logger/logger";
 import { getConfiguration } from "./services/helper";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { defaultConfig } from "./config/app.config";
 import { APP_ROOT, CONFIG_DIR, CONFIG_PATH } from "./config/app.paths";
 import { MongodbBuilder } from "./services/mongodb/mongodb.builder";
 import { EventMongoTerm } from "./core/eventBus";
+import { ensureSecureDir, writeFileSecure } from "./utils/secureFs";
 export let appInstance: MongoTermApp;
 export let appReady: Promise<MongoTermApp>;
 
@@ -17,10 +17,10 @@ var configuration: any = null;
 async function  ensureLoaded() {
   if (configuration) return;
 
-  mkdirSync(CONFIG_DIR, { recursive: true });
+  ensureSecureDir(CONFIG_DIR);
 
   if (!existsSync(CONFIG_PATH)) {
-    writeFileSync(CONFIG_PATH, JSON.stringify(defaultConfig, null, 2), "utf-8");
+    writeFileSecure(CONFIG_PATH, JSON.stringify(defaultConfig, null, 2));
   }
 
   configuration = JSON.parse(readFileSync(CONFIG_PATH, "utf-8"));
@@ -28,7 +28,7 @@ async function  ensureLoaded() {
 
 async function createApplicationDirectory(): Promise<void> {
   try {
-    await fs.mkdir(APP_ROOT, { recursive: true });
+    ensureSecureDir(APP_ROOT);
     logger.info({ message: `Application directory created  at: ${APP_ROOT}` });
     //    logger("Application directory created successfully.");
   } catch (err: any) {
