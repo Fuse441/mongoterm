@@ -12,6 +12,11 @@ and this project follows Semantic Versioning (SemVer).
 - Update CHANGELOG.md [skip ci] (7e042a2)
 - Bump esbuild (a8c06a3)
 - Update CHANGELOG.md [skip ci] (abf402e)
+- Update CHANGELOG.md [skip ci] (320b94c)
+
+### Fixed
+
+- Stop logging connection strings, restrict config/log files to owner (bdb5c0c)
 
 ### Other
 
@@ -25,6 +30,9 @@ chore(deps-dev): bump esbuild from 0.28.0 to 0.28.1 in the npm_and_yarn group ac
 - Merge pull request #12 from Fuse441/feat/mcp-wiki-server
 
 Feat/mcp wiki server (3760cb9)
+- Merge pull request #15 from Fuse441/fix/credential-log-and-file-perms
+
+fix: stop logging connection strings, restrict config/log files to owner (9daeee0)
 
 ## [0.4.1] - 2026-07-24
 
