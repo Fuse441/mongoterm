@@ -7,6 +7,7 @@ import { logger } from "@/utils/logger/logger.service";
 import { EVENTS } from "@/services/enum";
 import { openForm } from "@/panels/form/form.panel";
 import { openDialogConfirm, promptInline } from "@/panels/modal.panel";
+import { openColorPicker } from "@/panels/color-picker.panel";
 import { createTree, TreeNode } from "@/panels/tree/tree.panel";
 import { theme, connectionColors } from "@/config/app.config";
 import { getConfiguration, saveConnection } from "@/services/helper";
@@ -258,21 +259,34 @@ export function registerDirectoryTree(parent: any, top: any) {
       }
     });
 
-    // 🔹 cycle the highlighted connection's accent color
-    tree.el.key(["c"], () => {
+
+    // 🔹 open color picker for the highlighted connection
+    tree.el.key(["S-c"], () => {
       const selected = tree.getSelectedNode();
       if (selected?.type !== "connection") return;
       const conn = state.connections[selected.meta.index];
       if (!conn) return;
 
-      const current = conn.favorite?.color ?? connectionColors[0];
-      const next =
-        connectionColors[
-          (connectionColors.indexOf(current) + 1) % connectionColors.length
-        ];
-      appInstance.eventBus.emit(EVENTS.CONNECTION_UPDATE, {
-        id: conn.id,
-        data: { color: next },
+      const currentColor = conn.favorite?.color ?? "white";
+      
+      // Update keybindbar to show color picker controls
+      appInstance.setCustomKeybindbar([
+        { key: "↑/k", description: "up" },
+        { key: "↓/j", description: "down" },
+        { key: "←/h", description: "left" },
+        { key: "→/l", description: "right" },
+        { key: "enter", description: "select" },
+        { key: "esc", description: "cancel" },
+      ]);
+
+      openColorPicker((color) => {
+        logger.debug({ message: "Color selected", color });
+        appInstance.eventBus.emit(EVENTS.CONNECTION_UPDATE, {
+          id: conn.id,
+          data: { color },
+        });
+        // Restore tree keybindbar
+        appInstance.setKeybindbarContent("tree");
       });
     });
 
