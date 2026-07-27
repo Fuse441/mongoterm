@@ -8,6 +8,15 @@ export const theme = {
     blurBg: "black",
   },
 };
+export const connectionColors = [
+  "white",
+  "cyan",
+  "green",
+  "yellow",
+  "magenta",
+  "red",
+  "blue",
+];
 export const defaultConfig = {
   type: "Compass Connections",
   version: {

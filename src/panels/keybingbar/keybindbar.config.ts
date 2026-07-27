@@ -19,6 +19,10 @@ export const keybindbarConfig: TKeybind = {
       description: "delete/drop selected",
     },
     {
+      key: "c",
+      description: "cycle connection color",
+    },
+    {
       key: "x",
       description: "export connection(s)",
     },

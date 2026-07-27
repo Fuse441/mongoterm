@@ -8,6 +8,8 @@ export interface IConfigurationMongoConnection {
   };
   favorite: {
     name: MongoClient["name"];
+    color?: string;
+    group?: string;
   };
   savedConnectionType: "recent" | "favorite";
   connectionOptions: {
