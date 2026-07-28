@@ -1,7 +1,7 @@
 import blessed from "neo-blessed";
 
 import { theme } from "../config/app.config.js";
-import { openEditor, promptInline } from "./modal.panel.js";
+import { openDialogConfirm, openEditor, promptInline } from "./modal.panel.js";
 import { keybindbarConfig } from "./keybingbar/keybindbar.config.js";
 import { appInstance } from "@/app.js";
 import { state } from "@/shared/state.js";
@@ -74,6 +74,21 @@ function openPageSizePrompt(box: any) {
   });
 }
 
+function handleBulkDelete() {
+  const query = currentQuery();
+  const count = state.totalMatching;
+
+  if (count === 0) {
+    showToast({ statusCode: 400, message: "No records match this filter" });
+    return;
+  }
+
+  openDialogConfirm(
+    `Delete ALL ${count} record(s) matching this filter? This cannot be undone.`,
+    () => appInstance.eventBus.emit(EVENTS.RECORD_DELETE_MANY, { query }),
+  );
+}
+
 export const workspacePanel: any = () => {
   const id = "workspace";
   const box = blessed.box({
@@ -124,6 +139,7 @@ export const workspacePanel: any = () => {
 
   box.key(["s"], () => openSortPrompt(box));
   box.key(["S-s"], () => openPageSizePrompt(box));
+  box.key(["S-d"], () => handleBulkDelete());
 
   return box;
 };

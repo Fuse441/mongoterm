@@ -57,7 +57,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - [x] Delete record with confirmation
 - [x] Insert new record
 - [x] Duplicate record
-- [ ] Bulk delete
+- [x] Bulk delete
 
 </details>
 
