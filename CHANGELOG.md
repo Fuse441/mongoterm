@@ -10,10 +10,12 @@ and this project follows Semantic Versioning (SemVer).
 ### Added
 
 - Add connection color-coding, grouping, and dynamic keybindbar (6a42ba1)
+- Add bulk delete (delete-by-filter) (7b47c76)
 
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (19fae9b)
+- Update CHANGELOG.md [skip ci] (7798a29)
 
 ### Documentation
 
@@ -34,6 +36,9 @@ Connection color-coding, grouping, and dynamic keybindbar (c2283d9)
 - Merge pull request #17 from Fuse441/fix/keybindbar-focus-cascade-and-scroll
 
 fix: keybindbar focus cascade bug + smooth h/l scroll (d1519f0)
+- Merge pull request #18 from Fuse441/feat/bulk-delete
+
+feat: add bulk delete (delete-by-filter) (6f51e9a)
 
 ## [0.4.2] - 2026-07-25
 
