@@ -11,6 +11,10 @@ and this project follows Semantic Versioning (SemVer).
 
 - Add connection color-coding, grouping, and dynamic keybindbar (6a42ba1)
 
+### Chore
+
+- Update CHANGELOG.md [skip ci] (19fae9b)
+
 ### Documentation
 
 - Add comprehensive testing guide for color picker feature (7394b24)
@@ -20,12 +24,16 @@ and this project follows Semantic Versioning (SemVer).
 - Remove c key cycle color, implement Shift+C color picker modal (7f090b3)
 - Add missing setCustomKeybindbar and appendKeybindToBar methods (718d551)
 - Repair color picker (build error, broken nav, invisible swatches, stuck focus) (0c9fe67)
+- Dedupe keybindbar focus dispatch, add smooth h/l scroll (ea6890b)
 
 ### Other
 
 - Merge pull request #16 from Fuse441/feat/connection-color-coding-grouping
 
 Connection color-coding, grouping, and dynamic keybindbar (c2283d9)
+- Merge pull request #17 from Fuse441/fix/keybindbar-focus-cascade-and-scroll
+
+fix: keybindbar focus cascade bug + smooth h/l scroll (d1519f0)
 
 ## [0.4.2] - 2026-07-25
 
