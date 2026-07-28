@@ -7,7 +7,7 @@ import { TResponseLayout } from "@/layout/main.layout.types";
 let currentRecord = 0;
 import blessed from "neo-blessed";
 import { EVENTS } from "@/services/enum";
-
+let previousFocusedPanel: blessed.Widgets.BlessedElement | null = null;
 // ── config: key → action ──────────────────────────────
 const getBindings = (ui: TResponseLayout) => [
   {
@@ -27,7 +27,43 @@ const getBindings = (ui: TResponseLayout) => [
       appInstance.renderWorkspacePanel();
     },
   },
+  {
+    keys: ["S-k"],
+    condition: () => true,
+    action: () => {
+      previousFocusedPanel = appInstance.screen.focused;
+      logger.debug({
+        message:
+          "previousFocusedPanel ==>" + previousFocusedPanel.options?.label,
+      });
+      appInstance.ui.panels.keybindbar!.focus();
+      appInstance.screen.render();
+      logger.debug({ message: "Focusing keybindbar" });
+    },
+  },
+  {
+    keys: ["k", "top"],
+    condition: () => appInstance.screen.focused === ui.panels.keybindbar,
+    action: () => {
+      if (previousFocusedPanel) {
+        previousFocusedPanel.focus();
+        previousFocusedPanel = null;
+      }
 
+      appInstance.screen.render();
+      logger.debug({ message: "Focusing keybindbar" });
+    },
+  },
+  {
+    keys: ["h", "left"],
+    condition: () => appInstance.screen.focused === ui.panels.keybindbar,
+    action: () => appInstance.scrollKeybindbar(-1),
+  },
+  {
+    keys: ["l", "right"],
+    condition: () => appInstance.screen.focused === ui.panels.keybindbar,
+    action: () => appInstance.scrollKeybindbar(1),
+  },
   // ── workspace ─────────────────────────────────────
   {
     keys: ["h", "left"],
@@ -211,15 +247,29 @@ const getBindings = (ui: TResponseLayout) => [
 ];
 
 export const keybindings = (ui: any) => {
-  const keyMap = new Map();
+  // Grouped by each individual key (not by the joined `keys` array) because
+  // `screen.key(keys, cb)` treats every entry in `keys` as an independent
+  // trigger. Grouping by the joined string let two unrelated bindings that
+  // happen to share one literal key (e.g. ["k","top"] and ["k","up"]) end up
+  // as two separate `screen.key` registrations both listening on the same
+  // raw "key k" event — pressing "k" fired both in the same tick, and the
+  // second handler's condition re-read `screen.focused` *after* the first
+  // had already changed it, causing an unintended cascade (e.g. keybindbar
+  // -> workspace -> query on a single "k" press). Keying by the individual
+  // key name gives one ordered handler list per physical key, so only the
+  // first matching condition's action runs.
+  const keyMap = new Map<
+    string,
+    { condition?: () => boolean | undefined; action: () => void }[]
+  >();
   getBindings(ui).forEach(({ keys, condition, action }) => {
-    const keyStr = keys.join(",");
-    if (!keyMap.has(keyStr)) keyMap.set(keyStr, []);
-    keyMap.get(keyStr).push({ condition, action });
+    keys.forEach((key) => {
+      if (!keyMap.has(key)) keyMap.set(key, []);
+      keyMap.get(key)!.push({ condition, action });
+    });
   });
-  keyMap.forEach((handlers, keyStr) => {
-    const keys = keyStr.split(",");
-    appInstance.screen.key(keys, () => {
+  keyMap.forEach((handlers, key) => {
+    appInstance.screen.key([key], () => {
       for (const { condition, action } of handlers) {
         if (condition && !condition()) continue;
         action();

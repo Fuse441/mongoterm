@@ -9,13 +9,22 @@ import { initPluginsStyle } from "@/components/plugins/register";
 import { initDropdownEvents } from "@/panels/dropdown/dropdown.event";
 import { Logger } from "@/utils/logger/logger";
 import { IWorkspaceLogger } from "@/utils/logger/logger.interface";
-import { TKeybindName } from "@/panels/keybingbar/keybindbar.interface";
+import { IKeybind, TKeybindName } from "@/panels/keybingbar/keybindbar.interface";
 import { keybindbarConfig } from "@/panels/keybingbar/keybindbar.config";
+import { renderKeybindWindow } from "@/panels/keybingbar/keybindbarScroll";
 import { MongodbBuilder } from "@/services/mongodb/mongodb.builder";
+
+const KEYBINDBAR_SCROLL_STEP = 20;
+const KEYBINDBAR_SCROLL_FRAMES = 6;
+const KEYBINDBAR_SCROLL_FRAME_MS = 18;
+
 export class MongoTermApp {
   private _screen!: blessed.Widgets.Screen;
   private _ui!: TResponseLayout;
   private _style!: any;
+  private _keybindbarEntries: IKeybind[] = [];
+  private _keybindbarOffset = 0;
+  private _keybindbarScrollTimer: ReturnType<typeof setInterval> | null = null;
     constructor(private _eventBus:EventMongoTerm, private workspaceLogger: Logger,private mongodbBuilder: MongodbBuilder) {}
   public async init() {
     try {
@@ -97,30 +106,61 @@ export class MongoTermApp {
         this.renderScreen();
     logger.debug({ message: "UI initialized", details: this._ui });
   }
-  public setKeybindbarContent(id:TKeybindName) {
-    let content = ``;
-    const config  = keybindbarConfig[id]
-    for (const keybind of config) {
-      content += `[{bold}${keybind.key}{/bold}] - ${keybind.description}  `;
-    }
-    this._ui.panels.keybindbar!.setContent(content);
-    this.renderScreen();
+  public setKeybindbarContent(id: TKeybindName) {
+    this._setKeybindbarEntries(keybindbarConfig[id]);
   }
 
-  public setCustomKeybindbar(keybinds: Array<{ key: string; description: string }>) {
-    let content = ``;
-    for (const kb of keybinds) {
-      content += `[{bold}${kb.key}{/bold}] - ${kb.description}  `;
-    }
-    this._ui.panels.keybindbar!.setContent(content);
-    this.renderScreen();
+  public setCustomKeybindbar(keybinds: IKeybind[]) {
+    this._setKeybindbarEntries(keybinds);
   }
 
   public appendKeybindToBar(key: string, description: string) {
-    const current = this._ui.panels.keybindbar!.content || "";
-    const newContent = `${current}[{bold}${key}{/bold}] - ${description}  `;
-    this._ui.panels.keybindbar!.setContent(newContent);
+    this._setKeybindbarEntries([...this._keybindbarEntries, { key, description }]);
+  }
+
+  private _setKeybindbarEntries(entries: IKeybind[]) {
+    this._keybindbarEntries = entries;
+    this._keybindbarOffset = 0;
+    if (this._keybindbarScrollTimer) {
+      clearInterval(this._keybindbarScrollTimer);
+      this._keybindbarScrollTimer = null;
+    }
+    this._renderKeybindbarWindow();
+  }
+
+  private _keybindbarWidth(): number {
+    const box: any = this._ui.panels.keybindbar!;
+    return Math.max(0, Number(box.width) - Number(box.iwidth));
+  }
+
+  private _renderKeybindbarWindow() {
+    const box = this._ui.panels.keybindbar!;
+    const width = this._keybindbarWidth();
+    const { content } = renderKeybindWindow(this._keybindbarEntries, this._keybindbarOffset, width);
+    box.setContent(content);
     this.renderScreen();
+  }
+
+  public scrollKeybindbar(direction: 1 | -1) {
+    const width = this._keybindbarWidth();
+    const { maxOffset } = renderKeybindWindow(this._keybindbarEntries, this._keybindbarOffset, width);
+    const target = Math.min(Math.max(0, this._keybindbarOffset + direction * KEYBINDBAR_SCROLL_STEP), maxOffset);
+    if (target === this._keybindbarOffset) return;
+
+    if (this._keybindbarScrollTimer) clearInterval(this._keybindbarScrollTimer);
+
+    const start = this._keybindbarOffset;
+    const distance = target - start;
+    let step = 0;
+    this._keybindbarScrollTimer = setInterval(() => {
+      step += 1;
+      this._keybindbarOffset = Math.round(start + (distance * step) / KEYBINDBAR_SCROLL_FRAMES);
+      this._renderKeybindbarWindow();
+      if (step >= KEYBINDBAR_SCROLL_FRAMES) {
+        clearInterval(this._keybindbarScrollTimer!);
+        this._keybindbarScrollTimer = null;
+      }
+    }, KEYBINDBAR_SCROLL_FRAME_MS);
   }
   get style() {
     return this._style;

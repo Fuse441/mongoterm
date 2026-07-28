@@ -1,3 +1,4 @@
+import { appInstance } from "@/app";
 import { theme } from "@/config/app.config";
 import blessed from "neo-blessed";
 export function keybindbarPanel() {
@@ -8,11 +9,24 @@ export function keybindbarPanel() {
     height: 3,
     label: " keybindbar ",
     tags: true,
+    wrap: false,
     border: "line",
     style: {
       border: { fg: theme.border.blur },
+      bg: "black",
       label: {},
     },
+  });
+  box.on("focus", () => {
+    box.style.border.fg = theme.border.focus;
+    box.screen.render();
+  });
+
+  box.on("blur", () => {
+    box.style.border.fg = theme.border.blur;
+    box.style.bg = theme.header.blurBg;
+
+    box.screen.render();
   });
 
   return box;
