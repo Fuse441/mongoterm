@@ -10,11 +10,13 @@ export function openColorPicker(
   try {
     logger.debug({ message: "Opening color picker", currentColor });
 
+    const previousFocus = appInstance.screen.focused;
+
     const colors = connectionColors;
     const colsPerRow = 4;
     const rows = Math.ceil(colors.length / colsPerRow);
     const buttonWidth = 10;
-    const buttonHeight = 2;
+    const buttonHeight = 3;
     const width = colsPerRow * (buttonWidth + 1) + 4;
     const height = rows * (buttonHeight + 1) + 4;
 
@@ -43,9 +45,7 @@ export function openColorPicker(
       },
     });
 
-    let selectedIndex = currentColor
-      ? colors.indexOf(currentColor)
-      : 0;
+    let selectedIndex = currentColor ? colors.indexOf(currentColor) : 0;
     if (selectedIndex === -1) selectedIndex = 0;
 
     const colorButtons: blessed.Widgets.ButtonElement[] = [];
@@ -68,6 +68,7 @@ export function openColorPicker(
         width: buttonWidth,
         height: buttonHeight,
         content: `{center}${color}{/center}`,
+        tags: true,
         border: "line",
         mouse: true,
         keys: true,
@@ -75,8 +76,6 @@ export function openColorPicker(
           bg: color === "black" ? "#222222" : color,
           fg: ["white", "yellow"].includes(color) ? "black" : "white",
           border: { fg: isSelected ? "green" : "gray" },
-          focus: { border: { fg: "green" } },
-          hover: { border: { fg: "green" } },
         },
       });
 
@@ -91,7 +90,7 @@ export function openColorPicker(
 
     function updateSelection(index: number) {
       selectedIndex = Math.max(0, Math.min(index, colors.length - 1));
-      
+
       colorButtons.forEach((btn, i) => {
         if (i === selectedIndex) {
           btn.style.border!.fg = "green";
@@ -99,6 +98,8 @@ export function openColorPicker(
           btn.style.border!.fg = "gray";
         }
       });
+
+      colorButtons[selectedIndex].focus();
 
       logger.debug({ message: "Color selection updated", selectedIndex });
       appInstance.renderScreen();
@@ -109,38 +110,41 @@ export function openColorPicker(
       try {
         appInstance.removeScreenElement(overlay);
         appInstance.removeScreenElement(box);
+        if (previousFocus) {
+          previousFocus.focus();
+        }
+        appInstance.renderScreen();
       } catch (err) {
         logger.error({ message: "Error cleaning up color picker", error: err });
       }
     }
 
-    // Keyboard navigation
-    box.key(["escape"], () => {
-      logger.debug({ message: "Color picker cancelled" });
-      cleanup();
-    });
+    // Keyboard navigation — bound on every button since focus lives on the
+    // individual button widgets (blessed's Button consumes 'keypress' for
+    // enter/space itself), not on the outer `box`, so `box.key()` bindings
+    // would never fire (screen dispatches `element.key()` handlers only to
+    // whichever element is actually focused).
+    colorButtons.forEach((btn) => {
+      btn.key(["escape"], () => {
+        logger.debug({ message: "Color picker cancelled" });
+        cleanup();
+      });
 
-    box.key(["enter"], () => {
-      const selectedColor = colors[selectedIndex];
-      logger.debug({ message: "Color picker submitted", selectedColor });
-      onSelect(selectedColor);
-      cleanup();
-    });
+      btn.key(["j", "down"], () => {
+        updateSelection(selectedIndex + colsPerRow);
+      });
 
-    box.key(["j", "down"], () => {
-      updateSelection(selectedIndex + colsPerRow);
-    });
+      btn.key(["k", "up"], () => {
+        updateSelection(selectedIndex - colsPerRow);
+      });
 
-    box.key(["k", "up"], () => {
-      updateSelection(selectedIndex - colsPerRow);
-    });
+      btn.key(["l", "right"], () => {
+        updateSelection(selectedIndex + 1);
+      });
 
-    box.key(["l", "right"], () => {
-      updateSelection(selectedIndex + 1);
-    });
-
-    box.key(["h", "left"], () => {
-      updateSelection(selectedIndex - 1);
+      btn.key(["h", "left"], () => {
+        updateSelection(selectedIndex - 1);
+      });
     });
 
     // Append to screen in correct order

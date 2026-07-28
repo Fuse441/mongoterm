@@ -123,7 +123,6 @@ export class MongoTermApp {
     this.renderScreen();
   }
   get style() {
-  get style() {
     return this._style;
   }
   get screen() {
