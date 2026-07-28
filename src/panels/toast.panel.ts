@@ -18,8 +18,6 @@ export function showToast(toast: Record<string, any>) {
       fg: color,
     },
   });
-  box.focus();
-
   // if (statusCode != 200) {
   //   box.on("keypress", () => {
   //     appInstance.removeScreenElement(box);

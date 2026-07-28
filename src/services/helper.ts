@@ -27,6 +27,7 @@ export function saveConnection(
       },
       favorite: {
         name: connection.connectionName,
+        ...(connection.group?.trim() ? { group: connection.group.trim() } : {}),
       },
       savedConnectionType: "recent",
       connectionOptions: {
@@ -64,10 +65,23 @@ export function updateConnection(
 
     const updatedConnection: IConfigurationMongoConnection = {
       ...connections[index],
-      favorite: { name: connection.connectionName },
+      favorite: {
+        ...connections[index].favorite,
+        ...(connection.connectionName !== undefined
+          ? { name: connection.connectionName }
+          : {}),
+        ...(connection.color !== undefined
+          ? { color: connection.color }
+          : {}),
+        ...(connection.group !== undefined
+          ? { group: connection.group }
+          : {}),
+      },
       connectionOptions: {
         ...connections[index].connectionOptions,
-        connectionString: connection.connectionString,
+        ...(connection.connectionString !== undefined
+          ? { connectionString: connection.connectionString }
+          : {}),
       },
     };
 

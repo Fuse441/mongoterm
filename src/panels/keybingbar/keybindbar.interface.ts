@@ -1,5 +1,5 @@
 export type TKeybindName = "tree" | "workspace" | "query" | "record";
-export type THelpOnlySection = "editor" | "autocomplete" | "global";
+export type THelpOnlySection = "editor" | "autocomplete" | "global" | "colorPicker";
 export interface IKeybind {
   key: string;
   description: string;

@@ -1,5 +1,4 @@
 import { appInstance } from "@/app";
-import { getConnectionNames } from "@/shared/selectors/connection.selectors";
 import blessed from "neo-blessed";
 import os from "os";
 import path from "path";
@@ -8,8 +7,9 @@ import { logger } from "@/utils/logger/logger.service";
 import { EVENTS } from "@/services/enum";
 import { openForm } from "@/panels/form/form.panel";
 import { openDialogConfirm, promptInline } from "@/panels/modal.panel";
+import { openColorPicker } from "@/panels/color-picker.panel";
 import { createTree, TreeNode } from "@/panels/tree/tree.panel";
-import { theme } from "@/config/app.config";
+import { theme, connectionColors } from "@/config/app.config";
 import { getConfiguration, saveConnection } from "@/services/helper";
 
 // ".json" -> the Compass-compatible `{ connections: [...] }` shape (also
@@ -55,9 +55,25 @@ export function registerDirectoryTree(parent: any, top: any) {
       },
     });
     function buildConnectionNodes() {
-      const names = getConnectionNames();
-      const nodes = names.map((name: string, index: number) =>
-        tree.makeNode("connection", name, undefined, { index }),
+      const indexed = state.connections.map((c: any, index: number) => ({
+        c,
+        index,
+      }));
+      indexed.sort((a, b) => {
+        const ga = a.c.favorite?.group ?? "";
+        const gb = b.c.favorite?.group ?? "";
+        if (ga === gb) return a.index - b.index;
+        if (!ga) return -1;
+        if (!gb) return 1;
+        return ga.localeCompare(gb);
+      });
+      const nodes = indexed.map(({ c, index }) =>
+        tree.makeNode(
+          "connection",
+          c.favorite?.name ?? "(unnamed)",
+          undefined,
+          { index, color: c.favorite?.color, group: c.favorite?.group },
+        ),
       );
       tree.setRoots(nodes);
     }
@@ -76,6 +92,11 @@ export function registerDirectoryTree(parent: any, top: any) {
             name: "connectionString",
             label: "connectionString",
             value: "mongodb://localhost:27017",
+          },
+          {
+            name: "group",
+            label: "group (optional)",
+            value: "",
           },
         ],
         onSubmit(data) {
@@ -104,6 +125,11 @@ export function registerDirectoryTree(parent: any, top: any) {
             name: "connectionString",
             label: "connectionString",
             value: conn.connectionOptions.connectionString,
+          },
+          {
+            name: "group",
+            label: "group (optional)",
+            value: conn.favorite.group ?? "",
           },
         ],
         onSubmit(data) {
@@ -231,6 +257,37 @@ export function registerDirectoryTree(parent: any, top: any) {
       if (selected?.type === "connection") {
         openEditConnectionForm(selected);
       }
+    });
+
+
+    // 🔹 open color picker for the highlighted connection
+    tree.el.key(["S-c"], () => {
+      const selected = tree.getSelectedNode();
+      if (selected?.type !== "connection") return;
+      const conn = state.connections[selected.meta.index];
+      if (!conn) return;
+
+      const currentColor = conn.favorite?.color ?? "white";
+      
+      // Update keybindbar to show color picker controls
+      appInstance.setCustomKeybindbar([
+        { key: "↑/k", description: "up" },
+        { key: "↓/j", description: "down" },
+        { key: "←/h", description: "left" },
+        { key: "→/l", description: "right" },
+        { key: "enter", description: "select" },
+        { key: "esc", description: "cancel" },
+      ]);
+
+      openColorPicker((color) => {
+        logger.debug({ message: "Color selected", color });
+        appInstance.eventBus.emit(EVENTS.CONNECTION_UPDATE, {
+          id: conn.id,
+          data: { color },
+        });
+        // Restore tree keybindbar
+        appInstance.setKeybindbarContent("tree");
+      });
     });
 
     // 🔹 delete/drop the highlighted node (connection / database / collection)

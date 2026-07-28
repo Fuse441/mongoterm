@@ -106,6 +106,22 @@ export class MongoTermApp {
     this._ui.panels.keybindbar!.setContent(content);
     this.renderScreen();
   }
+
+  public setCustomKeybindbar(keybinds: Array<{ key: string; description: string }>) {
+    let content = ``;
+    for (const kb of keybinds) {
+      content += `[{bold}${kb.key}{/bold}] - ${kb.description}  `;
+    }
+    this._ui.panels.keybindbar!.setContent(content);
+    this.renderScreen();
+  }
+
+  public appendKeybindToBar(key: string, description: string) {
+    const current = this._ui.panels.keybindbar!.content || "";
+    const newContent = `${current}[{bold}${key}{/bold}] - ${description}  `;
+    this._ui.panels.keybindbar!.setContent(newContent);
+    this.renderScreen();
+  }
   get style() {
     return this._style;
   }

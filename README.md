@@ -90,7 +90,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - [x] Import / export connections (Compass JSON or mongosh URI list — `x`/`i` keys on the tree panel)
 - [ ] SSH tunnel support
 - [ ] TLS / X.509 / Kerberos / LDAP auth options
-- [ ] Connection favorites color-coding / grouping
+- [x] Connection favorites color-coding / grouping
 
 </details>
 
@@ -285,3 +285,8 @@ they act on whatever node is currently highlighted.
 | `ctrl+e`| create a new connection (sibling) | create a new database in this connection (sibling) | create a new collection in this database (sibling) |
 | `e`     | edit this connection           | —                                              | —                                  |
 | `d`     | delete this connection (confirm) | drop this database (confirm)                | drop this collection (confirm)    |
+| `c`     | cycle this connection's accent color | —                                        | —                                  |
+
+Connections can also be tagged with an optional **group** label from the
+create/edit form (`ctrl+e` / `e`) — the tree sorts ungrouped connections
+first, then groups alphabetically, showing `[group]` before grouped names.

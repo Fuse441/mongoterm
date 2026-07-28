@@ -106,10 +106,18 @@ export function createTree(parent: any, options: any) {
           ? TOGGLE_OPEN
           : TOGGLE_CLOSED;
     }
-    const { icon, color, bold } = NODE_STYLE[node.type];
+    const { icon, color: defaultColor, bold } = NODE_STYLE[node.type];
+    const color =
+      node.type === "connection" && node.meta?.color
+        ? node.meta.color
+        : defaultColor;
     const open = bold ? `{bold}{${color}-fg}` : `{${color}-fg}`;
     const close = bold ? `{/${color}-fg}{/bold}` : `{/${color}-fg}`;
-    return `${indent}${toggle} ${open}${icon} ${node.label}${close}`;
+    const group =
+      node.type === "connection" && node.meta?.group
+        ? `{gray-fg}[${node.meta.group}]{/gray-fg} `
+        : "";
+    return `${indent}${toggle} ${group}${open}${icon} ${node.label}${close}`;
   }
 
   function render() {

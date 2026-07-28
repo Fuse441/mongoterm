@@ -15,8 +15,16 @@ export const keybindbarConfig: TKeybind = {
       description: "edit connection",
     },
     {
+      key: "Shift+c",
+      description: "pick connection color",
+    },
+    {
       key: "d",
       description: "delete/drop selected",
+    },
+    {
+      key: "c",
+      description: "cycle connection color",
     },
     {
       key: "x",
@@ -135,6 +143,14 @@ export const keybindbarConfig: TKeybind = {
 | every keybind shown anywhere in the app — see help.panel.ts.
 */
 export const helpOnlyConfig: THelpSections = {
+  colorPicker: [
+    { key: "↑/k", description: "up" },
+    { key: "↓/j", description: "down" },
+    { key: "←/h", description: "left" },
+    { key: "→/l", description: "right" },
+    { key: "enter", description: "select" },
+    { key: "esc", description: "cancel" },
+  ],
   editor: [
     { key: "enter", description: "edit field value" },
     { key: "←/→", description: "change field dataType" },
