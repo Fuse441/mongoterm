@@ -248,6 +248,7 @@ export async function renderResult(
   parent.removeListener("scroll", () => { });
   const docs = payload.docs || [];
   const total = payload.pagination?.total ?? docs.length;
+  state.totalMatching = total;
 
   await parent.children.slice().forEach((child: any) => {
     if (child._isRecord || child._isEmptyState) {

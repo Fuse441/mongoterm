@@ -218,6 +218,23 @@ public async  deleteRecord(id: string) {
   });
 }
 
+public async deleteManyByQuery(query?: string) {
+  const dbName = state.databases[state.selectedDatabaseIndex];
+  const colName = state.collections[state.selectedCollectionIndex];
+
+  const filter = this.parseQuery(query);
+
+  const { deletedCount } = await this.getClient()
+    .db(dbName)
+    .collection(colName)
+    .deleteMany(filter);
+
+  this.eventBus.emit(EVENTS.TOAST_SHOW, {
+    statusCode: 200,
+    message: `${deletedCount} record(s) deleted!`,
+  });
+}
+
 public async insertRecord(doc: Record<string, unknown>) {
   const dbName = state.databases[state.selectedDatabaseIndex];
   const colName = state.collections[state.selectedCollectionIndex];

@@ -12,6 +12,7 @@ export const EVENTS = Object.freeze({
   RECORD_INSERT: "record:insert",
   TOAST_SHOW: "show:toast",
   RECORD_DELETE: "delete:record",
+  RECORD_DELETE_MANY: "delete:records:many",
   RECORD_DUPLICATE: "duplicate:record",
   CONNECTION_UPDATE: "connection:update",
   CONNECTION_UPDATED: "connection:updated",

@@ -79,6 +79,10 @@ export const keybindbarConfig: TKeybind = {
       description: "page size",
     },
     {
+      key: "Shift+d",
+      description: "bulk delete (matches filter)",
+    },
+    {
       key: "g",
       description: "first record",
     },

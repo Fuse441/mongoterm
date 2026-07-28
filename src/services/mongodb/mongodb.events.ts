@@ -364,6 +364,13 @@ export class EventMongoService {
       this.eventBus.emit(EVENTS.QUERY_SEND, query);
     });
 
+    this.eventBus.on(EVENTS.RECORD_DELETE_MANY, async ({ query }) => {
+      await this.mongoRepository.deleteManyByQuery(query);
+
+      state.page = 1;
+      this.eventBus.emit(EVENTS.QUERY_SEND, query);
+    });
+
     this.eventBus.on(EVENTS.RECORD_UPDATE, async ({ updated, query }) => {
       try {
         const parsed =
