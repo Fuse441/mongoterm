@@ -7,12 +7,35 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Added
+
+- Add connection color-coding, grouping, and dynamic keybindbar (6a42ba1)
+
+### Documentation
+
+- Add comprehensive testing guide for color picker feature (7394b24)
+
+### Fixed
+
+- Remove c key cycle color, implement Shift+C color picker modal (7f090b3)
+- Add missing setCustomKeybindbar and appendKeybindToBar methods (718d551)
+- Repair color picker (build error, broken nav, invisible swatches, stuck focus) (0c9fe67)
+
+### Other
+
+- Merge pull request #16 from Fuse441/feat/connection-color-coding-grouping
+
+Connection color-coding, grouping, and dynamic keybindbar (c2283d9)
+
+## [0.4.2] - 2026-07-25
+
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (7e042a2)
 - Bump esbuild (a8c06a3)
 - Update CHANGELOG.md [skip ci] (abf402e)
 - Update CHANGELOG.md [skip ci] (320b94c)
+- Update CHANGELOG.md [skip ci] (dca4ff5)
 
 ### Fixed
 
