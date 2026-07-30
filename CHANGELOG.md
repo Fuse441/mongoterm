@@ -7,6 +7,12 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Fixed
+
+- Check for updates on every launch instead of once per day (888b9a4)
+
+## [0.6.0] - 2026-07-30
+
 ### Added
 
 - Add query builder (no raw JSON typing) (0d7ca4e)
@@ -19,6 +25,7 @@ and this project follows Semantic Versioning (SemVer).
 - Update CHANGELOG.md [skip ci] (925510b)
 - Update CHANGELOG.md [skip ci] (c677b61)
 - Update CHANGELOG.md [skip ci] (730115d)
+- Update CHANGELOG.md [skip ci] (219161a)
 
 ### Fixed
 
