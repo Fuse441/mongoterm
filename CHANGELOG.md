@@ -7,6 +7,14 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Added
+
+- Add global Command Palette (Ctrl+P) (ba1f120)
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (93358a8)
+
 ### Documentation
 
 - Add 7 more roadmap ideas inspired by Studio 3T and Compass (e6689c2)
