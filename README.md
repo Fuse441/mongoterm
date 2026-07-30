@@ -155,7 +155,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - Collection stats (document count, avg/data/storage size, index size)
 - Table/grid view of results, toggleable with the tree-formatted view (`v` key)
 - Title bar showing app name/version, live connection status, and a persistent update-available badge
-- Update notification on startup when a newer version is tagged on GitHub (checked at most once per day, never blocks startup)
+- Update notification on startup when a newer version is tagged on GitHub (checked on every launch, never blocks startup)
 - Interactive dropdown navigation
 - Keyboard-driven interface
 - Lightweight terminal UI

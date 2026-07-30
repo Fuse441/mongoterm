@@ -69,6 +69,7 @@ function checkForUpdateInBackground(): void {
   appReady
     .then(() => checkForUpdate())
     .then((info) => {
+      logger.debug({ message: "Update check completed", info });
       if (!info.hasUpdate) return;
       // Toast for an immediate nudge; title bar badge because the toast
       // auto-dismisses (8s) and is easy to miss during the initial

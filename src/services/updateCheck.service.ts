@@ -12,14 +12,17 @@ import { logger } from "@/utils/logger/logger.service";
 | every release, but never creates an actual GitHub Release object, so
 | `/releases/latest` 404s — the tags API is what's actually populated.
 | Trade-off: tags don't carry release notes, so the toast just links to
-| the tagged tree rather than a changelog. Network call is cached to at
-| most once per CHECK_INTERVAL_MS so normal launches don't hit the API,
-| and every failure (offline, rate-limited, malformed response) is
-| swallowed — this must never block or crash startup.
+| the tagged tree rather than a changelog. Runs on every launch (an
+| unauthenticated GitHub API call, well under its 60/hour rate limit for
+| a single-user CLI) rather than being cached/throttled, so a fresh
+| install always sees the current state immediately. The on-disk cache is
+| kept only as an offline fallback — used solely when the live fetch
+| fails, not to skip the fetch. Every failure (offline, rate-limited,
+| malformed response) is swallowed — this must never block or crash
+| startup.
 */
 
 const TAGS_API = "https://api.github.com/repos/Fuse441/mongoterm/tags";
-const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 5000;
 
 interface UpdateCheckCache {
@@ -112,29 +115,25 @@ async function fetchLatestTag(): Promise<{ version: string; url: string } | null
 }
 
 export async function checkForUpdate(): Promise<UpdateInfo> {
-  const cache = readCache();
-  const isCacheFresh =
-    cache && Date.now() - cache.lastCheckedAt < CHECK_INTERVAL_MS;
+  const tag = await fetchLatestTag();
 
-  let latestVersion = cache?.latestVersion;
-  let releaseUrl = cache?.releaseUrl;
+  let latestVersion: string | undefined;
+  let releaseUrl: string | undefined;
 
-  if (!isCacheFresh) {
-    const tag = await fetchLatestTag();
-    if (tag) {
-      latestVersion = tag.version;
-      releaseUrl = tag.url;
-      writeCache({
-        lastCheckedAt: Date.now(),
-        latestVersion: tag.version,
-        releaseUrl: tag.url,
-      });
-    } else if (cache) {
-      // Fetch failed but we have a stale cache — use it rather than
-      // re-hitting the API on every launch until it succeeds again.
-      latestVersion = cache.latestVersion;
-      releaseUrl = cache.releaseUrl;
-    }
+  if (tag) {
+    latestVersion = tag.version;
+    releaseUrl = tag.url;
+    writeCache({
+      lastCheckedAt: Date.now(),
+      latestVersion: tag.version,
+      releaseUrl: tag.url,
+    });
+  } else {
+    // Live fetch failed (offline, rate-limited, etc.) — fall back to
+    // whatever we last saw rather than reporting "no update" outright.
+    const cache = readCache();
+    latestVersion = cache?.latestVersion;
+    releaseUrl = cache?.releaseUrl;
   }
 
   if (!latestVersion || !isNewerVersion(latestVersion, APP_VERSION)) {

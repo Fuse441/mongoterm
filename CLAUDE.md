@@ -105,8 +105,12 @@ src/
                                tag-release.yml only pushes a tag, never an
                                actual Release object, so `/releases/latest`
                                404s; see the file's own header comment).
-                               Cached to ~/.mongoterm/update-check.json,
-                               at most one network call per 24h. Called
+                               Runs on every launch (not throttled) — a
+                               single-user CLI is nowhere near GitHub's
+                               unauthenticated 60/hour rate limit.
+                               ~/.mongoterm/update-check.json is an
+                               offline-fallback cache only, used solely
+                               when the live fetch fails. Called
                                fire-and-forget from app.ts's bootstrap()
                                after appReady resolves — must never throw
                                or block startup.
