@@ -7,9 +7,19 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Documentation
+
+- Add 7 more roadmap ideas inspired by Studio 3T and Compass (e6689c2)
+
+## [0.6.3] - 2026-07-30
+
 ### Added
 
 - Add schema analysis panel (field frequency + BSON type distribution) (8a5c648)
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (fb685d6)
 
 ## [0.6.2] - 2026-07-30
 
