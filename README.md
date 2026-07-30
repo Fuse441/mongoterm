@@ -64,7 +64,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 <details>
 <summary><strong>🔎 Query</strong></summary>
 
-- [ ] Query builder (no need to type raw JSON)
+- [x] Query builder (no need to type raw JSON)
 - [ ] Save favorite queries
 - [x] Pagination / limit results
 - [x] Sort UI (`s` key)

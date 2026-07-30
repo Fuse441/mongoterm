@@ -172,6 +172,7 @@ export const helpOnlyConfig: THelpSections = {
   global: [
     { key: "?", description: "toggle help" },
     { key: ":", description: "open query shell" },
+    { key: "b", description: "open query builder" },
     { key: "q / C-c", description: "quit" },
     { key: "Shift+k", description: "focus keybindbar" },
     { key: "k (while keybindbar focused)", description: "return to previous panel" },
