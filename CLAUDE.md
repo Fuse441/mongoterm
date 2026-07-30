@@ -148,7 +148,16 @@ mutate their own blessed widget directly (`box.setContent(...)`,
   ever changes.
 - `tree/tree.panel.ts` — generic collapsible tree widget (connections ->
   databases -> collections). `tree/tree.event.ts` wires it to actual Mongo
-  calls and CRUD dialogs.
+  calls and CRUD dialogs. `createTree`'s returned API also exposes
+  `triggerNode(node)` (the same expand/collapse/select-leaf logic as
+  pressing enter on a node — collapses an *already*-expanded node, it's
+  not idempotent) and `focusNode(node)` (select + highlight without
+  toggling expand state, for landing on a node once its ancestors are
+  already expanded). `tree.event.ts` keeps the `createTree(...)` return
+  value in a module-level `treeApi` (otherwise discarded — `main.layout.ts`
+  only keeps `.el`) and exports `jumpToConnection`/`jumpToDatabase`/
+  `jumpToCollection` built on top of those two, consumed by
+  `commandPalette.panel.ts`.
 - `workspace.panel.ts` — the main content pane; hosts the rendered record
   list. `result.panel.ts` renders it one of two ways, toggled with `v`
   (`state.viewMode`, `toggleViewMode()`): the default tree view builds one
@@ -210,6 +219,22 @@ mutate their own blessed widget directly (`box.setContent(...)`,
   changes the sample size (`promptInline`, same pattern as
   `workspace.panel.ts`'s sort/page-size prompts). Mirrors
   `indexes.panel.ts`'s toggle/overlay/`listtable` structure.
+- `commandPalette.panel.ts` — the global `C-p` fuzzy-search overlay.
+  Composes navigation into the typing textbox itself via
+  `installCursorSupport`'s `onKey` (up/down move the results list,
+  enter/escape act on it) rather than switching focus to the list, same
+  technique as `query/queryAutocomplete.panel.ts`. Command list is
+  rebuilt fresh every time it opens: static actions (reusing existing
+  exported toggle/prompt functions from other panels — nothing new to
+  maintain) plus one entry per saved connection
+  (`tree.event.ts`'s `jumpToConnection`) and, only for whatever's
+  currently connected/selected, one per database/collection
+  (`jumpToDatabase`/`jumpToCollection`) — it can't offer databases or
+  collections of a connection you haven't connected to yet, since there's
+  no way to know their names without connecting first. Both the input and
+  the results list are plain text (no `tags`), since the list renders
+  real database/collection names — arbitrary strings that could contain a
+  literal `{` — same reasoning as `result.panel.ts`'s grid view.
 
 ### Event bus pattern
 

@@ -30,7 +30,7 @@ function rerun() {
   appInstance.eventBus.emit(EVENTS.QUERY_SEND, currentQuery());
 }
 
-function openSortPrompt(box: any) {
+export function openSortPrompt(box: any) {
   const current = state.sort
     ? Object.entries(state.sort)
         .map(([field, dir]) => `${field}:${dir}`)
@@ -68,7 +68,7 @@ function openSortPrompt(box: any) {
   );
 }
 
-function openPageSizePrompt(box: any) {
+export function openPageSizePrompt(box: any) {
   promptInline("Page size", String(state.pageSize), (value) => {
     box.focus();
     if (value === null) return;
@@ -87,7 +87,7 @@ function openPageSizePrompt(box: any) {
   });
 }
 
-function handleBulkDelete() {
+export function handleBulkDelete() {
   const query = currentQuery();
   const count = state.totalMatching;
 

@@ -271,6 +271,33 @@ export function createTree(parent: any, options: any) {
     render();
   }
 
+  // Programmatic equivalent of pressing enter on `node` — same
+  // expand/collapse/select-leaf semantics as `list.on("select", ...)`
+  // above, exposed for command-palette.panel.ts's "jump to" flow. Callers
+  // must check `node.expanded` themselves before calling this on a
+  // connection/database node — like the real keypress, calling it on an
+  // *already*-expanded node collapses it instead of being a no-op.
+  function triggerNode(node: TreeNode): Promise<void> {
+    return toggleNode(node);
+  }
+
+  // Selects `node` and re-renders so it's visibly highlighted, without
+  // toggling expand state — for landing on a node after `triggerNode` has
+  // already expanded all of its ancestors (so it's present in `visible`).
+  // Returns false if the node isn't currently visible (e.g. an ancestor
+  // failed to expand).
+  function focusNode(node: TreeNode): boolean {
+    visible = flatten();
+    const idx = visible.indexOf(node);
+    if (idx === -1) return false;
+    restyling = true;
+    list.setItems(visible.map((n, i) => formatRow(n, i === idx)));
+    list.select(idx);
+    restyling = false;
+    list.screen.render();
+    return true;
+  }
+
   return {
     el: list as blessed.Widgets.ListElement,
     setRoots,
@@ -280,5 +307,7 @@ export function createTree(parent: any, options: any) {
     removeNode,
     setCallbacks: (cb: TreeCallbacks) => (callbacks = cb),
     render,
+    triggerNode,
+    focusNode,
   };
 }

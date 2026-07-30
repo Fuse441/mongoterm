@@ -83,7 +83,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - [x] Connection manager (multiple connections)
 - [ ] Dark / light theme toggle
 - [ ] Loading indicator for slow queries
-- [ ] Command Palette — fuzzy `Ctrl+P`-style quick jump to any connection/database/collection or action, so you're never more than a few keystrokes from anywhere in the app
+- [x] Command Palette — fuzzy `Ctrl+P`-style quick jump to any connection/database/collection or action, so you're never more than a few keystrokes from anywhere in the app
 - [ ] Smart field autocomplete — suggest real field names (not just `$operators`) in the query box and query builder, sourced from the last Schema Analysis sample of the current collection
 
 </details>
@@ -169,6 +169,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - Collection stats (document count, avg/data/storage size, index size)
 - Schema analysis: field frequency and BSON type distribution across a sample (`a` key)
 - Table/grid view of results, toggleable with the tree-formatted view (`v` key)
+- Command Palette (`Ctrl+P`): fuzzy-jump to any saved connection, database/collection of the current connection, or action
 - Title bar showing app name/version, live connection status, and a persistent update-available badge
 - Update notification on startup when a newer version is tagged on GitHub (checked on every launch, never blocks startup)
 - Interactive dropdown navigation
@@ -291,6 +292,7 @@ MIT License
 | `S-c`       | focus connection panel        |
 | `S-w`       | focus workspace                |
 | `c`         | copy record to clipboard      |
+| `C-p`       | open command palette          |
 | `q` / `C-c` | quit                          |
 
 ### Connection / database / collection tree (`ctrl+e`, `e`, `d`)

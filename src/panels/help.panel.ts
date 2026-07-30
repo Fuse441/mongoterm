@@ -25,6 +25,7 @@ const SECTION_TITLES: Record<string, string> = {
   indexes: "Indexes",
   collectionStats: "Collection Stats",
   schemaAnalysis: "Schema Analysis",
+  commandPalette: "Command Palette",
   autocomplete: "Query Autocomplete",
   global: "Global",
 };
@@ -39,6 +40,7 @@ const SECTION_ORDER = [
   "indexes",
   "collectionStats",
   "schemaAnalysis",
+  "commandPalette",
   "autocomplete",
   "global",
 ] as const;

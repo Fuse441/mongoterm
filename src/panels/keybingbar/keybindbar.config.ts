@@ -209,6 +209,12 @@ export const helpOnlyConfig: THelpSections = {
     { key: "c", description: "change sample size" },
     { key: "esc", description: "close" },
   ],
+  commandPalette: [
+    { key: "type", description: "fuzzy-filter connections/databases/collections/actions" },
+    { key: "up/down", description: "navigate results" },
+    { key: "enter", description: "run selected" },
+    { key: "esc", description: "close" },
+  ],
   autocomplete: [
     { key: "$...", description: "typing $ starts operator suggestions (query/shell boxes)" },
     { key: "up/down", description: "navigate suggestions" },
@@ -219,6 +225,7 @@ export const helpOnlyConfig: THelpSections = {
     { key: "?", description: "toggle help" },
     { key: ":", description: "open query shell" },
     { key: "b", description: "open query builder" },
+    { key: "C-p", description: "open command palette" },
     { key: "q / C-c", description: "quit" },
     { key: "Shift+k", description: "focus keybindbar" },
     { key: "k (while keybindbar focused)", description: "return to previous panel" },

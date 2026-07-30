@@ -1,6 +1,7 @@
 import { toggleHelp } from "@/panels/help.panel";
 import { toggleShell } from "@/panels/shell.panel";
 import { toggleQueryBuilder } from "@/panels/queryBuilder.panel";
+import { toggleCommandPalette } from "@/panels/commandPalette.panel";
 import { logger } from "@/utils/logger/logger.service";
 import { state } from "@/shared/state";
 import { appInstance } from "@/app.js";
@@ -282,6 +283,12 @@ const getBindings = (ui: TResponseLayout) => [
     keys: ["b"],
     action: () => {
       toggleQueryBuilder();
+    },
+  },
+  {
+    keys: ["C-p"],
+    action: () => {
+      toggleCommandPalette();
     },
   },
 ];

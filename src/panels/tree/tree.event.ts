@@ -39,6 +39,12 @@ function waitFor(
   });
 }
 
+// Set once by registerDirectoryTree (called once at layout init) — lets
+// command-palette.panel.ts's "jump to" flow drive the tree without needing
+// its own reference to the widget (registerDirectoryTree's own return
+// value is otherwise discarded by main.layout.ts, which only keeps `.el`).
+let treeApi: ReturnType<typeof createTree> | undefined;
+
 export function registerDirectoryTree(parent: any, top: any) {
   //  const workspacePanel = appInstance.ui.panels.workspace;
   try {
@@ -483,10 +489,52 @@ export function registerDirectoryTree(parent: any, top: any) {
       },
     });
 
+    treeApi = tree;
     return tree;
   } catch (error: unknown) {
     if (error instanceof Error) {
       logger.error({ message: "Error registering directory tree", error });
     }
   }
+}
+
+/*
+|--------------------------------------------------------------------------
+| PROGRAMMATIC "JUMP TO" (for command-palette.panel.ts)
+|--------------------------------------------------------------------------
+| Mirror pressing enter down the tree by hand: expand each ancestor that
+| isn't already expanded (skipping ones that are, since triggerNode on an
+| already-expanded node collapses it — same as a real keypress), then
+| focus the target. Database/collection jumps only search the currently
+| *expanded* connection/database, matching state.databases/state.collections
+| (single-connection-scoped globals — see onExpand's "collapse other roots"
+| comment above) rather than requiring a connection index, since the
+| command palette only offers jumps within whatever's already loaded.
+*/
+
+export async function jumpToConnection(index: number): Promise<boolean> {
+  const node = treeApi?.getRoots().find((r) => r.meta?.index === index);
+  if (!treeApi || !node) return false;
+  if (!node.expanded) await treeApi.triggerNode(node);
+  return treeApi.focusNode(node);
+}
+
+export async function jumpToDatabase(dbName: string): Promise<boolean> {
+  const connNode = treeApi?.getRoots().find((r) => r.expanded);
+  if (!treeApi || !connNode) return false;
+  const dbNode = connNode.children.find((c) => c.meta?.dbName === dbName);
+  if (!dbNode) return false;
+  if (!dbNode.expanded) await treeApi.triggerNode(dbNode);
+  return treeApi.focusNode(dbNode);
+}
+
+export async function jumpToCollection(colName: string): Promise<boolean> {
+  const connNode = treeApi?.getRoots().find((r) => r.expanded);
+  if (!treeApi || !connNode) return false;
+  const dbNode = connNode.children.find((d) => d.expanded);
+  if (!dbNode) return false;
+  const colNode = dbNode.children.find((c) => c.meta?.colName === colName);
+  if (!colNode) return false;
+  await treeApi.triggerNode(colNode);
+  return treeApi.focusNode(colNode);
 }
