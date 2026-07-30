@@ -9,6 +9,12 @@ and this project follows Semantic Versioning (SemVer).
 
 ### Added
 
+- Add query builder (no raw JSON typing) (0d7ca4e)
+
+## [0.5.0] - 2026-07-28
+
+### Added
+
 - Add connection color-coding, grouping, and dynamic keybindbar (6a42ba1)
 - Add bulk delete (delete-by-filter) (7b47c76)
 
@@ -16,6 +22,7 @@ and this project follows Semantic Versioning (SemVer).
 
 - Update CHANGELOG.md [skip ci] (19fae9b)
 - Update CHANGELOG.md [skip ci] (7798a29)
+- Update CHANGELOG.md [skip ci] (d53e17d)
 
 ### Documentation
 
