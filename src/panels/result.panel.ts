@@ -337,7 +337,7 @@ function renderGridView(parent: blessed.Widgets.BoxElement, docs: any[]) {
       focus: { border: { fg: theme.border.focus } },
       header: { bold: true, fg: "yellow" },
       cell: {
-        selected: { bg: theme.listtable.selectedBg, fg: theme.listtable.selectedFg },
+        selected: { bg: theme.selection.bg, fg: theme.selection.fg },
       },
     },
   });

@@ -1,6 +1,7 @@
 import blessed from "neo-blessed";
 import { appInstance } from "@/app.js";
 import { state } from "@/shared/state.js";
+import { theme } from "@/config/app.config.js";
 import { installCursorSupport } from "@/services/cursorInput.service.js";
 import { openEditor } from "@/panels/modal.panel.js";
 import { toggleIndexesPanel } from "@/panels/indexes.panel.js";
@@ -201,7 +202,7 @@ export function toggleCommandPalette() {
     width: "100%-4",
     height: "100%-4",
     style: {
-      selected: { bg: "blue", fg: "white" },
+      selected: { bg: theme.selection.bg, fg: theme.selection.fg },
     },
   });
 

@@ -222,7 +222,7 @@ export function openEditor(doc: any, options: { isInsert?: boolean } = {}) {
       border: { fg: "cyan" },
       header: { bold: true, fg: "yellow" },
       cell: {
-        selected: { bg: theme.listtable.selectedBg, fg: theme.listtable.selectedFg },
+        selected: { bg: theme.selection.bg, fg: theme.selection.fg },
       },
     },
   });

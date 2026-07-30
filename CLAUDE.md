@@ -520,14 +520,16 @@ tmux kill-session -t mterm
 
 - `theme` (`src/config/app.config.ts`) centralizes border/label colors;
   panels reference `theme.border.focus` / `theme.border.blur` in their
-  `focus`/`blur` handlers rather than hardcoding colors. `theme.listtable`
-  (`selectedBg`/`selectedFg`) is the same idea for every `blessed.listtable`
-  overlay's `style.cell.selected` — `modal.panel.ts`, `queryBuilder.panel.ts`,
-  `indexes.panel.ts`, `schemaAnalysis.panel.ts`, and `result.panel.ts`'s
-  grid view all reference it rather than a literal, so they can't drift
-  apart. Plain `blessed.list` widgets (tree, history, command palette,
-  query autocomplete) aren't part of this convention — each currently
-  picks its own selected style independently.
+  `focus`/`blur` handlers rather than hardcoding colors. `theme.selection`
+  (`bg`/`fg`) is the same idea for the selected-row/item style of every
+  `blessed.listtable` (`style.cell.selected`) *and* `blessed.list`
+  (`style.selected`) in the app — `modal.panel.ts`, `queryBuilder.panel.ts`,
+  `indexes.panel.ts`, `schemaAnalysis.panel.ts`, `result.panel.ts`'s grid
+  view, `tree/tree.panel.ts`, `history.panel.ts`, `commandPalette.panel.ts`,
+  and `query/queryAutocomplete.panel.ts` all reference it rather than a
+  literal, so they can't drift apart. Not applied to
+  `connection.panel.ts`/`dropdown/dropdown.panel.ts` — dead code, never
+  appended to the screen by `main.layout.ts`.
 - `logger` (`src/utils/logger/logger.service.ts`) writes structured
   `{ message, ...context }` objects to `~/.mongoterm/app.log` — prefer this
   over `console.log` for anything beyond a quick local debug print (and

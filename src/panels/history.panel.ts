@@ -50,7 +50,7 @@ export const historyPanel = () => {
     vi: true,
     items: history.map((q) => `${q.query}`),
     style: {
-      selected: { bg: "blue", fg: "white" },
+      selected: { bg: theme.selection.bg, fg: theme.selection.fg },
       item: { fg: "white" },
     },
   });

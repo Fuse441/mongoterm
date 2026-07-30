@@ -51,7 +51,7 @@ export function createTree(parent: any, options: any) {
     scrollbar: { ch: " " },
     style: {
       border: { fg: theme.border.blur },
-      selected: { bg: "green", fg: "black" },
+      selected: { bg: theme.selection.bg, fg: theme.selection.fg },
       item: { fg: "white" },
     },
     ...options,

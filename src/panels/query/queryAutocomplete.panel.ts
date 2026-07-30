@@ -1,6 +1,7 @@
 import blessed from "neo-blessed";
 import { appInstance } from "@/app.js";
 import { findQueryOperators, IQueryOperator } from "@/services/query/queryOperators.js";
+import { theme } from "@/config/app.config.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -63,7 +64,7 @@ export function attachQueryAutocomplete(box: any /* cursor-aware blessed.Textbox
         tags: true,
         style: {
           border: { fg: "yellow" },
-          selected: { bg: "yellow", fg: "black" },
+          selected: { bg: theme.selection.bg, fg: theme.selection.fg },
         },
       });
       appInstance.appendToScreen(suggestBox);
