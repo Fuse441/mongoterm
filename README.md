@@ -70,6 +70,9 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - [x] Sort UI (`s` key)
 - [ ] Aggregation pipeline builder
 - [ ] Explain plan viewer
+- [ ] SQL Bridge — type a familiar `SELECT * FROM col WHERE age > 30`-style query and have it translated into a MongoDB filter, for anyone coming from a SQL background (Studio 3T's signature SQL-to-Mongo feature)
+- [ ] Live Shell — a real, mongosh-compatible embedded JS shell (`db.collection.find()`, `.aggregate()`, variables, JS expressions), distinct from today's `:` shell which is just a bigger JSON-filter box
+- [ ] Code Snap — generate ready-to-paste driver code (Node.js, Python, Java, ...) from whatever's currently in the query box or query builder, for handing a query off to application code
 
 </details>
 
@@ -80,6 +83,8 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - [x] Connection manager (multiple connections)
 - [ ] Dark / light theme toggle
 - [ ] Loading indicator for slow queries
+- [ ] Command Palette — fuzzy `Ctrl+P`-style quick jump to any connection/database/collection or action, so you're never more than a few keystrokes from anywhere in the app
+- [ ] Smart field autocomplete — suggest real field names (not just `$operators`) in the query box and query builder, sourced from the last Schema Analysis sample of the current collection
 
 </details>
 
@@ -91,6 +96,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - [ ] SSH tunnel support
 - [ ] TLS / X.509 / Kerberos / LDAP auth options
 - [x] Connection favorites color-coding / grouping
+- [ ] Safe Mode — flag a connection read-only (e.g. production) so every write/delete/index-drop action is blocked or requires an extra confirm, regardless of which panel triggers it
 
 </details>
 
@@ -101,6 +107,10 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - [x] Table / grid view (alternative to the tree layout)
 - [x] Schema analysis (field type + frequency distribution across a sample)
 - [x] Collection stats (storage size, doc count, avg doc size, index size)
+- [ ] Schema Guard — view (and eventually edit) a collection's `$jsonSchema` validation rules, so you can see what's actually enforced without leaving the terminal
+- [ ] File Vault — browse, download, and delete files stored in a GridFS bucket
+- [ ] Diff & Sync — compare two collections (same or different databases/connections), see which documents differ, and optionally sync one to match the other (Studio 3T's Data Compare)
+- [ ] View Forge — define a MongoDB view (a saved, read-only aggregation pipeline) from the query builder or shell, and have it show up in the connection tree like a regular collection
 
 </details>
 
@@ -109,6 +119,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 
 - [x] View / create / drop indexes
 - [x] Index usage stats
+- [ ] Index Advisor — after running a query, flag it if the explain plan shows a full collection scan and suggest a matching index to create
 
 </details>
 
@@ -117,6 +128,9 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 
 - [ ] User / role management
 - [ ] Server / replica-set / sharding topology view
+- [ ] Server Pulse — live server-side performance stats (ops/sec, memory, active connections, network I/O from `serverStatus`), distinct from the existing Monitor Panel which only tracks mongoterm's own process
+- [ ] Slow Query Log — browse `system.profile` entries (queries that exceeded a configurable threshold) to find real bottlenecks from actual usage, distinct from Index Advisor's per-query explain check
+- [ ] Backup Vault — a guided wrapper around `mongodump`/`mongorestore` for one-off collection/database backups and restores, without leaving the terminal
 
 </details>
 
