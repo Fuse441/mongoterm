@@ -202,6 +202,14 @@ mutate their own blessed widget directly (`box.setContent(...)`,
   `collStats` command, for sharded-cluster compatibility). Simpler than
   `indexes.panel.ts` — just a static box, no `listtable`, since there's
   nothing to select or edit.
+- `schemaAnalysis.panel.ts` — the `a` (workspace-focused) "Schema Analysis"
+  table overlay: samples documents (`$sample` aggregation, not a full
+  collection scan) and reports each top-level field's frequency across
+  the sample plus its mix of BSON types (MongoDB schemas can drift — a
+  field isn't guaranteed one type across documents). `r` resamples, `c`
+  changes the sample size (`promptInline`, same pattern as
+  `workspace.panel.ts`'s sort/page-size prompts). Mirrors
+  `indexes.panel.ts`'s toggle/overlay/`listtable` structure.
 
 ### Event bus pattern
 

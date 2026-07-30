@@ -38,6 +38,8 @@ export const EVENTS = Object.freeze({
   INDEX_DROPPED: "index:dropped",
   COLLECTION_STATS_FETCH: "collection:stats:fetch",
   COLLECTION_STATS_LOADED: "collection:stats:loaded",
+  SCHEMA_ANALYSIS_FETCH: "schema:analysis:fetch",
+  SCHEMA_ANALYSIS_LOADED: "schema:analysis:loaded",
 });
 
 export enum TYPE_LOGGER {

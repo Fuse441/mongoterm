@@ -102,6 +102,10 @@ export const keybindbarConfig: TKeybind = {
       key: "v",
       description: "toggle tree/table view",
     },
+    {
+      key: "a",
+      description: "schema analysis",
+    },
   ],
   record: [
     {
@@ -197,6 +201,12 @@ export const helpOnlyConfig: THelpSections = {
     { key: "esc", description: "close" },
   ],
   collectionStats: [
+    { key: "esc", description: "close" },
+  ],
+  schemaAnalysis: [
+    { key: "j/k", description: "navigate" },
+    { key: "r", description: "resample" },
+    { key: "c", description: "change sample size" },
     { key: "esc", description: "close" },
   ],
   autocomplete: [

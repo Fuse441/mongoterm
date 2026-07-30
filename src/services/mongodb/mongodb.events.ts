@@ -12,6 +12,7 @@ import { appInstance } from "@/app";
 import { renderResult } from "@/panels/result.panel";
 import { renderIndexesTable } from "@/panels/indexes.panel";
 import { renderCollectionStats } from "@/panels/collectionStats.panel";
+import { renderSchemaAnalysis } from "@/panels/schemaAnalysis.panel";
 import {
   deleteConnection,
   exportConnections,
@@ -45,6 +46,7 @@ export class EventMongoService {
     this.registerIndexEvents();
     this.registerIndexResultEvent();
     this.registerCollectionStatsEvents();
+    this.registerSchemaAnalysisEvents();
     logger.debug({ message: "Mongo events initialized" });
   }
 
@@ -488,6 +490,25 @@ export class EventMongoService {
 
     this.eventBus.on(EVENTS.COLLECTION_STATS_LOADED, (stats) => {
       renderCollectionStats(stats);
+    });
+  }
+
+  private registerSchemaAnalysisEvents() {
+    this.eventBus.on(EVENTS.SCHEMA_ANALYSIS_FETCH, async (sampleSize: number) => {
+      try {
+        const docs = await this.mongoRepository.getSchemaSample(sampleSize);
+        this.eventBus.emit(EVENTS.SCHEMA_ANALYSIS_LOADED, { docs });
+      } catch (error: any) {
+        logger.error({ message: "Failed to sample collection for schema analysis", error });
+        showToast({
+          statusCode: 500,
+          message: `Failed to analyze schema: ${error.message}`,
+        });
+      }
+    });
+
+    this.eventBus.on(EVENTS.SCHEMA_ANALYSIS_LOADED, (data) => {
+      renderSchemaAnalysis(data);
     });
   }
 }

@@ -272,6 +272,21 @@ public async getCollectionStats() {
   return result?.storageStats ?? null;
 }
 
+public async getSchemaSample(sampleSize: number) {
+  const dbName = state.databases[state.selectedDatabaseIndex];
+  const colName = state.collections[state.selectedCollectionIndex];
+
+  if (!dbName || !colName) {
+    return [];
+  }
+
+  return this.getClient()
+    .db(dbName)
+    .collection(colName)
+    .aggregate([{ $sample: { size: sampleSize } }])
+    .toArray();
+}
+
 public async listIndexes() {
   const dbName = state.databases[state.selectedDatabaseIndex];
   const colName = state.collections[state.selectedCollectionIndex];

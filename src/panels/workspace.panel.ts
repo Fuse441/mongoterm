@@ -4,6 +4,7 @@ import { theme } from "../config/app.config.js";
 import { openDialogConfirm, openEditor, promptInline } from "./modal.panel.js";
 import { toggleIndexesPanel } from "./indexes.panel.js";
 import { toggleCollectionStatsPanel } from "./collectionStats.panel.js";
+import { toggleSchemaAnalysisPanel } from "./schemaAnalysis.panel.js";
 import { toggleViewMode } from "./result.panel.js";
 import { keybindbarConfig } from "./keybingbar/keybindbar.config.js";
 import { appInstance } from "@/app.js";
@@ -155,6 +156,7 @@ export const workspacePanel: any = () => {
   box.key(["i"], () => toggleIndexesPanel());
   box.key(["S-i"], () => toggleCollectionStatsPanel());
   box.key(["v"], () => toggleViewMode());
+  box.key(["a"], () => toggleSchemaAnalysisPanel());
 
   return box;
 };

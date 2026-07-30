@@ -99,7 +99,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 
 - [x] Browse databases / collections, view documents (tree-formatted)
 - [x] Table / grid view (alternative to the tree layout)
-- [ ] Schema analysis (field type + frequency distribution across a sample)
+- [x] Schema analysis (field type + frequency distribution across a sample)
 - [x] Collection stats (storage size, doc count, avg doc size, index size)
 
 </details>
@@ -153,6 +153,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - Query with pagination and sort
 - View, create, and drop indexes, including usage stats and TTL info
 - Collection stats (document count, avg/data/storage size, index size)
+- Schema analysis: field frequency and BSON type distribution across a sample (`a` key)
 - Table/grid view of results, toggleable with the tree-formatted view (`v` key)
 - Title bar showing app name/version, live connection status, and a persistent update-available badge
 - Update notification on startup when a newer version is tagged on GitHub (checked on every launch, never blocks startup)
