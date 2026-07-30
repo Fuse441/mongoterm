@@ -9,6 +9,22 @@ let currentRecord = 0;
 import blessed from "neo-blessed";
 import { EVENTS } from "@/services/enum";
 let previousFocusedPanel: blessed.Widgets.BlessedElement | null = null;
+
+const KEYBINDBAR_BASE_LABEL = " keybindbar ";
+
+// Maps a focused widget back to the short name shown in the keybindbar's
+// own "[k→...]" hint — covers the named ui.panels plus the two dynamic,
+// flagged workspace children (tree-view record boxes, grid-view table;
+// see result.panel.ts) that aren't in ui.panels themselves.
+function panelDisplayName(ui: TResponseLayout, panel: any): string {
+  if (panel === ui.panels.tree) return "connection";
+  if (panel === ui.panels.workspace) return "workspace";
+  if (panel === ui.panels.query) return "query";
+  if (panel?._isRecord) return "record";
+  if (panel?._isGridTable) return "table";
+  return "previous panel";
+}
+
 // ── config: key → action ──────────────────────────────
 const getBindings = (ui: TResponseLayout) => [
   {
@@ -37,6 +53,9 @@ const getBindings = (ui: TResponseLayout) => [
         message:
           "previousFocusedPanel ==>" + previousFocusedPanel.options?.label,
       });
+      appInstance.ui.panels.keybindbar!.setLabel(
+        ` keybindbar  {grey-fg}[k→${panelDisplayName(ui, previousFocusedPanel)}]{/grey-fg} `,
+      );
       appInstance.ui.panels.keybindbar!.focus();
       appInstance.screen.render();
       logger.debug({ message: "Focusing keybindbar" });
@@ -49,6 +68,7 @@ const getBindings = (ui: TResponseLayout) => [
       if (previousFocusedPanel) {
         previousFocusedPanel.focus();
         previousFocusedPanel = null;
+        appInstance.ui.panels.keybindbar!.setLabel(KEYBINDBAR_BASE_LABEL);
       }
 
       appInstance.screen.render();

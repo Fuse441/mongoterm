@@ -47,7 +47,7 @@ export function registerDirectoryTree(parent: any, top: any) {
       left: 0,
       width: "25%",
       height: "100%-4",
-      label: " Connection ",
+      label: " Connection  {grey-fg}[l→workspace]{/grey-fg} ",
       border: "line",
       style: {
         border: { fg: theme.border.blur },

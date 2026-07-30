@@ -288,6 +288,29 @@ When adding or changing a keybind, edit `keybindbar.config.ts` (or
 `helpOnlyConfig` in the same file) — do not hand-edit `help.panel.ts`'s
 content; it's generated.
 
+**Border labels also carry a short, always-visible nav hint** — separate
+from and in addition to the keybindbar, showing at a glance which key
+moves focus *out* of that specific box, right on its own border title:
+`tree.event.ts`'s tree (`[l→workspace]`), `query.panel.ts` (`[h→tree]
+[j/esc→workspace]`), `workspace.panel.ts` (`[h→tree] [k→query]
+[l→record]`). These are static text baked into the `label:` option, not
+tag-parsed unless that widget already has `tags: true` — `query.panel.ts`
+deliberately doesn't, since its typed value is arbitrary JSON that could
+contain a literal `{` blessed would try to parse as markup, so its hint is
+plain text with no `{color-fg}` syntax. `workspace.panel.ts`'s hint
+(`WORKSPACE_NAV_HINT`) has to be duplicated as a literal into
+`result.panel.ts` rather than imported — that file overwrites the
+workspace box's whole label on every render (the results/pagination
+summary) and already imports `toggleViewMode` *from* `workspace.panel.ts`,
+so importing the hint back the other way would create a cycle; keep both
+copies in sync by hand. `keybindbar.panel.ts`'s label is the one dynamic
+case: `core/keybindings.ts`'s `S-k` handler overwrites it with
+`[k→<panel>]` (via `panelDisplayName()`) naming whatever panel focus is
+leaving, and the `k`/`top` handler resets it back to
+`KEYBINDBAR_BASE_LABEL` once focus returns — that constant's literal text
+must stay identical to `keybindbar.panel.ts`'s own construction-time
+`label:` option (also not imported, same cycle-avoidance reasoning).
+
 ## Known `neo-blessed` gotchas (read before touching input widgets)
 
 These bit us once already; the fixes are in place, but the underlying

@@ -7,6 +7,9 @@ export function keybindbarPanel() {
     left: 0,
     width: "100%",
     height: 3,
+    // Must match core/keybindings.ts's KEYBINDBAR_BASE_LABEL — that file
+    // overwrites this label with a "[k→<panel>]" hint on Shift+K and
+    // resets it back to this exact string when k returns focus.
     label: " keybindbar ",
     tags: true,
     wrap: false,

@@ -8,6 +8,11 @@ import { logger } from "@/utils/logger/logger.service";
 import { appInstance } from "@/app.js";
 import { state } from "@/shared/state.js";
 
+// Duplicated from workspace.panel.ts's WORKSPACE_NAV_HINT (not imported —
+// that file already imports toggleViewMode from this one, and importing
+// back would create a cycle). Keep both in sync by hand if this changes.
+const WORKSPACE_NAV_HINT = "{grey-fg}[h→tree] [k→query] [l→record]{/grey-fg}";
+
 /*
 |--------------------------------------------------------------------------
 | FORMAT HELPERS
@@ -423,7 +428,7 @@ export async function renderResult(
     : "";
   const viewLabel = state.viewMode === "table" ? "  view:table" : "";
   parent.setLabel(
-    ` Results (${total}) page ${state.page} of ${state.totalPages || 1}  size:${state.pageSize}${sortLabel}${viewLabel} `,
+    ` Results (${total}) page ${state.page} of ${state.totalPages || 1}  size:${state.pageSize}${sortLabel}${viewLabel}  ${WORKSPACE_NAV_HINT} `,
   );
   const rowHeight = RECORD_HEIGHT + RECORD_GAP;
   //

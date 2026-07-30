@@ -32,7 +32,12 @@ export const queryInput = () => {
     left: "25%",
     width: "75%",
     height: 3,
-    label: " Query ",
+    // Plain text, no {color-fg} tags: this textbox doesn't set `tags: true`
+    // (its typed value is arbitrary JSON that could contain a literal "{"
+    // sequence blessed would otherwise try to parse as markup — see
+    // Textarea.prototype.setValue -> setContent), so its label box inherits
+    // that same parseTags:false and would render tag syntax literally.
+    label: " Query  [h→tree] [j/esc→workspace] ",
     border: "line",
     inputOnFocus: true,
     vi: false,

@@ -11,6 +11,15 @@ import { state } from "@/shared/state.js";
 import { EVENTS } from "@/services/enum.js";
 import { showToast } from "./toast.panel.js";
 
+// Duplicated (not imported) in result.panel.ts, which overwrites this box's
+// label entirely on every render (results/pagination summary) and needs
+// the same hint to survive past the box's initial, pre-query construction
+// label. Not shared via import because result.panel.ts already imports
+// from this file (toggleViewMode -> workspace.panel.ts's "v" key), and
+// this file importing back from result.panel.ts would create a cycle —
+// keep both copies in sync by hand if this ever changes.
+const WORKSPACE_NAV_HINT = "{grey-fg}[h→tree] [k→query] [l→record]{/grey-fg}";
+
 function currentQuery(): string {
   return appInstance.ui.panels.query!.getContent();
 }
@@ -100,7 +109,7 @@ export const workspacePanel: any = () => {
     left: "25%",
     width: "75%",
     height: "100%-7",
-    label: " Workspace ",
+    label: ` Workspace  ${WORKSPACE_NAV_HINT} `,
     border: "line",
     tags: true,
 
