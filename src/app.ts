@@ -5,10 +5,13 @@ import { WorkspaceLogger } from "./utils/logger/logger";
 import { getConfiguration } from "./services/helper";
 import { existsSync, readFileSync } from "fs";
 import { defaultConfig } from "./config/app.config";
-import { APP_ROOT, CONFIG_DIR, CONFIG_PATH } from "./config/app.paths";
+import { APP_ROOT, APP_VERSION, CONFIG_DIR, CONFIG_PATH } from "./config/app.paths";
 import { MongodbBuilder } from "./services/mongodb/mongodb.builder";
 import { EventMongoTerm } from "./core/eventBus";
 import { ensureSecureDir, writeFileSecure } from "./utils/secureFs";
+import { checkForUpdate } from "./services/updateCheck.service";
+import { showToast } from "./panels/toast.panel";
+import { setUpdateBadge } from "./panels/titlebar.panel";
 export let appInstance: MongoTermApp;
 export let appReady: Promise<MongoTermApp>;
 
@@ -59,12 +62,37 @@ const app = new MongoTermApp(eventBus,
   }
 }
 
+// Fire-and-forget: never let a network hiccup delay or fail startup. Waits
+// for the screen to exist (appReady) before showing anything, since
+// showToast needs appInstance.
+function checkForUpdateInBackground(): void {
+  appReady
+    .then(() => checkForUpdate())
+    .then((info) => {
+      if (!info.hasUpdate) return;
+      // Toast for an immediate nudge; title bar badge because the toast
+      // auto-dismisses (8s) and is easy to miss during the initial
+      // connection screen — the badge stays until the app is restarted
+      // on the new version.
+      showToast({
+        statusCode: 200,
+        message: `Update available: ${info.latestVersion} (you have v${APP_VERSION}) — npm i -g mongoterm@latest`,
+        duration: 8000,
+      });
+      setUpdateBadge(info.latestVersion ?? null);
+    })
+    .catch((error) => {
+      logger.debug({ message: "Update check failed", error });
+    });
+}
+
 async function bootstrap(): Promise<void> {
   try {
     await createApplicationDirectory();
     await ensureLoaded();
 
     appReady = initializeApp();
+    checkForUpdateInBackground();
 
     // Import services and handle errors
     await import("./services/mongodb/mongodb.events");

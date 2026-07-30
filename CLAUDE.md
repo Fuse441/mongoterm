@@ -99,6 +99,17 @@ src/
     query/queryOperators.ts     QUERY_OPERATORS — Mongo operator name +
                                description list, single source for the
                                query/shell autocomplete dropdown
+    updateCheck.service.ts      checkForUpdate() — compares the local
+                               package.json version against GitHub's git
+                               tags (not Releases — this repo's
+                               tag-release.yml only pushes a tag, never an
+                               actual Release object, so `/releases/latest`
+                               404s; see the file's own header comment).
+                               Cached to ~/.mongoterm/update-check.json,
+                               at most one network call per 24h. Called
+                               fire-and-forget from app.ts's bootstrap()
+                               after appReady resolves — must never throw
+                               or block startup.
   shared/
     state.ts                  IState — in-memory app state (selected
                                connection/db/collection indices, mongoClient,
@@ -120,6 +131,17 @@ mutate their own blessed widget directly (`box.setContent(...)`,
 `table.setData(...)`, `list.setItems(...)`) and call
 `appInstance.renderScreen()` to flush.
 
+- `titlebar.panel.ts` — single-row, borderless header spanning the full
+  screen width: app name/version, connection status (refreshed off
+  `EVENTS.DB_DATABASES_LOADED`, reads the connected host straight from
+  `state.mongoClient.options.hosts`), and a persistent "update available"
+  badge (`setUpdateBadge()`, called from `app.ts` alongside the
+  update-check toast — the badge doesn't auto-dismiss like the toast does,
+  since the toast is easy to miss during the initial connection screen).
+  Reserves row 0; every other top-anchored panel was shifted down by 1 and
+  had its height band reduced by 1 to make room — see the "percentage
+  math" gotcha below, and update all of them together if this bar's height
+  ever changes.
 - `tree/tree.panel.ts` — generic collapsible tree widget (connections ->
   databases -> collections). `tree/tree.event.ts` wires it to actual Mongo
   calls and CRUD dialogs.
@@ -302,6 +324,14 @@ them.
    as the terminal size changes. Keep a single set of fixed-size bands
    (header row count, footer row count) and derive everything else from
    `"100%-N"` against those, rather than hand-tuning percentages per panel.
+   Current bands, top to bottom: `titlebar.panel.ts` (`height: 1`, `top: 0`)
+   → `tree.event.ts`'s tree / `query.panel.ts` (`top: 1`) → `workspace.panel.ts`
+   (`top: 4`, i.e. below the 1-row titlebar + 3-row query box) → 3 rows
+   reserved at the bottom for `keybindbar.panel.ts`. So the tree's height is
+   `"100%-4"` (1 titlebar + 3 keybindbar) and the workspace's is `"100%-7"`
+   (1 titlebar + 3 query + 3 keybindbar). If you resize or add another
+   top/bottom band, update every one of these together, not just the panel
+   you're touching.
 
 4. **`options.parent` auto-appends.** Any blessed widget created with
    `parent: someElement` is automatically appended to `someElement` inside

@@ -2,7 +2,7 @@ import blessed from "neo-blessed";
 import { logger } from "@/utils/logger/logger.service";
 import { appInstance } from "@/app";
 export function showToast(toast: Record<string, any>) {
-  const { statusCode, message } = toast;
+  const { statusCode, message, duration = 2500 } = toast;
   const color = statusCode != 200 ? "red" : "green";
   const box = blessed.box({
     bottom: 1,
@@ -32,7 +32,7 @@ export function showToast(toast: Record<string, any>) {
   setTimeout(() => {
     appInstance.removeScreenElement(box);
     appInstance.renderScreen();
-  }, 2500);
+  }, duration);
 
   appInstance.appendToScreen(box);
   appInstance.renderScreen();

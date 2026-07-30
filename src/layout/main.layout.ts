@@ -9,6 +9,7 @@ import { IMainLayout } from "./main.layout.types.js";
 import { createTree } from "@/panels/tree/tree.panel.js";
 import { registerDirectoryTree } from "@/panels/tree/tree.event.js";
 import { keybindbarPanel } from "@/panels/keybingbar/keybindbar.panel.js";
+import { titlebarPanel } from "@/panels/titlebar.panel.js";
 export class MognoTermLayout {
   private _panels!: IMainLayout["panels"];
   private _dropdowns!: IMainLayout["dropdowns"];
@@ -42,11 +43,12 @@ export class MognoTermLayout {
 
   private async initPanels() {
     this._panels = {
+      titlebar: titlebarPanel(),
       tree: registerDirectoryTree(appInstance.screen, {})!.el,
       workspace: workspacePanel(),
       query: queryInput(),
       monitor: monitorPanel(),
-      keybindbar: keybindbarPanel(), 
+      keybindbar: keybindbarPanel(),
     };
   }
     private async initMonitor() {

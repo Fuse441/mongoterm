@@ -96,10 +96,10 @@ export const workspacePanel: any = () => {
   const id = "workspace";
   const box = blessed.box({
     id,
-    top: 3,
+    top: 4,
     left: "25%",
     width: "75%",
-    height: "100%-6",
+    height: "100%-7",
     label: " Workspace ",
     border: "line",
     tags: true,

@@ -43,10 +43,10 @@ export function registerDirectoryTree(parent: any, top: any) {
   //  const workspacePanel = appInstance.ui.panels.workspace;
   try {
     const tree = createTree(parent, {
-      top: 0,
+      top: 1,
       left: 0,
       width: "25%",
-      height: "100%-3",
+      height: "100%-4",
       label: " Connection ",
       border: "line",
       style: {

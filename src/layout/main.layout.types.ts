@@ -15,6 +15,7 @@ type TTree = {
 };
 export type TLayoutScreen = {
   _panels: {
+    titlebar: blessed.Widgets.BoxElement;
     tree: any;
     connection: blessed.Widgets.BoxElement;
     workspace: blessed.Widgets.BoxElement;

@@ -28,7 +28,7 @@ export const queryInput = () => {
   const id = "query";
   const query = blessed.textbox({
     id,
-    top: 0,
+    top: 1,
     left: "25%",
     width: "75%",
     height: 3,
