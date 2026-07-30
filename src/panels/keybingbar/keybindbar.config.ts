@@ -90,6 +90,10 @@ export const keybindbarConfig: TKeybind = {
       key: "Shift+g",
       description: "last record",
     },
+    {
+      key: "i",
+      description: "indexes",
+    },
   ],
   record: [
     {
@@ -162,6 +166,12 @@ export const helpOnlyConfig: THelpSections = {
     { key: "d", description: "remove field" },
     { key: "C-s", description: "save" },
     { key: "esc", description: "cancel" },
+  ],
+  indexes: [
+    { key: "j/k", description: "navigate" },
+    { key: "c", description: "create index" },
+    { key: "d", description: "drop index" },
+    { key: "esc", description: "close" },
   ],
   autocomplete: [
     { key: "$...", description: "typing $ starts operator suggestions (query/shell boxes)" },

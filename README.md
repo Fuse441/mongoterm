@@ -107,8 +107,8 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 <details>
 <summary><strong>📇 Indexes</strong></summary>
 
-- [ ] View / create / drop indexes
-- [ ] Index usage stats
+- [x] View / create / drop indexes
+- [x] Index usage stats
 
 </details>
 
@@ -151,6 +151,7 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - Browse, create, and drop collections
 - View, insert, edit, delete, and duplicate documents
 - Query with pagination and sort
+- View, create, and drop indexes, including usage stats and TTL info
 - Interactive dropdown navigation
 - Keyboard-driven interface
 - Lightweight terminal UI

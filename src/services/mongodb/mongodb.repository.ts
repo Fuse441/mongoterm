@@ -255,6 +255,68 @@ public async insertRecord(doc: Record<string, unknown>) {
   });
 }
 
+public async listIndexes() {
+  const dbName = state.databases[state.selectedDatabaseIndex];
+  const colName = state.collections[state.selectedCollectionIndex];
+
+  if (!dbName || !colName) {
+    return [];
+  }
+
+  return this.getClient().db(dbName).collection(colName).listIndexes().toArray();
+}
+
+public async getIndexStats() {
+  const dbName = state.databases[state.selectedDatabaseIndex];
+  const colName = state.collections[state.selectedCollectionIndex];
+
+  if (!dbName || !colName) {
+    return [];
+  }
+
+  try {
+    return await this.getClient()
+      .db(dbName)
+      .collection(colName)
+      .aggregate([{ $indexStats: {} }])
+      .toArray();
+  } catch (error) {
+    logger.debug({ message: "Failed to fetch index stats", error });
+    return [];
+  }
+}
+
+public async createIndex(
+  keys: Record<string, 1 | -1>,
+  options: { name?: string; unique?: boolean; sparse?: boolean; expireAfterSeconds?: number } = {},
+) {
+  const dbName = state.databases[state.selectedDatabaseIndex];
+  const colName = state.collections[state.selectedCollectionIndex];
+
+  await this.getClient().db(dbName).collection(colName).createIndex(keys, options);
+
+  this.eventBus.emit(EVENTS.TOAST_SHOW, {
+    statusCode: 200,
+    message: "Index created",
+  });
+}
+
+public async dropIndex(indexName: string) {
+  if (indexName === "_id_") {
+    throw new Error("Cannot drop the _id index");
+  }
+
+  const dbName = state.databases[state.selectedDatabaseIndex];
+  const colName = state.collections[state.selectedCollectionIndex];
+
+  await this.getClient().db(dbName).collection(colName).dropIndex(indexName);
+
+  this.eventBus.emit(EVENTS.TOAST_SHOW, {
+    statusCode: 200,
+    message: `Index "${indexName}" dropped`,
+  });
+}
+
 public async duplicateRecord(id: string) {
   const result = await this.fetchQuery(
     JSON.stringify({

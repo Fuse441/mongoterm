@@ -2,6 +2,7 @@ import blessed from "neo-blessed";
 
 import { theme } from "../config/app.config.js";
 import { openDialogConfirm, openEditor, promptInline } from "./modal.panel.js";
+import { toggleIndexesPanel } from "./indexes.panel.js";
 import { keybindbarConfig } from "./keybingbar/keybindbar.config.js";
 import { appInstance } from "@/app.js";
 import { state } from "@/shared/state.js";
@@ -140,6 +141,7 @@ export const workspacePanel: any = () => {
   box.key(["s"], () => openSortPrompt(box));
   box.key(["S-s"], () => openPageSizePrompt(box));
   box.key(["S-d"], () => handleBulkDelete());
+  box.key(["i"], () => toggleIndexesPanel());
 
   return box;
 };

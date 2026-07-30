@@ -150,6 +150,11 @@ mutate their own blessed widget directly (`box.setContent(...)`,
   keybindbar, not hand-maintained separately. Always restores focus to
   whatever was focused before opening (see gotcha #5) — don't remove that.
 - `monitor.panel.ts` — a small floating CPU/RAM HUD (dev/debug aid).
+- `indexes.panel.ts` — the `i` (workspace-focused) "Indexes" table overlay:
+  lists indexes (keys/unique/TTL) plus `$indexStats` usage for the current
+  collection, and drives create (`c`, prompt-based) / drop (`d`, confirm
+  dialog) via `EVENTS.INDEX_CREATE`/`EVENTS.INDEX_DROP`. Mirrors
+  `queryBuilder.panel.ts`'s toggle/overlay/`listtable` structure.
 
 ### Event bus pattern
 

@@ -21,6 +21,7 @@ const SECTION_TITLES: Record<string, string> = {
   record: "Record",
   query: "Query",
   editor: "Record Editor",
+  indexes: "Indexes",
   autocomplete: "Query Autocomplete",
   global: "Global",
 };
@@ -31,6 +32,7 @@ const SECTION_ORDER = [
   "record",
   "query",
   "editor",
+  "indexes",
   "autocomplete",
   "global",
 ] as const;

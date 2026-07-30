@@ -10,6 +10,7 @@ import { logger } from "@/utils/logger/logger.service";
 import { showToast } from "@/panels/toast.panel";
 import { appInstance } from "@/app";
 import { renderResult } from "@/panels/result.panel";
+import { renderIndexesTable } from "@/panels/indexes.panel";
 import {
   deleteConnection,
   exportConnections,
@@ -40,6 +41,8 @@ export class EventMongoService {
     this.registerCollectionLoadedEvent();
     this.registerDatabaseLoadedEvent();
     this.registerQueryResultEvent();
+    this.registerIndexEvents();
+    this.registerIndexResultEvent();
     logger.debug({ message: "Mongo events initialized" });
   }
 
@@ -402,6 +405,68 @@ export class EventMongoService {
           message: String(`Failed to insert record: ${error.message}`),
         });
       }
+    });
+  }
+
+  private registerIndexEvents() {
+    this.eventBus.on(EVENTS.INDEX_LIST_FETCH, async () => {
+      try {
+        const [indexes, stats] = await Promise.all([
+          this.mongoRepository.listIndexes(),
+          this.mongoRepository.getIndexStats(),
+        ]);
+
+        this.eventBus.emit(EVENTS.INDEX_LIST_LOADED, { indexes, stats });
+      } catch (error: any) {
+        logger.error({ message: "Failed to fetch indexes", error });
+        showToast({
+          statusCode: 500,
+          message: `Failed to fetch indexes: ${error.message}`,
+        });
+      }
+    });
+
+    this.eventBus.on(
+      EVENTS.INDEX_CREATE,
+      async ({
+        keys,
+        options,
+      }: {
+        keys: Record<string, 1 | -1>;
+        options?: Record<string, any>;
+      }) => {
+        try {
+          await this.mongoRepository.createIndex(keys, options);
+          this.eventBus.emit(EVENTS.INDEX_CREATED, { keys, options });
+          this.eventBus.emit(EVENTS.INDEX_LIST_FETCH);
+        } catch (error: any) {
+          logger.error({ message: "Failed to create index", error });
+          showToast({
+            statusCode: 500,
+            message: `Failed to create index: ${error.message}`,
+          });
+        }
+      },
+    );
+
+    this.eventBus.on(EVENTS.INDEX_DROP, async (indexName: string) => {
+      try {
+        await this.mongoRepository.dropIndex(indexName);
+        this.eventBus.emit(EVENTS.INDEX_DROPPED, { indexName });
+        this.eventBus.emit(EVENTS.INDEX_LIST_FETCH);
+      } catch (error: any) {
+        logger.error({ message: "Failed to drop index", error });
+        showToast({
+          statusCode: 500,
+          message: `Failed to drop index: ${error.message}`,
+        });
+      }
+    });
+  }
+
+  private registerIndexResultEvent() {
+    this.eventBus.on(EVENTS.INDEX_LIST_LOADED, (data) => {
+      renderIndexesTable(data);
     });
   }
 }
