@@ -11,10 +11,12 @@ and this project follows Semantic Versioning (SemVer).
 
 - Add query builder (no raw JSON typing) (0d7ca4e)
 - Add index management panel (view/create/drop, usage stats, TTL) (9166c29)
+- Add collection stats and table/grid view, fix listtable render lag (80535fb)
 
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (925510b)
+- Update CHANGELOG.md [skip ci] (c677b61)
 
 ### Fixed
 
