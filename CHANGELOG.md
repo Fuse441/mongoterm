@@ -7,6 +7,16 @@ and this project follows Semantic Versioning (SemVer).
 
 ## [Unreleased]
 
+### Added
+
+- Show nav-out keybind hints on each panel's border label (8bd71ea)
+
+## [0.6.1] - 2026-07-30
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (0635a92)
+
 ### Fixed
 
 - Check for updates on every launch instead of once per day (888b9a4)
