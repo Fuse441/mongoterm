@@ -95,7 +95,7 @@ export function createTree(parent: any, options: any) {
     return out;
   }
 
-  function formatRow(node: TreeNode): string {
+  function formatRow(node: TreeNode, isSelected: boolean): string {
     const indent = "  ".repeat(depthOf(node));
     const hasChildren = node.type !== "collection";
     let toggle = " ";
@@ -111,14 +111,34 @@ export function createTree(parent: any, options: any) {
       node.type === "connection" && node.meta?.color
         ? node.meta.color
         : defaultColor;
-    const open = bold ? `{bold}{${color}-fg}` : `{${color}-fg}`;
-    const close = bold ? `{/${color}-fg}{/bold}` : `{/${color}-fg}`;
     const group =
       node.type === "connection" && node.meta?.group
-        ? `{gray-fg}[${node.meta.group}]{/gray-fg} `
+        ? `[${node.meta.group}] `
         : "";
-    return `${indent}${toggle} ${group}${open}${icon} ${node.label}${close}`;
+
+    // The selected row's bg/fg (style.selected, set below) is meant to be
+    // the single source of contrast for a highlighted item. Any {color-fg}
+    // tag baked into the label (per-connection color-coding, the gray group
+    // label) overrides that fg per-character when blessed parses tags — so
+    // e.g. a green-tagged collection row on the tree's green selected
+    // background rendered as invisible green-on-green text. Skip the color
+    // tags entirely on the selected row so it always uses the plain
+    // selected style instead.
+    if (isSelected) {
+      return `${indent}${toggle} ${group}${icon} ${node.label}`;
+    }
+
+    const open = bold ? `{bold}{${color}-fg}` : `{${color}-fg}`;
+    const close = bold ? `{/${color}-fg}{/bold}` : `{/${color}-fg}`;
+    const groupTag = group ? `{gray-fg}${group}{/gray-fg}` : "";
+    return `${indent}${toggle} ${groupTag}${open}${icon} ${node.label}${close}`;
   }
+
+  // Reentrancy guard: restyleSelection() calls list.setItems()/list.select(),
+  // both of which emit "select item" internally (see List.prototype.setItems
+  // in neo-blessed), which would otherwise call back into the handler below
+  // and recurse.
+  let restyling = false;
 
   function render() {
     visible = flatten();
@@ -128,11 +148,33 @@ export function createTree(parent: any, options: any) {
         "{gray-fg}No saved connections — press Ctrl+E to add one{/gray-fg}",
       ]);
     } else {
-      list.setItems(visible.map(formatRow));
-      list.select(Math.min(prevSelected, visible.length - 1));
+      const selectedIndex = Math.min(prevSelected, visible.length - 1);
+      restyling = true;
+      list.setItems(
+        visible.map((node, i) => formatRow(node, i === selectedIndex)),
+      );
+      list.select(selectedIndex);
+      restyling = false;
     }
     list.screen.render();
   }
+
+  // Plain up/down navigation (vi/arrow keys, built into `List` since
+  // `keys`/`vi` are set) doesn't go through render() above — it just moves
+  // `list.selected`. Re-run the tag-stripping in formatRow whenever the
+  // selection moves so the newly-selected row loses its color tag too,
+  // not just whichever row was selected the last time render() ran.
+  list.on("select item", () => {
+    if (restyling || !visible.length) return;
+    restyling = true;
+    const selectedIndex = list.selected;
+    list.setItems(
+      visible.map((node, i) => formatRow(node, i === selectedIndex)),
+    );
+    list.select(selectedIndex);
+    restyling = false;
+    list.screen.render();
+  });
 
   function syncSpinner() {
     const anyLoading = visible.some((n) => n.loading);

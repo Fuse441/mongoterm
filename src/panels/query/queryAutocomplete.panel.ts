@@ -34,8 +34,15 @@ export function attachQueryAutocomplete(box: any /* cursor-aware blessed.Textbox
   }
 
   function render() {
-    const items = matches.map(
-      (m) => `{bold}${m.op}{/bold} {grey-fg}${m.description}{/grey-fg}`,
+    // The description's {grey-fg} tag would otherwise override the
+    // selected row's fg (style.selected below) when blessed parses tags,
+    // making it render in grey instead of the intended selected color —
+    // skip the tag on the currently selected row (see the same fix in
+    // tree.panel.ts's formatRow for the fuller version of this issue).
+    const items = matches.map((m, i) =>
+      i === selected
+        ? `{bold}${m.op}{/bold} ${m.description}`
+        : `{bold}${m.op}{/bold} {grey-fg}${m.description}{/grey-fg}`,
     );
 
     if (!suggestBox) {
