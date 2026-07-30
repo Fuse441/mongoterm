@@ -10,6 +10,15 @@ and this project follows Semantic Versioning (SemVer).
 ### Added
 
 - Add query builder (no raw JSON typing) (0d7ca4e)
+- Add index management panel (view/create/drop, usage stats, TTL) (9166c29)
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (925510b)
+
+### Fixed
+
+- Prevent color tags from overriding selected-row contrast in lists (a4dc564)
 
 ## [0.5.0] - 2026-07-28
 
