@@ -14,11 +14,13 @@ and this project follows Semantic Versioning (SemVer).
 ### Changed
 
 - Centralize listtable selected-row color into theme (f34e281)
+- Extend theme.selection to blessed.list widgets too (952a7dd)
 
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (93358a8)
 - Update CHANGELOG.md [skip ci] (452196c)
+- Update CHANGELOG.md [skip ci] (2056ce4)
 
 ### Documentation
 
