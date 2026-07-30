@@ -9,7 +9,17 @@ and this project follows Semantic Versioning (SemVer).
 
 ### Added
 
+- Add schema analysis panel (field frequency + BSON type distribution) (8a5c648)
+
+## [0.6.2] - 2026-07-30
+
+### Added
+
 - Show nav-out keybind hints on each panel's border label (8bd71ea)
+
+### Chore
+
+- Update CHANGELOG.md [skip ci] (f9f6ea6)
 
 ## [0.6.1] - 2026-07-30
 
