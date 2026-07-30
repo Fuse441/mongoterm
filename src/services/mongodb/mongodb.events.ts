@@ -11,6 +11,7 @@ import { showToast } from "@/panels/toast.panel";
 import { appInstance } from "@/app";
 import { renderResult } from "@/panels/result.panel";
 import { renderIndexesTable } from "@/panels/indexes.panel";
+import { renderCollectionStats } from "@/panels/collectionStats.panel";
 import {
   deleteConnection,
   exportConnections,
@@ -43,6 +44,7 @@ export class EventMongoService {
     this.registerQueryResultEvent();
     this.registerIndexEvents();
     this.registerIndexResultEvent();
+    this.registerCollectionStatsEvents();
     logger.debug({ message: "Mongo events initialized" });
   }
 
@@ -467,6 +469,25 @@ export class EventMongoService {
   private registerIndexResultEvent() {
     this.eventBus.on(EVENTS.INDEX_LIST_LOADED, (data) => {
       renderIndexesTable(data);
+    });
+  }
+
+  private registerCollectionStatsEvents() {
+    this.eventBus.on(EVENTS.COLLECTION_STATS_FETCH, async () => {
+      try {
+        const stats = await this.mongoRepository.getCollectionStats();
+        this.eventBus.emit(EVENTS.COLLECTION_STATS_LOADED, stats);
+      } catch (error: any) {
+        logger.error({ message: "Failed to fetch collection stats", error });
+        showToast({
+          statusCode: 500,
+          message: `Failed to fetch collection stats: ${error.message}`,
+        });
+      }
+    });
+
+    this.eventBus.on(EVENTS.COLLECTION_STATS_LOADED, (stats) => {
+      renderCollectionStats(stats);
     });
   }
 }

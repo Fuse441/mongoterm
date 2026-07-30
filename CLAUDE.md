@@ -124,7 +124,22 @@ mutate their own blessed widget directly (`box.setContent(...)`,
   databases -> collections). `tree/tree.event.ts` wires it to actual Mongo
   calls and CRUD dialogs.
 - `workspace.panel.ts` — the main content pane; hosts the rendered record
-  list (`result.panel.ts` builds one `box` per document inside it).
+  list. `result.panel.ts` renders it one of two ways, toggled with `v`
+  (`state.viewMode`, `toggleViewMode()`): the default tree view builds one
+  `box` per document (`createRecordBox`, lazily appended as you scroll —
+  see `renderResult`'s `scroll` listener); the grid/table view
+  (`renderGridView`) instead builds a single `listtable` with one row per
+  document and a column per top-level field (union across the current
+  page, capped, `_id` always first). Grid cells are deliberately plain
+  text (`tags: false`) rather than reusing `formatValue`/`colorValue`'s
+  `{color-fg}` tags — tag-colored cell content is exactly what broke
+  selected-row contrast elsewhere (see the tree/autocomplete fix below),
+  and grid values are arbitrary user data that could itself contain a
+  literal `{...}` sequence. `toggleViewMode()` re-renders from a cached
+  last payload rather than re-querying MongoDB. The grid table sets its
+  own `_isGridTable` flag (mirroring records' `_isRecord`) so
+  `core/keybindings.ts`'s workspace `l`/`right` handler knows to focus it
+  instead of the first record box.
 - `query.panel.ts` — the query input textbox.
 - `modal.panel.ts` — record editor (table of field/value/type rows, with
   type-cycling via left/right), delete/duplicate confirm dialogs, and
@@ -155,6 +170,12 @@ mutate their own blessed widget directly (`box.setContent(...)`,
   collection, and drives create (`c`, prompt-based) / drop (`d`, confirm
   dialog) via `EVENTS.INDEX_CREATE`/`EVENTS.INDEX_DROP`. Mirrors
   `queryBuilder.panel.ts`'s toggle/overlay/`listtable` structure.
+- `collectionStats.panel.ts` — the `Shift+i` (workspace-focused) read-only
+  "Collection Stats" overlay: doc count, avg/data/storage size, index
+  count/size, from a `$collStats` aggregation (not the deprecated
+  `collStats` command, for sharded-cluster compatibility). Simpler than
+  `indexes.panel.ts` — just a static box, no `listtable`, since there's
+  nothing to select or edit.
 
 ### Event bus pattern
 
@@ -316,6 +337,20 @@ them.
    `modal.panel.ts`'s `closeEditor()`/`closeDialogConfirm()` and
    `shell.panel.ts`'s `closeShell()` both explicitly remove every
    direct child in addition to the overlay; do the same in any new modal.
+
+8. **Nothing repaints the terminal after a keypress unless application code
+   explicitly calls `appInstance.renderScreen()`.** `neo-blessed` doesn't
+   auto-render on `element.key()`/`select`/`down`/`up` — the *only*
+   periodic auto-render anywhere in this app is `monitor.panel.ts`'s
+   500ms CPU/RAM `setInterval`. Every `blessed.listtable`'s `j`/`k`
+   row-navigation binding (`table.key(["j"], () => table.down(1))`, copied
+   across `modal.panel.ts`, `queryBuilder.panel.ts`, `indexes.panel.ts`,
+   `result.panel.ts`'s grid view) originally omitted the render call —
+   `table.down(1)`/`.up(1)` move `table.selected` and scroll internally,
+   but the new highlight only actually painted whenever the monitor's next
+   tick happened to fire, which read as laggy/stepped input on rapid j/k
+   (a real, reported bug). Always pair a bare `table.down/up/select` call
+   with an immediate `appInstance.renderScreen()` in the same handler.
 
 ## Reusable input building blocks
 

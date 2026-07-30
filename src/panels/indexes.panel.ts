@@ -161,8 +161,17 @@ export function toggleIndexesPanel() {
   indexesInstance = { overlay, table, hint, indexes: [], stats: [] };
 
   table.key(["escape"], () => closeIndexesPanel());
-  table.key(["j"], () => table.down(1));
-  table.key(["k"], () => table.up(1));
+  // Explicit render: nothing auto-repaints the screen after a keypress
+  // (the only periodic render in the app is monitor.panel.ts's 500ms
+  // tick), so without this the selection highlight lags behind rapid j/k.
+  table.key(["j"], () => {
+    table.down(1);
+    appInstance.renderScreen();
+  });
+  table.key(["k"], () => {
+    table.up(1);
+    appInstance.renderScreen();
+  });
   table.key(["c"], () => createIndexFlow());
   table.key(["d"], () => dropSelectedIndex());
 

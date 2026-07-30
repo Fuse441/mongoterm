@@ -80,6 +80,19 @@ const getBindings = (ui: TResponseLayout) => [
     keys: ["l", "right"],
     condition: () => appInstance.screen.focused === ui.panels.workspace,
     action: () => {
+      // Table (grid) view is a single focusable widget with its own
+      // internal row navigation — focus it directly rather than the
+      // per-record-box _isRecord flow below, which only applies to the
+      // tree view.
+      const grid: any = ui.panels.workspace!.children.find(
+        (c: any) => c._isGridTable,
+      );
+      if (grid) {
+        grid.focus();
+        appInstance.screen.render();
+        return;
+      }
+
       const records: blessed.Widgets.BoxOptions[] =
         ui.panels.workspace!.children.filter((c: any) => c._isRecord);
       if (!records.length) return;

@@ -19,9 +19,11 @@ const SECTION_TITLES: Record<string, string> = {
   tree: "Connection Tree",
   workspace: "Workspace",
   record: "Record",
+  grid: "Table/Grid View",
   query: "Query",
   editor: "Record Editor",
   indexes: "Indexes",
+  collectionStats: "Collection Stats",
   autocomplete: "Query Autocomplete",
   global: "Global",
 };
@@ -30,9 +32,11 @@ const SECTION_ORDER = [
   "tree",
   "workspace",
   "record",
+  "grid",
   "query",
   "editor",
   "indexes",
+  "collectionStats",
   "autocomplete",
   "global",
 ] as const;

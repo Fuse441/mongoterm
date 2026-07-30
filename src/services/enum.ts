@@ -36,6 +36,8 @@ export const EVENTS = Object.freeze({
   INDEX_CREATED: "index:created",
   INDEX_DROP: "index:drop",
   INDEX_DROPPED: "index:dropped",
+  COLLECTION_STATS_FETCH: "collection:stats:fetch",
+  COLLECTION_STATS_LOADED: "collection:stats:loaded",
 });
 
 export enum TYPE_LOGGER {

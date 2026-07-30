@@ -16,6 +16,7 @@ interface IState {
   totalPages: number;
   totalMatching: number;
   sort: Record<string, 1 | -1> | null;
+  viewMode: "tree" | "table";
 }
 export const state: IState = {
   connections: config.connections || [],
@@ -31,4 +32,5 @@ export const state: IState = {
   totalPages: 0,
   totalMatching: 0,
   sort: null,
+  viewMode: "tree",
 };

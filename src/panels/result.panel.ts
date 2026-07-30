@@ -162,6 +162,8 @@ function bindRecordEvents({ box, parent, doc, id, idx }: any) {
 
   box.key("C-n", () => handleInsert());
 
+  box.key("v", () => toggleViewMode());
+
   box.key("tab", () => parent.screen.focusNext());
 
   box.key("S-tab", () => parent.screen.focusPrevious());
@@ -240,26 +242,188 @@ function deleteRecord({ id, query }: any) {
   appInstance.eventBus.emit(EVENTS.RECORD_DELETE, { id, query });
 }
 
+// Cached so toggleViewMode() can flip state.viewMode and re-render the
+// current page without re-querying MongoDB.
+let lastPayload: any = { docs: [], pagination: {} };
+
+export function toggleViewMode() {
+  state.viewMode = state.viewMode === "tree" ? "table" : "tree";
+  renderResult(appInstance.ui.panels.workspace!, lastPayload);
+}
+
+/*
+|--------------------------------------------------------------------------
+| GRID VIEW (flat table, alternative to the tree-formatted record boxes)
+|--------------------------------------------------------------------------
+| One row per document instead of one box per document — column set is the
+| union of top-level field names across the current page (capped so it
+| doesn't overflow), always leading with _id. Deliberately plain text (no
+| {color-fg} tags / tags:false) rather than reusing formatValue/colorValue:
+| tag-colored cell content is exactly what broke selected-row contrast in
+| the tree/autocomplete lists (see tree.panel.ts's formatRow) and grid
+| values are free-form user data, so tags:false also avoids a document
+| field value like "{red-fg}" being parsed as markup.
+*/
+
+const GRID_MAX_COLUMNS = 6;
+const GRID_CELL_MAX = 30;
+
+function truncateCell(text: string, max = GRID_CELL_MAX): string {
+  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+}
+
+function stringifyCell(value: any): string {
+  if (value === null || value === undefined) return "";
+  if (value?._bsontype) return value.toString();
+  if (Buffer.isBuffer(value)) return `Buffer(${value.length})`;
+  if (value instanceof Date) return value.toISOString();
+  if (Array.isArray(value)) return `[${value.length} items]`;
+  if (typeof value === "object") {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return "{Object}";
+    }
+  }
+  return String(value);
+}
+
+function gridColumns(docs: any[]): string[] {
+  const columns: string[] = [];
+  const seen = new Set<string>();
+  for (const doc of docs) {
+    for (const key of Object.keys(doc)) {
+      if (!seen.has(key)) {
+        seen.add(key);
+        columns.push(key);
+      }
+    }
+    if (columns.length >= GRID_MAX_COLUMNS) break;
+  }
+  const withoutId = columns.filter((c) => c !== "_id").slice(0, GRID_MAX_COLUMNS - 1);
+  return columns.includes("_id") ? ["_id", ...withoutId] : withoutId;
+}
+
+function renderGridView(parent: blessed.Widgets.BoxElement, docs: any[]) {
+  const columns = gridColumns(docs);
+  const rows = [columns].concat(
+    docs.map((doc) => columns.map((col) => truncateCell(stringifyCell(doc[col])))),
+  );
+
+  const table: any = blessed.listtable({
+    parent,
+    top: 0,
+    left: 0,
+    width: "100%-2",
+    height: "100%-2",
+    border: "line",
+    align: "left",
+    keys: true,
+    mouse: true,
+    tags: false,
+    interactive: true,
+    data: rows,
+    style: {
+      border: { fg: theme.border.blur },
+      focus: { border: { fg: theme.border.focus } },
+      header: { bold: true, fg: "yellow" },
+      cell: {
+        selected: { bg: "blue", fg: "white" },
+      },
+    },
+  });
+  table._isGridTable = true;
+
+  table.on("focus", () => appInstance.setKeybindbarContent("grid"));
+
+  function selectedDoc(): any {
+    const idx = ((table.selected ?? 1) - 1) as number;
+    return docs[idx];
+  }
+
+  function query(): string {
+    return appInstance.ui.panels.query!.getContent();
+  }
+
+  // Row navigation must render immediately — nothing else in the app does
+  // a periodic auto-render except monitor.panel.ts's 500ms CPU/RAM tick, so
+  // without an explicit renderScreen() here the highlight only catches up
+  // whenever that tick happens to fire next, which reads as laggy/stepped
+  // input on rapid j/k presses.
+  table.key(["j"], () => {
+    table.down(1);
+    appInstance.renderScreen();
+  });
+  table.key(["k"], () => {
+    table.up(1);
+    appInstance.renderScreen();
+  });
+  table.key(["g"], () => {
+    table.select(0);
+    appInstance.renderScreen();
+  });
+  table.key(["S-g"], () => {
+    table.select(rows.length - 1);
+    appInstance.renderScreen();
+  });
+  table.key(["h", "escape"], () => {
+    appInstance.ui.panels.workspace!.focus();
+    appInstance.renderScreen();
+  });
+  table.key(["enter", "e"], () => {
+    const doc = selectedDoc();
+    if (doc) handleEdit(parent, doc, 0);
+  });
+  table.key(["c"], () => {
+    const doc = selectedDoc();
+    if (doc) handleCopy(parent, doc);
+  });
+  table.key(["d"], () => {
+    const doc = selectedDoc();
+    if (!doc) return;
+    openDialogConfirm(
+      `Are you sure you want to delete this record id: ${doc._id}?`,
+      () => deleteRecord({ id: doc._id, query: query() }),
+    );
+  });
+  table.key(["y"], () => {
+    const doc = selectedDoc();
+    if (!doc) return;
+    openDialogConfirm(
+      "Are you sure you want to Duplicate this record id: random ?",
+      () => duplicateRecord({ id: String(doc._id), query: query() }),
+    );
+  });
+  table.key(["C-n"], () => handleInsert());
+  table.key(["v"], () => toggleViewMode());
+
+  parent.append(table);
+  table.focus();
+  parent.screen.render();
+}
+
 export async function renderResult(
   parent: blessed.Widgets.BoxElement,
   payload: any,
 ) {
   appInstance.ui.panels.workspace?.focus();
   parent.removeListener("scroll", () => { });
+  lastPayload = payload;
   const docs = payload.docs || [];
   const total = payload.pagination?.total ?? docs.length;
   state.totalMatching = total;
 
   await parent.children.slice().forEach((child: any) => {
-    if (child._isRecord || child._isEmptyState) {
+    if (child._isRecord || child._isEmptyState || child._isGridTable) {
       parent.remove(child);
     }
   });
   const sortLabel = state.sort
     ? `  sort:${Object.entries(state.sort).map(([f, d]) => `${f}:${d}`).join(",")}`
     : "";
+  const viewLabel = state.viewMode === "table" ? "  view:table" : "";
   parent.setLabel(
-    ` Results (${total}) page ${state.page} of ${state.totalPages || 1}  size:${state.pageSize}${sortLabel} `,
+    ` Results (${total}) page ${state.page} of ${state.totalPages || 1}  size:${state.pageSize}${sortLabel}${viewLabel} `,
   );
   const rowHeight = RECORD_HEIGHT + RECORD_GAP;
   //
@@ -282,6 +446,12 @@ export async function renderResult(
     parent.screen.render();
     return;
   }
+
+  if (state.viewMode === "table") {
+    renderGridView(parent, docs);
+    return;
+  }
+
   const visibleRows = Math.ceil(Number(parent.height) / rowHeight) + 5;
   let renderedCount = Math.min(docs.length, visibleRows);
 

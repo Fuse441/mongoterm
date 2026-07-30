@@ -241,8 +241,17 @@ export function toggleQueryBuilder() {
   }
 
   table.key(["escape"], () => closeQueryBuilder());
-  table.key(["j"], () => table.down(1));
-  table.key(["k"], () => table.up(1));
+  // Explicit render: nothing auto-repaints the screen after a keypress
+  // (the only periodic render in the app is monitor.panel.ts's 500ms
+  // tick), so without this the selection highlight lags behind rapid j/k.
+  table.key(["j"], () => {
+    table.down(1);
+    appInstance.renderScreen();
+  });
+  table.key(["k"], () => {
+    table.up(1);
+    appInstance.renderScreen();
+  });
   table.key(["left"], () => cycleOperator(-1));
   table.key(["right"], () => cycleOperator(1));
   table.key(["enter"], () => editValue());

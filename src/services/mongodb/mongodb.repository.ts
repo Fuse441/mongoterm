@@ -255,6 +255,23 @@ public async insertRecord(doc: Record<string, unknown>) {
   });
 }
 
+public async getCollectionStats() {
+  const dbName = state.databases[state.selectedDatabaseIndex];
+  const colName = state.collections[state.selectedCollectionIndex];
+
+  if (!dbName || !colName) {
+    return null;
+  }
+
+  const [result] = await this.getClient()
+    .db(dbName)
+    .collection(colName)
+    .aggregate([{ $collStats: { storageStats: {} } }])
+    .toArray();
+
+  return result?.storageStats ?? null;
+}
+
 public async listIndexes() {
   const dbName = state.databases[state.selectedDatabaseIndex];
   const colName = state.collections[state.selectedCollectionIndex];

@@ -94,6 +94,14 @@ export const keybindbarConfig: TKeybind = {
       key: "i",
       description: "indexes",
     },
+    {
+      key: "Shift+i",
+      description: "collection stats",
+    },
+    {
+      key: "v",
+      description: "toggle tree/table view",
+    },
   ],
   record: [
     {
@@ -132,12 +140,27 @@ export const keybindbarConfig: TKeybind = {
       key: "ctrl+n",
       description: "insert record",
     },
+    {
+      key: "v",
+      description: "toggle tree/table view",
+    },
   ],
   query: [
     {
       key: "esc",
       description: "workspace",
     },
+  ],
+  grid: [
+    { key: "j/k", description: "navigate rows" },
+    { key: "g / Shift+g", description: "first/last row" },
+    { key: "enter / e", description: "edit row" },
+    { key: "d", description: "delete row" },
+    { key: "y", description: "duplicate row" },
+    { key: "c", description: "copy row" },
+    { key: "ctrl+n", description: "insert record" },
+    { key: "v", description: "toggle tree/table view" },
+    { key: "h / esc", description: "workspace" },
   ],
 };
 
@@ -171,6 +194,9 @@ export const helpOnlyConfig: THelpSections = {
     { key: "j/k", description: "navigate" },
     { key: "c", description: "create index" },
     { key: "d", description: "drop index" },
+    { key: "esc", description: "close" },
+  ],
+  collectionStats: [
     { key: "esc", description: "close" },
   ],
   autocomplete: [

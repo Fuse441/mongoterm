@@ -98,9 +98,9 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 <summary><strong>🗄️ Data Browsing</strong></summary>
 
 - [x] Browse databases / collections, view documents (tree-formatted)
-- [ ] Table / grid view (alternative to the tree layout)
+- [x] Table / grid view (alternative to the tree layout)
 - [ ] Schema analysis (field type + frequency distribution across a sample)
-- [ ] Collection stats (storage size, doc count, avg doc size, index size)
+- [x] Collection stats (storage size, doc count, avg doc size, index size)
 
 </details>
 
@@ -152,6 +152,8 @@ Mongoterm allows developers to connect to MongoDB, browse databases and collecti
 - View, insert, edit, delete, and duplicate documents
 - Query with pagination and sort
 - View, create, and drop indexes, including usage stats and TTL info
+- Collection stats (document count, avg/data/storage size, index size)
+- Table/grid view of results, toggleable with the tree-formatted view (`v` key)
 - Interactive dropdown navigation
 - Keyboard-driven interface
 - Lightweight terminal UI

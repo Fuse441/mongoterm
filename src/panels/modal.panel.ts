@@ -358,8 +358,17 @@ export function openEditor(doc: any, options: { isInsert?: boolean } = {}) {
   }
 
   table.key(["escape"], () => closeEditor());
-  table.key(["j"], () => table.down(1));
-  table.key(["k"], () => table.up(1));
+  // Explicit render: nothing auto-repaints the screen after a keypress
+  // (the only periodic render in the app is monitor.panel.ts's 500ms
+  // tick), so without this the selection highlight lags behind rapid j/k.
+  table.key(["j"], () => {
+    table.down(1);
+    appInstance.renderScreen();
+  });
+  table.key(["k"], () => {
+    table.up(1);
+    appInstance.renderScreen();
+  });
   table.key(["left"], () => cycleType(-1));
   table.key(["right"], () => cycleType(1));
   table.key(["enter"], () => editValue());
