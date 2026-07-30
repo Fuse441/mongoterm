@@ -3,6 +3,7 @@ import { appInstance } from "@/app.js";
 import { EVENTS } from "@/services/enum.js";
 import { promptInline } from "@/panels/modal.panel.js";
 import { QUERY_OPERATORS } from "@/services/query/queryOperators.js";
+import { theme } from "@/config/app.config.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -144,7 +145,7 @@ export function toggleQueryBuilder() {
       border: { fg: "cyan" },
       header: { bold: true, fg: "yellow" },
       cell: {
-        selected: { bg: "blue", fg: "white" },
+        selected: { bg: theme.listtable.selectedBg, fg: theme.listtable.selectedFg },
       },
     },
   });

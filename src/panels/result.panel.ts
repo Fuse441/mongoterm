@@ -155,8 +155,8 @@ function bindRecordEvents({ box, parent, doc, id, idx }: any) {
   // });
 
   box.on("focus", () => {
-      appInstance.setKeybindbarContent("record"); 
-  })
+    appInstance.setKeybindbarContent("record");
+  });
   box.key("c", () => handleCopy(parent, doc));
 
   box.key("e", () => handleEdit(parent, doc, idx));
@@ -305,14 +305,18 @@ function gridColumns(docs: any[]): string[] {
     }
     if (columns.length >= GRID_MAX_COLUMNS) break;
   }
-  const withoutId = columns.filter((c) => c !== "_id").slice(0, GRID_MAX_COLUMNS - 1);
+  const withoutId = columns
+    .filter((c) => c !== "_id")
+    .slice(0, GRID_MAX_COLUMNS - 1);
   return columns.includes("_id") ? ["_id", ...withoutId] : withoutId;
 }
 
 function renderGridView(parent: blessed.Widgets.BoxElement, docs: any[]) {
   const columns = gridColumns(docs);
   const rows = [columns].concat(
-    docs.map((doc) => columns.map((col) => truncateCell(stringifyCell(doc[col])))),
+    docs.map((doc) =>
+      columns.map((col) => truncateCell(stringifyCell(doc[col]))),
+    ),
   );
 
   const table: any = blessed.listtable({
@@ -333,7 +337,7 @@ function renderGridView(parent: blessed.Widgets.BoxElement, docs: any[]) {
       focus: { border: { fg: theme.border.focus } },
       header: { bold: true, fg: "yellow" },
       cell: {
-        selected: { bg: "blue", fg: "white" },
+        selected: { bg: theme.listtable.selectedBg, fg: theme.listtable.selectedFg },
       },
     },
   });
@@ -424,7 +428,9 @@ export async function renderResult(
     }
   });
   const sortLabel = state.sort
-    ? `  sort:${Object.entries(state.sort).map(([f, d]) => `${f}:${d}`).join(",")}`
+    ? `  sort:${Object.entries(state.sort)
+      .map(([f, d]) => `${f}:${d}`)
+      .join(",")}`
     : "";
   const viewLabel = state.viewMode === "table" ? "  view:table" : "";
   parent.setLabel(

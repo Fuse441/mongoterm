@@ -4,6 +4,7 @@ import { EVENTS } from "../services/enum.js";
 import { appInstance } from "@/app.js";
 import { logger } from "@/utils/logger/logger.service.js";
 import { installCursorSupport } from "@/services/cursorInput.service.js";
+import { theme } from "@/config/app.config.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -221,7 +222,7 @@ export function openEditor(doc: any, options: { isInsert?: boolean } = {}) {
       border: { fg: "cyan" },
       header: { bold: true, fg: "yellow" },
       cell: {
-        selected: { bg: "blue", fg: "white" },
+        selected: { bg: theme.listtable.selectedBg, fg: theme.listtable.selectedFg },
       },
     },
   });

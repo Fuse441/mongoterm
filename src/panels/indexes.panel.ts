@@ -3,6 +3,7 @@ import { appInstance } from "@/app.js";
 import { EVENTS } from "@/services/enum.js";
 import { openDialogConfirm, promptInline } from "@/panels/modal.panel.js";
 import { showToast } from "@/panels/toast.panel.js";
+import { theme } from "@/config/app.config.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -140,7 +141,7 @@ export function toggleIndexesPanel() {
       border: { fg: "cyan" },
       header: { bold: true, fg: "yellow" },
       cell: {
-        selected: { bg: "blue", fg: "white" },
+        selected: { bg: theme.listtable.selectedBg, fg: theme.listtable.selectedFg },
       },
     },
   });
