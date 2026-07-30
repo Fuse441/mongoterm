@@ -11,9 +11,14 @@ and this project follows Semantic Versioning (SemVer).
 
 - Add global Command Palette (Ctrl+P) (ba1f120)
 
+### Changed
+
+- Centralize listtable selected-row color into theme (f34e281)
+
 ### Chore
 
 - Update CHANGELOG.md [skip ci] (93358a8)
+- Update CHANGELOG.md [skip ci] (452196c)
 
 ### Documentation
 
